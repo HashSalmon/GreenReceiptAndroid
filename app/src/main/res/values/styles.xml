@@ -1,0 +1,13 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="android:Theme.Holo.Light">
+        <!--<item name="android:actionBarTabStyle">@style/MyActionBarTab</item>-->
+    </style>
+    <style name="MyActionBarTab" parent="android:Widget.Holo.ActionBar.TabText">
+        <item name="android:gravity">center</item>
+    </style>
+    <color name="background">#ffe6ffca</color>
+    <color name="white">#ffffff</color>
+    <color name="black">#000000</color>
+</resources>

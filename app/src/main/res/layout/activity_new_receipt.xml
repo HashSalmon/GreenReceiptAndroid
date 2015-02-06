@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".Login$PlaceholderFragment"
+    android:background="#ffe6ffca"
+    android:gravity="center">
+    <TextView
+        android:text="Add with your Green Receipt Number"
+        android:textSize="20dip"
+        android:textColor="#000000"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="15" />
+    <TextView
+        android:id="@+id/greenReceiptNumber"
+        android:text="0012345678"
+        android:textSize="20dip"
+        android:textColor="#000000"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="9" />
+    <TextView
+        android:text="OR"
+        android:textSize="20dip"
+        android:textColor="#000000"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="10" />
+    <TextView
+        android:text="Scan the following code"
+        android:textSize="20dip"
+        android:textColor="#000000"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="10" />
+    <ImageView
+        android:layout_weight="30"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:id="@+id/code"
+        android:gravity="center" />
+    <TextView
+        android:text="OR"
+        android:textSize="20dip"
+        android:textColor="#000000"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="10" />
+    <TextView
+        android:text="Enter a receipt by hand"
+        android:textSize="20dip"
+        android:textColor="#000000"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="10" />
+    <LinearLayout
+        android:layout_weight="20"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="horizontal">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/icon"
+            android:gravity="center"
+            android:layout_gravity="center" />
+    </LinearLayout>
+    <TextView
+        android:text="OR"
+        android:textSize="20dip"
+        android:textColor="#000000"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="10" />
+    <TextView
+        android:text="Take a picture of your receipt"
+        android:textSize="20dip"
+        android:textColor="#000000"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="10" />
+    <LinearLayout
+        android:layout_weight="20"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="horizontal">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/cam_icon"
+            android:gravity="center"
+            android:layout_gravity="center" />
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffe6ffca">
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#ffe6ffca"
+    android:paddingTop="30dp"
+    android:paddingBottom="30dp"
+    android:paddingLeft="30dp"
+    android:paddingRight="30dp">
+
+    <TextView
+        android:text="Green Receipt"
+        android:layout_weight="30"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:id="@+id/textView1"
+        android:textSize="30dp"
+        android:textColor="#ff000000"
+        android:layout_gravity="center_horizontal|center_vertical"
+        android:gravity="center"
+        android:paddingTop="15dp"
+        android:paddingBottom="10dp"/>
+    <ImageView
+        android:src="@android:drawable/ic_menu_gallery"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_gravity="center"
+        android:id="@+id/logo"
+        android:paddingBottom="10dp"/>
+    <EditText
+        android:layout_weight="10"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:id="@+id/usernameField"
+        android:hint="Email"
+        android:layout_gravity="center"
+        android:textColorHint="#ff606060"
+        android:singleLine="true"
+        android:text="zeiguang@gmail.com"
+        android:background="@android:drawable/edit_text"
+        android:textColor="@android:color/primary_text_light"
+        />
+    <EditText
+        android:text="Password1@"
+        android:layout_weight="10"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:id="@+id/passwordField"
+        android:inputType="textPassword"
+        android:hint="Password"
+        android:gravity="left"
+        android:layout_gravity="center"
+        android:password="true"
+        android:singleLine="true"
+        android:background="@android:drawable/edit_text"
+        android:textColor="@android:color/primary_text_light"/>
+    <TextView
+        android:text="Forgot Password?"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="10"
+        android:id="@+id/forgot"
+        android:textSize="15dp"
+        android:textColor="#ff1024f0"
+        android:gravity="left"
+        android:paddingBottom="10dp"/>
+    <LinearLayout
+        android:layout_weight="45"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:gravity="top"
+        android:orientation="vertical"
+        android:paddingTop="20dp"
+        android:paddingBottom="10dp">
+        <Button
+            android:id="@+id/loginButton"
+            android:layout_gravity="center"
+            android:text="Login"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:gravity="center" />
+        <Button
+            android:id="@+id/signupButton"
+            android:layout_gravity="center"
+            android:text="Sign Up"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:gravity="center" />
+    </LinearLayout>
+</LinearLayout>
+</ScrollView>
