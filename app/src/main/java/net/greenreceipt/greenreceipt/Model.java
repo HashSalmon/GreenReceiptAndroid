@@ -34,18 +34,25 @@ public class Model
         public void getReceiptSuccess();
         public void getReceiptFailed();
     }
-
+    public interface ReturnReceiptListener
+    {
+        public void returnDetected();
+    }
+    static final String RECEIPT_FILTER="filter";
     private OnLoginListener _loginListener;
     private RegisterUserListener _registerUserListener;
     private AddReceiptListener _receiptListener;
     private GetReceiptListener _getReceiptListener;
+    private ReturnReceiptListener _returnReceiptListener;
 
     private static Model _instance;
-    private static User _currentUser = null;
+    static User _currentUser = null;
     public static String _token;
-//    private static File _receiptFile;
     private static File _userFile;
     static List<Receipt> _receipts;
+    static List<Receipt> _returnReceipts;
+    static List<Receipt> _displayReceipts;
+    private static Networking networking;
     public static Model getInstance()
     {
         if (_instance == null)
@@ -57,6 +64,8 @@ public class Model
     private Model()
     {
         _receipts = new ArrayList<Receipt>();
+        _returnReceipts = new ArrayList<Receipt>();
+        networking = new Networking();
     }
     public void setOnLoginListener(OnLoginListener listener)
     {
@@ -74,16 +83,20 @@ public class Model
     {
         _getReceiptListener = listener;
     }
+    public void setReturnReceiptListener(ReturnReceiptListener listener)
+    {
+        _returnReceiptListener = listener;
+    }
     public void login(final String email, final String password)
     {
-        AsyncTask<String,Integer,Networking.tokenObject> loginTask = new AsyncTask<String, Integer, Networking.tokenObject>() {
+        AsyncTask<String,Integer,Token> loginTask = new AsyncTask<String, Integer, Token>() {
             @Override
-            protected Networking.tokenObject doInBackground(String... params) {
-                return Networking.login(params[0],params[1]);
+            protected Token doInBackground(String... params) {
+                return networking.login(params[0],params[1]);
             }
 
             @Override
-            protected void onPostExecute(Networking.tokenObject tokenObject) {
+            protected void onPostExecute(Token tokenObject) {
                 super.onPostExecute(tokenObject);
                 if(tokenObject != null)
                 {
@@ -101,14 +114,6 @@ public class Model
         };
         loginTask.execute(email,password);
     }
-//    public File getReceiptFile()
-//    {
-//        return _receiptFile;
-//    }
-//    public void setReceiptFile(File file)
-//    {
-//        _receiptFile = file;
-//    }
     public boolean userLoggedIn()
     {
         return _currentUser != null;
@@ -191,7 +196,7 @@ public class Model
         };
         getTask.execute();
     }
-    public int getReceiptIndex(int id)
+    public int getReceiptById(int id)
     {
         int index = 0;
         for(Receipt r:_receipts)
@@ -210,9 +215,10 @@ public class Model
         int count=0;
         double total=0;
         String month = ""+Calendar.MONTH;
+        String year = ""+Calendar.YEAR;
         for(Receipt r: _receipts)
         {
-            if(android.text.format.DateFormat.format("M", r.PurchaseDate).equals(month))
+            if(android.text.format.DateFormat.format("M", r.PurchaseDate).equals(month) && android.text.format.DateFormat.format("YYYY", r.PurchaseDate).equals(year))
             {
                 count++;
                 total+=r.Total;
@@ -221,56 +227,49 @@ public class Model
         Pair result = new Pair(count,total);
         return result;
     }
-//    private void loadReceipts(File receiptFile)
-//    {
-//        _receipts.clear();
-//        try{
-//            FileReader textReader = new FileReader(receiptFile);
-//            BufferedReader bufferedReader = new BufferedReader(textReader);
-//            String libraryJson = bufferedReader.readLine();
-//		    Gson gson = new Gson();
-//
-//            Receipt[] receipts = gson.fromJson(libraryJson,Receipt[].class);
-//            Collections.addAll(_receipts, receipts);
-//
-//            bufferedReader.close();
-//        }
-//        catch (Exception e)
-//        {
-////            add();
-////				addBook("Mistborn");
-////				addBook("Words of Radiance");
-////				addBook("Green Eggs and Ham");
-//        }
-//    }
-//    private void saveReceipts(File receiptFile)
-//    {
-//        try{
-//            FileWriter textWriter = new FileWriter(receiptFile);
-//
-//            BufferedWriter bufferedWriter = new BufferedWriter(textWriter);
-//
-//			Gson gson = new Gson();
-//            String receiptsJson = gson.toJson(_receipts.toArray(new Receipt[_receipts.size()]));
-//            bufferedWriter.write(receiptsJson);
-//            bufferedWriter.close();
-//        }
-//        catch (Exception e)
-//        {
-////				add();
-//        }
-//    }
-//    public void addReceipt(Receipt r)
-//    {
-//        _receipts.add(r);
-////        saveReceipts(_receiptFile);
-//    }
+
     public double getReceiptsTotal()
     {
         double result=0;
         for(Receipt r : _receipts)
         {
             result += r.Total;
+        }
+        return result;
+    }
+    public void GetReturnReceipts()
+    {
+        AsyncTask<Void,Integer,Receipt[]> returnTask = new AsyncTask<Void, Integer, Receipt[]>() {
+            @Override
+            protected Receipt[] doInBackground(Void... params) {
+                return Networking.getReturnReceipts();
+            }
+
+            @Override
+            protected void onPostExecute(Receipt[] receipts) {
+                super.onPostExecute(receipts);
+                if(receipts!=null)
+                {
+                    for(Receipt r: receipts)
+                        _returnReceipts.add(r);
+                    if(_returnReceiptListener!=null)
+                        _returnReceiptListener.returnDetected();
+                }
+            }
+        };
+        returnTask.execute();
+    }
+    public List<Receipt> getCurrentMonthReceipt()
+    {
+        List<Receipt> result = new ArrayList<Receipt>();
+        String month = ""+Calendar.MONTH;
+        String year = ""+Calendar.YEAR;
+        for(Receipt r: _receipts)
+        {
+            if(android.text.format.DateFormat.format("M", r.PurchaseDate).equals(month) && android.text.format.DateFormat.format("YYYY", r.PurchaseDate).equals(year))
+            {
+                result.add(r);
+            }
         }
         return result;
     }

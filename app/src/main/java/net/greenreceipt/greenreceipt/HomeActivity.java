@@ -1,10 +1,14 @@
 package net.greenreceipt.greenreceipt;
 
 import android.app.Activity;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,27 +26,17 @@ import java.util.Date;
 
 public class HomeActivity extends Activity implements ListAdapter{
 ListView summary;
+private static final int RETURN_ALERT_NOTIFICATION = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        Model.getInstance().GetAllReceipt();
-        Model.getInstance().setGetReceiptListener(new Model.GetReceiptListener() {
-            @Override
-            public void getReceiptSuccess() {
-                summary.invalidateViews();
-            }
 
-            @Override
-            public void getReceiptFailed() {
-
-            }
-        });
         ImageView logo = (ImageView) findViewById(R.id.logo);
         logo.setImageResource(R.drawable.profile);
         TextView date = (TextView) findViewById(R.id.date);
         TextView greeting = (TextView) findViewById(R.id.greeting);
-        greeting.setText("Welcome back, John!");
+        greeting.setText("Welcome back, "+Model._currentUser.Username+"!");
         Date now = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("MMMM d yyyy");
         String currentDate = sdf.format(new Date());
@@ -172,6 +166,7 @@ ListView summary;
                 @Override
                 public void onClick(View v) {
                     Intent list = new Intent(getBaseContext(),ListReceiptActivity.class);
+                    list.putExtra(Model.RECEIPT_FILTER,2);
                     startActivity(list);
                 }
             });
@@ -197,6 +192,38 @@ ListView summary;
     @Override
     protected void onResume() {
         super.onResume();
+        Log.d("state","Resume");
+        Model.getInstance().setGetReceiptListener(new Model.GetReceiptListener() {
+            @Override
+            public void getReceiptSuccess() {
+                summary.invalidateViews();
+            }
+
+            @Override
+            public void getReceiptFailed() {
+
+            }
+        });
+
+
+        Model.getInstance().setReturnReceiptListener(new Model.ReturnReceiptListener() {
+            @Override
+            public void returnDetected() {
+                //do notification here
+                NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(HomeActivity.this);
+                mBuilder.setSmallIcon(R.drawable.logo);
+                mBuilder.setContentTitle("Return Alert");
+                mBuilder.setContentText("You have upcoming return deadlines");
+                NotificationManager mNotificationManager =
+                        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+// notificationID allows you to update the notification later on.
+                mNotificationManager.notify(RETURN_ALERT_NOTIFICATION, mBuilder.build());
+            }
+        });
+        Model.getInstance().GetAllReceipt();
+        Model.getInstance().GetReturnReceipts();
         summary.invalidateViews();
+
     }
 }

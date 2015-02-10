@@ -60,6 +60,11 @@
         android:singleLine="true"
         android:background="@android:drawable/edit_text"
         android:textColor="@android:color/primary_text_light"/>
+    <CheckBox
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Keep me logged in"
+        android:id="@+id/keeplogin"/>
     <TextView
         android:text="Forgot Password?"
         android:layout_width="match_parent"

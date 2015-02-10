@@ -11,8 +11,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.text.DecimalFormat;
@@ -22,7 +24,22 @@ import java.text.SimpleDateFormat;
 public class ListReceiptActivity extends Activity implements ListAdapter{
     final static String RECEIPT_ID = "ReceiptId";
     ListView list;
-
+    Spinner filters;
+    Spinner order;
+    int filter;
+    String[] options = {
+            "Date Range",
+            "This Week",
+            "This Month",
+            "This Year",
+            "Show All"
+    };
+    String[] orderBy = {
+            "Sort By",
+            "Store Name",
+            "Date",
+            "Total"
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,7 +59,9 @@ public class ListReceiptActivity extends Activity implements ListAdapter{
         list = (ListView) findViewById(R.id.list);
         ActionBar bar = getActionBar();
         bar.setDisplayHomeAsUpEnabled(true);
-        list.setAdapter(this);
+
+//        list.setAdapter(this);
+        list.setAdapter(new ListReceiptAdapter(this));
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -50,6 +69,37 @@ public class ListReceiptActivity extends Activity implements ListAdapter{
 //				activity2.PutExtra ("MyData", "Data from Activity1");
                 detail.putExtra(RECEIPT_ID, position);
                 startActivity(detail);
+            }
+        });
+        filters = (Spinner) findViewById(R.id.filters);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                this, android.R.layout.simple_spinner_item, options);
+        filters.setAdapter(adapter);
+        filters.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                filter = position;
+                //update result
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                filter = 0;
+            }
+        });
+        order = (Spinner) findViewById(R.id.order);
+        ArrayAdapter<String> orderAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, orderBy);
+        order.setAdapter(orderAdapter);
+        order.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
             }
         });
     }
@@ -112,12 +162,12 @@ public class ListReceiptActivity extends Activity implements ListAdapter{
 
     @Override
     public Object getItem(int position) {
-        return position;
+        return Model._receipts.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-        return position;
+        return Model._receipts.get(position).Id;
     }
 
     @Override
@@ -165,6 +215,8 @@ public class ListReceiptActivity extends Activity implements ListAdapter{
     @Override
     protected void onResume() {
         super.onResume();
+        filter = getIntent().getIntExtra(Model.RECEIPT_FILTER,0);
+        if(filter == 0)
         Model.getInstance().GetAllReceipt();
         list.invalidateViews();
     }

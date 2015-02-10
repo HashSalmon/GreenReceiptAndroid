@@ -27,20 +27,11 @@ import java.util.Scanner;
  */
 public class Networking {
 
-    public class tokenObject {
-
-        public String access_token;
-        public String token_type;
-        public long expires_in;
-        public String userName;
-        public String issued;
-        public String expires;
-    }
 //    private static String BASE_URL = "https://www.greenreceipt.net/";
     private static String BASE_URL = "https://www.greenreceipt.net/";
     private static int timeoutConnection = 3000;
     private static int timeoutSocket = 5000;
-    public static tokenObject login(String email, String password) {
+    public Token login(String email, String password) {
         try {
             HttpParams httpParameters = new BasicHttpParams();
             HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
@@ -60,14 +51,21 @@ public class Networking {
             String responseString = responseScanner.hasNext() ? responseScanner.next() : null;
 
             if (responseString == null || response.getStatusLine().getStatusCode() != 200)
-                return null;
+            {
+                Token login = new Token();
+                login.error = "Bad credentials";
+                return login;
+            }
+
 
             Gson gson = new Gson();
-            tokenObject login = gson.fromJson(responseString, tokenObject.class);
+            Token login = gson.fromJson(responseString, Token.class);
 
             return login;
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
+
             return null;
         }
     }
@@ -130,6 +128,33 @@ public class Networking {
             HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
             HttpClient client = new DefaultHttpClient(httpParameters);
             HttpGet request = new HttpGet(BASE_URL + "api/Receipt");
+            request.addHeader("Authorization","Bearer "+Model._token);
+            HttpResponse response = client.execute(request);
+
+            InputStream responseContent = response.getEntity().getContent();
+            Scanner responseScanner = new Scanner(responseContent).useDelimiter("\\A");
+            String responseString = responseScanner.hasNext() ? responseScanner.next() : null;
+
+            if(responseString == null || response.getStatusLine().getStatusCode() != 200)
+                return null;
+
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
+            Receipt[] receipts = gson.fromJson(responseString,Receipt[].class);
+            return receipts;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    public static Receipt[] getReturnReceipts()
+    {
+        try {
+            HttpParams httpParameters = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+            HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+            HttpClient client = new DefaultHttpClient(httpParameters);
+            HttpGet request = new HttpGet(BASE_URL + "api/Receipt/ReturnReceipts");
             request.addHeader("Authorization","Bearer "+Model._token);
             HttpResponse response = client.execute(request);
 
