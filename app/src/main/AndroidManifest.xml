@@ -24,13 +24,15 @@
         <meta-data
             android:name="android.support.UI_OPTIONS"
             android:value="splitActionBarWhenNarrow" />
+
         <activity
             android:name="abbyy.ocrsdk.android.MainActivity"
             android:label="@string/title_activity_main" >
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
+
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
         </activity>
         <activity
             android:name="abbyy.ocrsdk.android.ResultsActivity"
@@ -107,14 +109,14 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustResize" >
         </activity>
-        <!--<activity-->
-            <!--android:name=".PieChartActivity"-->
-            <!--android:label="@string/title_activity_pie_chart" >-->
-        <!--</activity>-->
-        <!--<activity-->
-            <!--android:name=".Test"-->
-            <!--android:label="@string/title_activity_test" >-->
-        <!--</activity>-->
+        <!-- <activity -->
+        <!-- android:name=".PieChartActivity" -->
+        <!-- android:label="@string/title_activity_pie_chart" > -->
+        <!-- </activity> -->
+        <!-- <activity -->
+        <!-- android:name=".Test" -->
+        <!-- android:label="@string/title_activity_test" > -->
+        <!-- </activity> -->
         <activity
             android:name=".ItemDetailActivity"
             android:label="@string/title_activity_item_detail" >
@@ -123,6 +125,11 @@
             android:name=".ReturnAlertActivity"
             android:label="@string/title_activity_return_alert" >
         </activity>
+
+        <service
+            android:name=".CheckReturnService"
+            android:exported="false" >
+        </service>
     </application>
 
 </manifest>

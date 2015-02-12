@@ -7,6 +7,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -31,8 +32,11 @@ public class Networking {
     private static String BASE_URL = "https://www.greenreceipt.net/";
     private static int timeoutConnection = 3000;
     private static int timeoutSocket = 5000;
+    String error;
     public Token login(String email, String password) {
+
         try {
+            error = "";
             HttpParams httpParameters = new BasicHttpParams();
             HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
             HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
@@ -52,9 +56,10 @@ public class Networking {
 
             if (responseString == null || response.getStatusLine().getStatusCode() != 200)
             {
-                Token login = new Token();
-                login.error = "Bad credentials";
-                return login;
+//                Token login = new Token();
+                error = "Bad credentials";
+//                return login;
+                return null;
             }
 
 
@@ -97,10 +102,11 @@ public class Networking {
             return false;
         }
     }
-    public static boolean addReceipt(Receipt r)
+    public boolean addReceipt(Receipt r)
     {
 
         try {
+            error = "";
             HttpParams httpParameters = new BasicHttpParams();
             HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
             HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
@@ -113,6 +119,13 @@ public class Networking {
             StringEntity entity = new StringEntity(jsonString);
             request.setEntity(entity);
             HttpResponse response = client.execute(request);
+            if(response.getStatusLine().getStatusCode()!=200)
+            {
+                InputStream responseContent = response.getEntity().getContent();
+                Scanner responseScanner = new Scanner(responseContent).useDelimiter("\\A");
+                String responseString = responseScanner.hasNext() ? responseScanner.next() : null;
+                error = responseString;
+            }
             return response.getStatusLine().getStatusCode() == 200;
         }
         catch (Exception e) {
@@ -172,6 +185,34 @@ public class Networking {
         catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+    public boolean deleteReceipt(long id)
+    {
+        try {
+            error = "";
+            HttpParams httpParameters = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+            HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+            HttpClient client = new DefaultHttpClient(httpParameters);
+            HttpDelete request = new HttpDelete(BASE_URL + "api/Receipt?id="+id);
+            request.addHeader("Content-Type", "application/json");
+            request.addHeader("Authorization","Bearer "+Model._token);
+
+            HttpResponse response = client.execute(request);
+            if(response.getStatusLine().getStatusCode()!=200)//failed
+            {
+                InputStream responseContent = response.getEntity().getContent();
+                Scanner responseScanner = new Scanner(responseContent).useDelimiter("\\A");
+                String responseString = responseScanner.hasNext() ? responseScanner.next() : null;
+                error = responseString;
+                return false;
+            }
+            return response.getStatusLine().getStatusCode() == 200;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 

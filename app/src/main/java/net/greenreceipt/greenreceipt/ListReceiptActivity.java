@@ -32,7 +32,8 @@ public class ListReceiptActivity extends Activity implements ListAdapter{
             "This Week",
             "This Month",
             "This Year",
-            "Show All"
+            "Show All",
+            "Upcoming Returns"
     };
     String[] orderBy = {
             "Sort By",
@@ -44,10 +45,11 @@ public class ListReceiptActivity extends Activity implements ListAdapter{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_receipt);
-        Model.getInstance().GetAllReceipt();
+//        Model.getInstance().GetAllReceipt();
         Model.getInstance().setGetReceiptListener(new Model.GetReceiptListener() {
             @Override
             public void getReceiptSuccess() {
+
                 list.invalidateViews();
             }
 
@@ -60,8 +62,8 @@ public class ListReceiptActivity extends Activity implements ListAdapter{
         ActionBar bar = getActionBar();
         bar.setDisplayHomeAsUpEnabled(true);
 
-//        list.setAdapter(this);
-        list.setAdapter(new ListReceiptAdapter(this));
+        list.setAdapter(this);
+//        list.setAdapter(new ListReceiptAdapter(this));
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -80,6 +82,8 @@ public class ListReceiptActivity extends Activity implements ListAdapter{
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 filter = position;
                 //update result
+                Model.getInstance().changeDisplayReceipts(filter);
+                list.invalidateViews();
 
             }
 
@@ -157,17 +161,17 @@ public class ListReceiptActivity extends Activity implements ListAdapter{
 
     @Override
     public int getCount() {
-        return Model.getInstance().getReceiptsCount();
+        return Model.getInstance().getDisplayReceiptsCount();
     }
 
     @Override
     public Object getItem(int position) {
-        return Model._receipts.get(position);
+        return Model._displayReceipts.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-        return Model._receipts.get(position).Id;
+        return Model._displayReceipts.get(position).Id;
     }
 
     @Override
@@ -185,7 +189,9 @@ public class ListReceiptActivity extends Activity implements ListAdapter{
             view = View.inflate(this, R.layout.listitem, null);
         TextView store = (TextView) view.findViewById(R.id.store);
         if(r.Store!=null)
-        store.setText(r.Store.Company.Name);
+            if(r.Store.Company != null) {
+                store.setText(r.Store.Company.Name);
+            }
         else
             store.setText("");
         TextView detail = (TextView) view.findViewById(R.id.detail);
@@ -215,9 +221,17 @@ public class ListReceiptActivity extends Activity implements ListAdapter{
     @Override
     protected void onResume() {
         super.onResume();
-        filter = getIntent().getIntExtra(Model.RECEIPT_FILTER,0);
-        if(filter == 0)
         Model.getInstance().GetAllReceipt();
+        filter = getIntent().getIntExtra(Model.RECEIPT_FILTER,0);
+//        Model.getInstance().changeDisplayReceipts(filter);
+        if(filter >= 0 && filter < options.length)//it's with in the option range
+        filters.setSelection(filter);
+//        if(filter < 0)//refresh trigger
+//        {
+//            Model.getInstance().GetAllReceipt();
+//            Model.getInstance().changeDisplayReceipts(0);
+//        }
+
         list.invalidateViews();
     }
 }

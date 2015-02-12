@@ -1,8 +1,5 @@
 package abbyy.ocrsdk.android;
 
-import java.util.HashMap;
-import java.util.List;
-
 /**
  * Created by KingsleyZ on 2/4/15.
  */
@@ -10,15 +7,25 @@ public class StoreNames
 {
 
 
-    public static HashMap<String, String> storeNames()
+    public static String[] storeNames()
     {
-        HashMap<String, String> names = new HashMap<String, String>();
+        String[] names = {
+                "best buy",
+                "apple",
+                "walmart",
+                "smith's",
+                "macy's"
 
-        names = new HashMap<String, String>();
-
-        names.put("best buy", "best buy");
-        names.put("apple", "apple");
-        names.put("walmart", "walmart");
+        };
+//        HashMap<String, String> names = new HashMap<String, String>();
+//
+//        names = new HashMap<String, String>();
+//
+//        names.put("best buy", "best buy");
+//        names.put("apple", "apple");
+//        names.put("walmart", "walmart");
+//        names.put("smith's", "smith's");
+//        names.put("macy's","macy's");
 
         return names;
     }

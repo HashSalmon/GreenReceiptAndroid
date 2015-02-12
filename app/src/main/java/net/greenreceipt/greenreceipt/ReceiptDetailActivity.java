@@ -3,9 +3,13 @@ package net.greenreceipt.greenreceipt;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
+import android.content.Intent;
 import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
@@ -30,6 +34,8 @@ public class ReceiptDetailActivity extends Activity implements ListAdapter {
     int mYear;
     int mMonth;
     int mDay;
+    ProgressDialog spinner;
+    boolean deleted;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +46,45 @@ public class ReceiptDetailActivity extends Activity implements ListAdapter {
         receipt = Model.getInstance().getReceipt(id);
         list = (ListView) findViewById(R.id.list);
         list.setAdapter(this);
+        Model.getInstance().setOnDeleteReceiptListener(new Model.OnDeleteReceiptListener() {
+            @Override
+            public void deleteSuccess() {
+                spinner.dismiss();
+                deleted = true;
+                Intent list = new Intent(getBaseContext(),ListReceiptActivity.class);
+                list.putExtra(Model.RECEIPT_FILTER,-1);
+                startActivity(list);
+            }
+
+            @Override
+            public void deleteFailed(String error) {
+                spinner.dismiss();
+
+            }
+        });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.receipt_detail, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        switch (item.getItemId())
+        {
+            case R.id.delete:
+                spinner = ProgressDialog.show(this,null,"Deleting...");
+                Model.getInstance().DeleteReceipt(receipt.Id);
+                return true;
+
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -108,6 +153,34 @@ public class ReceiptDetailActivity extends Activity implements ListAdapter {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     receipt.ReturnReminder = isChecked;
+                    if(isChecked) {//if turn on alert, force user to pick a date
+                        final Calendar c = Calendar.getInstance();
+                        mYear = c.get(Calendar.YEAR);
+                        mMonth = c.get(Calendar.MONTH);
+                        mDay = c.get(Calendar.DAY_OF_MONTH);
+
+                        DatePickerDialog dpd = new DatePickerDialog(ReceiptDetailActivity.this,
+                                new DatePickerDialog.OnDateSetListener() {
+
+                                    @Override
+                                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                                        text.setText("Return Date: " + (monthOfYear + 1) + "/" + dayOfMonth + "/" + year);
+                                        mYear = year;
+                                        mMonth = monthOfYear;
+                                        mDay = dayOfMonth;
+                                        receipt.ReturnDate = new Date(mYear, mMonth, mDay);
+                                    }
+                                }, mYear, mMonth, mDay);
+                        dpd.setIcon(R.drawable.ic_action_time);
+                        dpd.setTitle("Date");
+                        dpd.show();
+
+                    }
+                    else
+                    {
+                        text.setText("Return Alert:");
+                    }
+
                 }
             });
 
@@ -148,7 +221,7 @@ public class ReceiptDetailActivity extends Activity implements ListAdapter {
                         dpd.show();
                     }
                 });
-                alert.setChecked(receipt.ReturnReminder);
+//                alert.setChecked(receipt.ReturnReminder);
             }
 
 
@@ -284,6 +357,7 @@ public class ReceiptDetailActivity extends Activity implements ListAdapter {
     @Override
     protected void onPause() {
         super.onPause();
-        Model.getInstance().AddReceipt(receipt);
+        if(!deleted)
+        Model.getInstance().AddReceipt(receipt);//update if not deleted
     }
 }

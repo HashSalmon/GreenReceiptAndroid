@@ -46,7 +46,9 @@
             android:layout_weight="75"
             android:id="@+id/price"
             android:background="@android:drawable/edit_text"
-            android:textColor="@android:color/primary_text_light"/>
+            android:textColor="@android:color/primary_text_light"
+            android:singleLine="true"
+            android:numeric=""/>
     </LinearLayout>
 
 </LinearLayout>

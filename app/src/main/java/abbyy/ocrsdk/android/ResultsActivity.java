@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Pair;
 import android.view.Menu;
 import android.widget.TextView;
 
@@ -20,6 +21,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Date;
 import java.util.HashMap;
+
+import static net.greenreceipt.greenreceipt.Model.RECEIPT_FILTER;
 
 
 public class ResultsActivity extends Activity {
@@ -46,16 +49,17 @@ public class ResultsActivity extends Activity {
                 spinner.dismiss();
                 Intent intent = new Intent(getBaseContext(),ListReceiptActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                intent.putExtra(RECEIPT_FILTER,4);
                 startActivity(intent);
                 finish();
             }
 
             @Override
-            public void addReceiptFailed() {
+            public void addReceiptFailed(String error) {
                 spinner.dismiss();
                 AlertDialog.Builder builder = new AlertDialog.Builder(ResultsActivity.this);
                 builder.setTitle("Error");
-                builder.setMessage("Receipt add failed!");
+                builder.setMessage(error);
                 builder.setPositiveButton("OK",new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -136,11 +140,11 @@ public class ResultsActivity extends Activity {
 
     private void getStoreName(String contents)
     {
-        for (String key : StoreNames.storeNames().keySet())
+        for (String s : StoreNames.storeNames())
         {
-            if (contents.contains(key))
+            if (contents.contains(s))
             {
-                this.storeName = key;
+                this.storeName = s;
                 this.foundStoreName = true;
             }
         }
@@ -211,6 +215,10 @@ public class ResultsActivity extends Activity {
             Receipt r = new Receipt();
             r.Store.Company.Name = getStoreName();
             r.CreatedDate = new Date();
+            Pair<Double,Double> location = Model.getInstance().getCurrentLocation(this);
+            r.Longitude = location.first;
+            r.Latitude = location.second;
+            r.PurchaseDate = new Date();
             try {
                 r.Total = Double.parseDouble(getTotalAmount());
                 r.Tax = Double.parseDouble(getTotalTax());

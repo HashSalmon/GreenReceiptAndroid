@@ -1,13 +1,10 @@
 package net.greenreceipt.greenreceipt;
 
 import android.app.Activity;
-import android.app.NotificationManager;
-import android.content.Context;
 import android.content.Intent;
 import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
@@ -26,17 +23,19 @@ import java.util.Date;
 
 public class HomeActivity extends Activity implements ListAdapter{
 ListView summary;
-private static final int RETURN_ALERT_NOTIFICATION = 1;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+
         ImageView logo = (ImageView) findViewById(R.id.logo);
         logo.setImageResource(R.drawable.profile);
         TextView date = (TextView) findViewById(R.id.date);
         TextView greeting = (TextView) findViewById(R.id.greeting);
-        greeting.setText("Welcome back, "+Model._currentUser.Username+"!");
+        greeting.setText("Welcome back, "+Model._currentUser.FirstName+"!");
         Date now = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("MMMM d yyyy");
         String currentDate = sdf.format(new Date());
@@ -143,12 +142,13 @@ private static final int RETURN_ALERT_NOTIFICATION = 1;
             TextView store = (TextView) view.findViewById(R.id.store);
             store.setText("Total receipts");
             TextView detail = (TextView) view.findViewById((R.id.detail));
-            detail.setText(Model.getInstance().getReceiptsCount()+"\n$ "+new DecimalFormat("##.##").format(Model.getInstance().getReceiptsTotal()));
+            detail.setText(Model.getInstance().getTotalReceiptCount()+"\n$ "+new DecimalFormat("##.##").format(Model.getInstance().getReceiptsTotal()));
             view.setBackgroundColor(Color.WHITE);
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent list = new Intent(getBaseContext(),ListReceiptActivity.class);
+                    list.putExtra(Model.RECEIPT_FILTER,4);
                     startActivity(list);
                 }
             });
@@ -205,24 +205,8 @@ private static final int RETURN_ALERT_NOTIFICATION = 1;
             }
         });
 
-
-        Model.getInstance().setReturnReceiptListener(new Model.ReturnReceiptListener() {
-            @Override
-            public void returnDetected() {
-                //do notification here
-                NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(HomeActivity.this);
-                mBuilder.setSmallIcon(R.drawable.logo);
-                mBuilder.setContentTitle("Return Alert");
-                mBuilder.setContentText("You have upcoming return deadlines");
-                NotificationManager mNotificationManager =
-                        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-// notificationID allows you to update the notification later on.
-                mNotificationManager.notify(RETURN_ALERT_NOTIFICATION, mBuilder.build());
-            }
-        });
         Model.getInstance().GetAllReceipt();
-        Model.getInstance().GetReturnReceipts();
+        Model.getInstance().changeDisplayReceipts(0);
         summary.invalidateViews();
 
     }

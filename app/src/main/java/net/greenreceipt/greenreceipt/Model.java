@@ -1,5 +1,10 @@
 package net.greenreceipt.greenreceipt;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.util.Pair;
 
@@ -27,7 +32,7 @@ public class Model
     public interface AddReceiptListener
     {
         public void addReceiptSuccess();
-        public void addReceiptFailed();
+        public void addReceiptFailed(String error);
     }
     public interface GetReceiptListener
     {
@@ -38,12 +43,30 @@ public class Model
     {
         public void returnDetected();
     }
-    static final String RECEIPT_FILTER="filter";
+    public interface OnDeleteReceiptListener{
+        public void deleteSuccess();
+        public void deleteFailed(String error);
+    }
+    public static final String RECEIPT_FILTER="filter";
+    static final int SHOW_RETURN_RECEIPTS = 5;
+    static final String[] PAYMENT_TYPES = {
+            "Payment Type",
+            "Amex",
+            "Visa",
+            "MasterCard",
+            "Discover",
+            "Cash"
+    };
+
+    static final int RETURN_ALERT_NOTIFICATION = 1;
+
+
     private OnLoginListener _loginListener;
     private RegisterUserListener _registerUserListener;
     private AddReceiptListener _receiptListener;
     private GetReceiptListener _getReceiptListener;
     private ReturnReceiptListener _returnReceiptListener;
+    private OnDeleteReceiptListener _onDeleteReceiptListener;
 
     private static Model _instance;
     static User _currentUser = null;
@@ -65,8 +88,14 @@ public class Model
     {
         _receipts = new ArrayList<Receipt>();
         _returnReceipts = new ArrayList<Receipt>();
+        _displayReceipts = new ArrayList<Receipt>();
         networking = new Networking();
     }
+
+
+    /*
+    **********************Listeners**********************
+     */
     public void setOnLoginListener(OnLoginListener listener)
     {
         _loginListener = listener;
@@ -87,7 +116,17 @@ public class Model
     {
         _returnReceiptListener = listener;
     }
-    public void login(final String email, final String password)
+    public void setOnDeleteReceiptListener(OnDeleteReceiptListener listener)
+    {
+        _onDeleteReceiptListener = listener;
+    }
+
+
+
+    /*
+    ****************Server calls******************
+     */
+    public void Login(final String email, final String password)
     {
         AsyncTask<String,Integer,Token> loginTask = new AsyncTask<String, Integer, Token>() {
             @Override
@@ -103,7 +142,9 @@ public class Model
                     _currentUser = new User();
                     _token = tokenObject.access_token;
                     _currentUser.Email = email;
-                    _currentUser.Username = tokenObject.userName;
+                    _currentUser.FirstName = tokenObject.FirstName;
+                    _currentUser.LastName = tokenObject.LastName;
+
                     _loginListener.onLoginSuccess();
                 }
                 else
@@ -112,21 +153,20 @@ public class Model
                 }
             }
         };
-        loginTask.execute(email,password);
+        loginTask.execute(email, password);
     }
-    public boolean userLoggedIn()
+    public void Logout(Context context)
     {
-        return _currentUser != null;
+        SharedPreferences pref = context.getSharedPreferences("GreenReceipt", 0); // 0 - for private mode
+        SharedPreferences.Editor editor = pref.edit();
+        editor.clear();
+        editor.commit();
+        Intent login = new Intent(context,LoginActivity.class);
+        login.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(login);
     }
 
-    public int getReceiptsCount()
-    {
-        return _receipts.size();
-    }
-    public Receipt getReceipt(int index)
-    {
-        return _receipts.get(index);
-    }
+
     public void Register(final String email, String firstname, String lastname, final String password, String confirm, String username)
     {
         AsyncTask<String,Integer,Boolean> registerTask = new AsyncTask<String, Integer, Boolean>() {
@@ -152,7 +192,7 @@ public class Model
             @Override
             protected Boolean doInBackground(Receipt... params)
             {
-                return Networking.addReceipt(params[0]);
+                return networking.addReceipt(params[0]);
             }
 
             @Override
@@ -163,11 +203,36 @@ public class Model
                     if (aBoolean)
                         _receiptListener.addReceiptSuccess();
                     else
-                        _receiptListener.addReceiptFailed();
+                        _receiptListener.addReceiptFailed(networking.error);
                 }
             }
         };
         addTask.execute(r);
+    }
+
+    public void DeleteReceipt(long id)
+    {
+        AsyncTask<Long,Integer,Boolean> deleteTask = new AsyncTask<Long, Integer, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Long... params) {
+                return networking.deleteReceipt(params[0]);
+            }
+
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                super.onPostExecute(aBoolean);
+
+                if(aBoolean)
+                    if(_onDeleteReceiptListener!=null)
+                    _onDeleteReceiptListener.deleteSuccess();
+                else
+                    if(_onDeleteReceiptListener!=null)
+                        _onDeleteReceiptListener.deleteFailed(networking.error);
+
+
+            }
+        };
+        deleteTask.execute(id);
     }
     public void GetAllReceipt()
     {
@@ -187,14 +252,55 @@ public class Model
                     _receipts.clear();
                     for(Receipt r : receipts)
                         _receipts.add(r);
+                    GetReturnReceipts();
+                    if(_getReceiptListener!=null)
                     _getReceiptListener.getReceiptSuccess();
                 }
                 else
-                    _getReceiptListener.getReceiptFailed();
+                {
+                    if (_getReceiptListener != null)
+                        _getReceiptListener.getReceiptFailed();
+                }
 
             }
         };
         getTask.execute();
+    }
+    public void GetReturnReceipts()
+    {
+        AsyncTask<Void,Integer,Receipt[]> returnTask = new AsyncTask<Void, Integer, Receipt[]>() {
+            @Override
+            protected Receipt[] doInBackground(Void... params) {
+                return Networking.getReturnReceipts();
+            }
+
+            @Override
+            protected void onPostExecute(Receipt[] receipts) {
+                super.onPostExecute(receipts);
+                if(receipts!=null)
+                {
+                    _returnReceipts.clear();
+                    for(Receipt r: receipts)
+                        _returnReceipts.add(r);
+                    if(_returnReceiptListener!=null && _returnReceipts.size()!=0)
+                        _returnReceiptListener.returnDetected();
+                }
+            }
+        };
+        returnTask.execute();
+    }
+
+
+    /*
+    *****************None server call below*********************
+     */
+    public int getDisplayReceiptsCount()
+    {
+        return _displayReceipts.size();
+    }
+    public Receipt getReceipt(int index)
+    {
+        return _displayReceipts.get(index);
     }
     public int getReceiptById(int id)
     {
@@ -215,10 +321,11 @@ public class Model
         int count=0;
         double total=0;
         String month = ""+Calendar.MONTH;
-        String year = ""+Calendar.YEAR;
+        Calendar c = Calendar.getInstance();
+        String year = c.get(Calendar.YEAR)+"";
         for(Receipt r: _receipts)
         {
-            if(android.text.format.DateFormat.format("M", r.PurchaseDate).equals(month) && android.text.format.DateFormat.format("YYYY", r.PurchaseDate).equals(year))
+            if(android.text.format.DateFormat.format("M", r.PurchaseDate).equals(month) && android.text.format.DateFormat.format("yyyy", r.PurchaseDate).equals(year))
             {
                 count++;
                 total+=r.Total;
@@ -237,40 +344,56 @@ public class Model
         }
         return result;
     }
-    public void GetReturnReceipts()
+    public int getTotalReceiptCount()
     {
-        AsyncTask<Void,Integer,Receipt[]> returnTask = new AsyncTask<Void, Integer, Receipt[]>() {
-            @Override
-            protected Receipt[] doInBackground(Void... params) {
-                return Networking.getReturnReceipts();
-            }
-
-            @Override
-            protected void onPostExecute(Receipt[] receipts) {
-                super.onPostExecute(receipts);
-                if(receipts!=null)
-                {
-                    for(Receipt r: receipts)
-                        _returnReceipts.add(r);
-                    if(_returnReceiptListener!=null)
-                        _returnReceiptListener.returnDetected();
-                }
-            }
-        };
-        returnTask.execute();
+        return _receipts.size();
     }
+
+
     public List<Receipt> getCurrentMonthReceipt()
     {
         List<Receipt> result = new ArrayList<Receipt>();
         String month = ""+Calendar.MONTH;
-        String year = ""+Calendar.YEAR;
+        Calendar c = Calendar.getInstance();
+        String year = c.get(Calendar.YEAR)+"";
         for(Receipt r: _receipts)
         {
-            if(android.text.format.DateFormat.format("M", r.PurchaseDate).equals(month) && android.text.format.DateFormat.format("YYYY", r.PurchaseDate).equals(year))
+            if(android.text.format.DateFormat.format("M", r.PurchaseDate).equals(month) && android.text.format.DateFormat.format("yyyy", r.PurchaseDate).equals(year))
             {
                 result.add(r);
             }
         }
+        return result;
+    }
+
+    public void changeDisplayReceipts(int display)
+    {
+        switch (display){
+
+            case 1://week
+                break;
+            case 2://month
+                _displayReceipts = getCurrentMonthReceipt();
+                break;
+            case 3://year
+                break;
+            case 4:
+                _displayReceipts = _receipts;
+                break;
+            case 5://display return
+                _displayReceipts = _returnReceipts;
+                break;
+            default:
+                break;//do nothing
+        }
+    }
+    public Pair<Double,Double> getCurrentLocation(Context context)
+    {
+        LocationManager lm = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
+        Location location = lm.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
+        double longitude = location.getLongitude();
+        double latitude = location.getLatitude();
+        Pair<Double,Double> result = new Pair<Double,Double>(longitude,latitude);
         return result;
     }
 

@@ -43,7 +43,7 @@ public class SignUpActivity extends Activity {
                     }
                 });
                 builder.setTitle("Congratulations!");
-                builder.setMessage("You are registered! Please login with your new account!");
+                builder.setMessage("You are registered! Please Login with your new account!");
                 AlertDialog dialog = builder.create();
                 dialog.show();
 
