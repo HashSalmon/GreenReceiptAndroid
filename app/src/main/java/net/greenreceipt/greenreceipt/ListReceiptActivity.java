@@ -2,6 +2,7 @@ package net.greenreceipt.greenreceipt;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.DataSetObserver;
 import android.graphics.Color;
@@ -27,6 +28,7 @@ public class ListReceiptActivity extends Activity implements ListAdapter{
     Spinner filters;
     Spinner order;
     int filter;
+    ProgressDialog spinner;
     String[] options = {
             "Date Range",
             "This Week",
@@ -46,16 +48,19 @@ public class ListReceiptActivity extends Activity implements ListAdapter{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_receipt);
 //        Model.getInstance().GetAllReceipt();
+        spinner = ProgressDialog.show(this, null, "Loading...");
+
         Model.getInstance().setGetReceiptListener(new Model.GetReceiptListener() {
             @Override
             public void getReceiptSuccess() {
-
+                spinner.dismiss();
                 list.invalidateViews();
             }
 
             @Override
             public void getReceiptFailed() {
-
+                spinner.dismiss();
+                Helper.AlertBox(ListReceiptActivity.this,"Error","Failed to retrieve data.\nPlease check your internet connection.");
             }
         });
         list = (ListView) findViewById(R.id.list);

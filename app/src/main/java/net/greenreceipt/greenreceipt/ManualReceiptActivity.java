@@ -162,15 +162,17 @@ public class ManualReceiptActivity extends FragmentActivity{
                 public void onClick(View v) {
                     if (!checkReceipt(storeName, date, tax, items))//there's error
                     {
-                        AlertBox("Error", error);
-                    } else {
+                        Helper.AlertBox(ManualReceiptActivity.this,"Error", error);
+                    }
+                    else {
                         double subtotal = 0;
                         for (Item i : items) {
                             subtotal += i.Price;
                         }
 
                         try {
-                            spinner = ProgressDialog.show(ManualReceiptActivity.this, null, "Working...");
+                            spinner = ProgressDialog.show(ManualReceiptActivity.this, null, "Processing...");
+                            spinner.setCanceledOnTouchOutside(true);
                             Receipt receipt = new Receipt();
                             Store store = new Store();
                             store.Company.Name = storeName.getText().toString();
@@ -345,20 +347,7 @@ public class ManualReceiptActivity extends FragmentActivity{
 
         return result;
     }
-    private void AlertBox(String title, String message)
-    {
-        AlertDialog.Builder builder = new AlertDialog.Builder(ManualReceiptActivity.this);
-        builder.setTitle(title);
-        builder.setMessage(message);
-        builder.setPositiveButton("OK",new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
 
-            }
-        });
-        AlertDialog dialog = builder.create();
-        dialog.show();
-    }
 //    @Override
 //    public void onClick(String s) {
 //        category.setText(s);

@@ -35,7 +35,7 @@ public class ReceiptDetailActivity extends Activity implements ListAdapter {
     int mMonth;
     int mDay;
     ProgressDialog spinner;
-    boolean deleted;
+    boolean deleted = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -194,6 +194,7 @@ public class ReceiptDetailActivity extends Activity implements ListAdapter {
                 }
                 else
                 {
+                    alert.setChecked(false);
                     text.setText("Return Alert: ");
                 }
                 text.setOnClickListener(new View.OnClickListener() {

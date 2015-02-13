@@ -206,6 +206,7 @@ ListView summary;
         });
 
         Model.getInstance().GetAllReceipt();
+        Model.getInstance().GetReturnReceipts();
         Model.getInstance().changeDisplayReceipts(0);
         summary.invalidateViews();
 

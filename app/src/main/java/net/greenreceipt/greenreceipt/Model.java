@@ -11,6 +11,7 @@ import android.util.Pair;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -394,6 +395,11 @@ public class Model
         double longitude = location.getLongitude();
         double latitude = location.getLatitude();
         Pair<Double,Double> result = new Pair<Double,Double>(longitude,latitude);
+        return result;
+    }
+    public List<Receipt> sortByStore(Comparator<Receipt> comparator)
+    {
+        List<Receipt> result = _displayReceipts;
         return result;
     }
 

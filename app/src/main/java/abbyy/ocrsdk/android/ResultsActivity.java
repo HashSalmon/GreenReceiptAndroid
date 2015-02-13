@@ -48,7 +48,6 @@ public class ResultsActivity extends Activity {
             public void addReceiptSuccess() {
                 spinner.dismiss();
                 Intent intent = new Intent(getBaseContext(),ListReceiptActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
                 intent.putExtra(RECEIPT_FILTER,4);
                 startActivity(intent);
                 finish();

@@ -22,5 +22,6 @@
      android:layout_height="wrap_content"
      android:visibility="gone"
      android:id="@+id/returnSwitch"
-     android:layout_gravity="center"/>
+     android:layout_gravity="center"
+     android:checked="true"/>
 </LinearLayout>
