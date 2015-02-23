@@ -8,9 +8,9 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.util.Pair;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -48,6 +48,11 @@ public class Model
         public void deleteSuccess();
         public void deleteFailed(String error);
     }
+    public interface GetCategoryListener
+    {
+        public void onGetCategorySuccess();
+        public void onGetCateogryFailed(String error);
+    }
     public static final String RECEIPT_FILTER="filter";
     static final int SHOW_RETURN_RECEIPTS = 5;
     static final String[] PAYMENT_TYPES = {
@@ -68,14 +73,15 @@ public class Model
     private GetReceiptListener _getReceiptListener;
     private ReturnReceiptListener _returnReceiptListener;
     private OnDeleteReceiptListener _onDeleteReceiptListener;
+    private GetCategoryListener _getCategoryListener;
 
     private static Model _instance;
     static User _currentUser = null;
     public static String _token;
-    private static File _userFile;
     static List<Receipt> _receipts;
     static List<Receipt> _returnReceipts;
     static List<Receipt> _displayReceipts;
+    static Category[] categories;
     private static Networking networking;
     public static Model getInstance()
     {
@@ -120,6 +126,10 @@ public class Model
     public void setOnDeleteReceiptListener(OnDeleteReceiptListener listener)
     {
         _onDeleteReceiptListener = listener;
+    }
+    public void setGetCategoryListener(GetCategoryListener listener)
+    {
+        _getCategoryListener = listener;
     }
 
 
@@ -241,7 +251,7 @@ public class Model
             @Override
             protected Receipt[] doInBackground(Object... params)
             {
-                return Networking.getAllReceipts();
+                return networking.getAllReceipts();
             }
 
             @Override
@@ -290,6 +300,34 @@ public class Model
         };
         returnTask.execute();
     }
+
+    public void GetCategories()
+    {
+        AsyncTask<Void, Integer, Category[]> getCategoryTask = new AsyncTask<Void, Integer, Category[]>() {
+            @Override
+            protected Category[] doInBackground(Void... params) {
+                return networking.getCategories();
+            }
+
+            @Override
+            protected void onPostExecute(Category[] categories) {
+                super.onPostExecute(categories);
+                if(categories!=null)
+                {
+                    Model.getInstance().categories = categories;
+                    if(_getCategoryListener !=null)
+                        _getCategoryListener.onGetCategorySuccess();
+                }
+                else
+                {
+                    if(_getCategoryListener!=null)
+                        _getCategoryListener.onGetCateogryFailed(networking.error);
+                }
+            }
+        };
+        getCategoryTask.execute();
+    }
+
 
 
     /*
@@ -397,9 +435,10 @@ public class Model
         Pair<Double,Double> result = new Pair<Double,Double>(longitude,latitude);
         return result;
     }
-    public List<Receipt> sortByStore(Comparator<Receipt> comparator)
+    public List<Receipt> sortList(Comparator<Receipt> comparator)
     {
         List<Receipt> result = _displayReceipts;
+        Collections.sort(result, comparator);
         return result;
     }
 

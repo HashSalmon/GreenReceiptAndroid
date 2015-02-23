@@ -20,13 +20,15 @@ import android.widget.TextView;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Comparator;
 
 
 public class ListReceiptActivity extends Activity implements ListAdapter{
     final static String RECEIPT_ID = "ReceiptId";
     ListView list;
     Spinner filters;
-    Spinner order;
+    Spinner sort;
     int filter;
     ProgressDialog spinner;
     String[] options = {
@@ -40,8 +42,10 @@ public class ListReceiptActivity extends Activity implements ListAdapter{
     String[] orderBy = {
             "Sort By",
             "Store Name",
-            "Date",
-            "Total"
+            "Date(Ascending)",
+            "Date(Descending)",
+            "Total(lowest to highest)",
+            "Total(highest to lowest)"
     };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,13 +101,37 @@ public class ListReceiptActivity extends Activity implements ListAdapter{
                 filter = 0;
             }
         });
-        order = (Spinner) findViewById(R.id.order);
+        sort = (Spinner) findViewById(R.id.sort);
         ArrayAdapter<String> orderAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, orderBy);
-        order.setAdapter(orderAdapter);
-        order.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        sort.setAdapter(orderAdapter);
+        sort.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Comparator<Receipt> comparator=null;
+                    switch(position){
+                        case 1:
+                           comparator = new SortByStore();
+                            break;
+                        case 2:
+                            comparator = new SortByDate();
+                            break;
+                        case 3:
+                            comparator = new SortByDate();
+                            comparator = Collections.reverseOrder(comparator);
+                            break;
+                        case 4:
+                            comparator = new SortByTotal();
+                            break;
+                        case 5:
+                            comparator = new SortByTotal();
+                            comparator = Collections.reverseOrder(comparator);
+                            break;
+                    }
+                if(comparator!=null) {
+                    Model.getInstance().sortList(comparator);
 
+                    list.invalidateViews();
+                }
             }
 
             @Override

@@ -24,7 +24,9 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
+import hotchemi.stringpicker.StringPicker;
 import hotchemi.stringpicker.StringPickerDialog;
 
 
@@ -48,6 +50,8 @@ public class ManualReceiptActivity extends FragmentActivity{
     Spinner payment;
     String error;
     TextView itemsPurchased;
+    List<String> categoryList = new ArrayList<String>();
+    StringPicker categoryPicker;
 
 //    int paymentType;
     @Override
@@ -56,34 +60,7 @@ public class ManualReceiptActivity extends FragmentActivity{
         setContentView(R.layout.activity_manual_receipt);
         itemsPurchased = (TextView) findViewById(R.id.itemsPurchased);
 //        category = (TextView) findViewById(R.id.category);
-        Model.getInstance().setAddReceiptListener(new Model.AddReceiptListener() {
-            @Override
-            public void addReceiptSuccess() {
-                spinner.dismiss();
-                Intent intent = new Intent(getBaseContext(),ListReceiptActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-                intent.putExtra(Model.RECEIPT_FILTER,4);
-                startActivity(intent);
-                finish();
 
-            }
-
-            @Override
-            public void addReceiptFailed(String error) {
-                spinner.dismiss();
-                AlertDialog.Builder builder = new AlertDialog.Builder(ManualReceiptActivity.this);
-                builder.setTitle("Error");
-                builder.setMessage(error);
-                builder.setPositiveButton("OK",new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                });
-                AlertDialog dialog = builder.create();
-                dialog.show();
-            }
-        });
 
 
 
@@ -203,6 +180,8 @@ public class ManualReceiptActivity extends FragmentActivity{
             });
         ImageView icon = (ImageView) findViewById(R.id.icon);
 
+
+        //add item dialog
         icon.setImageResource(R.drawable.ic_action_new);
         icon.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -223,11 +202,14 @@ public class ManualReceiptActivity extends FragmentActivity{
                             Item item = new Item();
                             item.ItemName = itemName.getText().toString();
                             item.Price = Double.parseDouble(itemPrice.getText().toString());
+                            item.CreatedDate = new Date();
+                            item.Category = Model.categories[categoryPicker.getCurrent()];
                             items.add(item);
                             itemContainer.addView(view);
                             itemName.setText("");
                             itemPrice.setText("");
                             itemsPurchased.setTextColor(Color.GRAY);
+
                         }
                     }
                 });
@@ -236,6 +218,8 @@ public class ManualReceiptActivity extends FragmentActivity{
                 builder.setView(add);
                 itemName = (EditText) add.findViewById(R.id.itemName);
                 itemPrice = (EditText) add.findViewById(R.id.price);
+                categoryPicker = (StringPicker) add.findViewById(R.id.category);
+                categoryPicker.setValues(categoryList);
                 AlertDialog addDialog = builder.create();
                 addDialog.show();
             }
@@ -348,7 +332,53 @@ public class ManualReceiptActivity extends FragmentActivity{
         return result;
     }
 
-//    @Override
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Model.getInstance().setAddReceiptListener(new Model.AddReceiptListener() {
+            @Override
+            public void addReceiptSuccess() {
+                spinner.dismiss();
+                Intent intent = new Intent(getBaseContext(),ListReceiptActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                intent.putExtra(Model.RECEIPT_FILTER,4);
+                startActivity(intent);
+                finish();
+            }
+            @Override
+            public void addReceiptFailed(String error) {
+                spinner.dismiss();
+                AlertDialog.Builder builder = new AlertDialog.Builder(ManualReceiptActivity.this);
+                builder.setTitle("Error");
+                builder.setMessage(error);
+                builder.setPositiveButton("OK",new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
+        Model.getInstance().setGetCategoryListener(new Model.GetCategoryListener() {
+            @Override
+            public void onGetCategorySuccess() {
+                for(Category c: Model.categories)
+                {
+                    categoryList.add(c.Name);
+                }
+            }
+
+            @Override
+            public void onGetCateogryFailed(String error) {
+
+            }
+        });
+        Model.getInstance().GetCategories();
+    }
+
+    //    @Override
 //    public void onClick(String s) {
 //        category.setText(s);
 //    }

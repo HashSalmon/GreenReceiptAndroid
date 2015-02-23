@@ -133,7 +133,7 @@ public class Networking {
             return false;
         }
     }
-    public static Receipt[] getAllReceipts()
+    public Receipt[] getAllReceipts()
     {
         try {
             HttpParams httpParameters = new BasicHttpParams();
@@ -213,6 +213,37 @@ public class Networking {
         catch (Exception e) {
             e.printStackTrace();
             return false;
+        }
+    }
+    public Category[] getCategories()
+    {
+        try {
+            error = "";
+            HttpParams httpParameters = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+            HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+            HttpClient client = new DefaultHttpClient(httpParameters);
+            HttpGet request = new HttpGet(BASE_URL + "api/Category/GetCategories");
+            request.addHeader("Authorization","Bearer "+Model._token);
+            HttpResponse response = client.execute(request);
+
+            InputStream responseContent = response.getEntity().getContent();
+            Scanner responseScanner = new Scanner(responseContent).useDelimiter("\\A");
+            String responseString = responseScanner.hasNext() ? responseScanner.next() : null;
+
+            if(responseString == null || response.getStatusLine().getStatusCode() != 200)
+            {
+                error = "Failed to retrieve data";
+                return null;
+            }
+
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
+            Category[] categories = gson.fromJson(responseString,Category[].class);
+            return categories;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
