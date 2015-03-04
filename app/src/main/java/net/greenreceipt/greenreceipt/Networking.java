@@ -114,7 +114,7 @@ public class Networking {
             HttpPost request = new HttpPost(BASE_URL + "api/Receipt");
             request.addHeader("Content-Type", "application/json");
             request.addHeader("Authorization","Bearer "+Model._token);
-            Gson gson = new Gson();
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
             String jsonString = gson.toJson(r);
             StringEntity entity = new StringEntity(jsonString);
             request.setEntity(entity);
@@ -246,5 +246,166 @@ public class Networking {
             return null;
         }
     }
+    public CategoryReport getCategoryReport(String startDate, String endDate)
+    {
+        try {
+            error = "";
+            HttpParams httpParameters = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+            HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+            HttpClient client = new DefaultHttpClient(httpParameters);
+            HttpGet request = new HttpGet(BASE_URL + "api/CategoryReport?startDate="+startDate+"&endDate="+endDate);
+            request.addHeader("Authorization","Bearer "+Model._token);
+            HttpResponse response = client.execute(request);
+
+            InputStream responseContent = response.getEntity().getContent();
+            Scanner responseScanner = new Scanner(responseContent).useDelimiter("\\A");
+            String responseString = responseScanner.hasNext() ? responseScanner.next() : null;
+
+            if(responseString == null || response.getStatusLine().getStatusCode() != 200)
+            {
+                error = "Failed to retrieve data";
+                return null;
+            }
+
+            Gson gson = new Gson();
+            CategoryReport categoryReport = gson.fromJson(responseString, CategoryReport.class);
+            return categoryReport;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            error = e.getMessage();
+            return null;
+        }
+    }
+    public Budget getCurrentBudget()
+    {
+        try {
+            error = "";
+            HttpParams httpParameters = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+            HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+            HttpClient client = new DefaultHttpClient(httpParameters);
+            HttpGet request = new HttpGet(BASE_URL + "api/Budget/CurrentBudget");
+            request.addHeader("Authorization","Bearer "+Model._token);
+            HttpResponse response = client.execute(request);
+
+            InputStream responseContent = response.getEntity().getContent();
+            Scanner responseScanner = new Scanner(responseContent).useDelimiter("\\A");
+            String responseString = responseScanner.hasNext() ? responseScanner.next() : null;
+
+            if(responseString == null || response.getStatusLine().getStatusCode() != 200)
+            {
+                error = "Bad call";
+                return null;
+            }
+
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
+            Budget budget = gson.fromJson(responseString, Budget.class);
+            return budget;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            error = e.getMessage();
+            return null;
+        }
+    }
+    public boolean createBudget(Budget b)
+    {
+        try {
+            error = "";
+            HttpParams httpParameters = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+            HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+            HttpClient client = new DefaultHttpClient(httpParameters);
+            HttpPost request = new HttpPost(BASE_URL + "api/Budget");
+            request.addHeader("Content-Type", "application/json");
+            request.addHeader("Authorization","Bearer "+Model._token);
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
+            String jsonString = gson.toJson(b);
+            StringEntity entity = new StringEntity(jsonString);
+            request.setEntity(entity);
+            HttpResponse response = client.execute(request);
+            if(response.getStatusLine().getStatusCode()!=200)
+            {
+                InputStream responseContent = response.getEntity().getContent();
+                Scanner responseScanner = new Scanner(responseContent).useDelimiter("\\A");
+                String responseString = responseScanner.hasNext() ? responseScanner.next() : null;
+                error = responseString;
+            }
+            return response.getStatusLine().getStatusCode() == 200;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            error = e.getMessage();
+            return false;
+        }
+    }
+
+    public boolean saveBudgetItem(List<BudgetItem> items)
+    {
+        try {
+            error = "";
+            HttpParams httpParameters = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+            HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+            HttpClient client = new DefaultHttpClient(httpParameters);
+            HttpPost request = new HttpPost(BASE_URL + "api/BudgetItem");
+            request.addHeader("Content-Type", "application/json");
+            request.addHeader("Authorization","Bearer "+Model._token);
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
+            String jsonString = gson.toJson(items);
+            StringEntity entity = new StringEntity(jsonString);
+            request.setEntity(entity);
+            HttpResponse response = client.execute(request);
+            if(response.getStatusLine().getStatusCode()!=200)
+            {
+                InputStream responseContent = response.getEntity().getContent();
+                Scanner responseScanner = new Scanner(responseContent).useDelimiter("\\A");
+                String responseString = responseScanner.hasNext() ? responseScanner.next() : null;
+                error = responseString;
+            }
+            return response.getStatusLine().getStatusCode() == 200;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            error = e.getMessage();
+            return false;
+        }
+    }
+    public boolean deleteBudgetItem(List<Integer> ids)
+    {
+        try {
+            error = "";
+            HttpParams httpParameters = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+            HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+            HttpClient client = new DefaultHttpClient(httpParameters);
+            HttpPost request = new HttpPost(BASE_URL + "api/BudgetItem/DeleteBudgetItems");
+            request.addHeader("Content-Type", "application/json");
+            request.addHeader("Authorization","Bearer "+Model._token);
+
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
+            String jsonString = gson.toJson(ids);
+            StringEntity entity = new StringEntity(jsonString);
+            request.setEntity(entity);
+            HttpResponse response = client.execute(request);
+            if(response.getStatusLine().getStatusCode()!=200)
+            {
+                InputStream responseContent = response.getEntity().getContent();
+                Scanner responseScanner = new Scanner(responseContent).useDelimiter("\\A");
+                String responseString = responseScanner.hasNext() ? responseScanner.next() : null;
+                error = responseString;
+            }
+            return response.getStatusLine().getStatusCode() == 200;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            error = e.getMessage();
+            return false;
+        }
+    }
+
+
 
 }

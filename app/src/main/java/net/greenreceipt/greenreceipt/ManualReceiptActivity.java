@@ -58,6 +58,11 @@ public class ManualReceiptActivity extends FragmentActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manual_receipt);
+        if(Model.categories != null)
+        {
+            for(Category c : Model.categories)
+                categoryList.add(c.Name);
+        }
         itemsPurchased = (TextView) findViewById(R.id.itemsPurchased);
 //        category = (TextView) findViewById(R.id.category);
 
@@ -219,7 +224,12 @@ public class ManualReceiptActivity extends FragmentActivity{
                 itemName = (EditText) add.findViewById(R.id.itemName);
                 itemPrice = (EditText) add.findViewById(R.id.price);
                 categoryPicker = (StringPicker) add.findViewById(R.id.category);
+
                 categoryPicker.setValues(categoryList);
+                if(categoryList.size()==0)
+                {
+                    categoryList.add("");
+                }
                 AlertDialog addDialog = builder.create();
                 addDialog.show();
             }
@@ -361,21 +371,7 @@ public class ManualReceiptActivity extends FragmentActivity{
                 dialog.show();
             }
         });
-        Model.getInstance().setGetCategoryListener(new Model.GetCategoryListener() {
-            @Override
-            public void onGetCategorySuccess() {
-                for(Category c: Model.categories)
-                {
-                    categoryList.add(c.Name);
-                }
-            }
 
-            @Override
-            public void onGetCateogryFailed(String error) {
-
-            }
-        });
-        Model.getInstance().GetCategories();
     }
 
     //    @Override

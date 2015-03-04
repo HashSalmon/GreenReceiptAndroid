@@ -19,7 +19,6 @@ public class Receipt
     public double Discount;
     public String Address;
     public Date ReturnDate;
-    public String Category="";
     public boolean ReturnReminder;
     public String BarCode;
     public Date PurchaseDate;

@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,12 +28,44 @@ ListView summary;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-
+//        Toolbar actionBar = (Toolbar) findViewById(R.id.action_bar);
+//        setSupportActionBar(actionBar);
+//
+//        Toolbar bottomBar = (Toolbar) findViewById(R.id.bottom_bar);
+//        bottomBar.inflateMenu(R.menu.home);
+//
+//        bottomBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+//            @Override
+//            public boolean onMenuItemClick(MenuItem menuItem) {
+//                switch (menuItem.getItemId())
+//                {
+//                    case R.id.new_receipt:
+//                        Intent newIntent = new Intent(HomeActivity.this , NewReceiptActivity.class);
+//                        startActivity(newIntent);
+//                        return true;
+//                    case R.id.viewReceipts:
+//                        Intent list = new Intent(HomeActivity.this , ListReceiptActivity.class);
+//                        startActivity(list);
+//                        return true;
+//                    case R.id.view_summary:
+//                        Intent summary = new Intent(HomeActivity.this , SummaryActivity.class);
+//                        startActivity(summary);
+//
+//                        return true;
+//                    case R.id.action_settings:
+//                        Intent settings = new Intent(HomeActivity.this , SettingsActivity.class);
+//                        startActivity(settings);
+//                        return true;
+//                }
+//                return true;
+//            }
+//        });
 
         ImageView logo = (ImageView) findViewById(R.id.logo);
-        logo.setImageResource(R.drawable.profile);
+        logo.setImageResource(R.drawable.logo);
         TextView date = (TextView) findViewById(R.id.date);
         TextView greeting = (TextView) findViewById(R.id.greeting);
+        if(Model._currentUser!=null)
         greeting.setText("Welcome back, "+Model._currentUser.FirstName+"!");
         Date now = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("MMMM d yyyy");
@@ -78,6 +109,7 @@ ListView summary;
                 return true;
             case R.id.viewReceipts:
                 Intent list = new Intent(this , ListReceiptActivity.class);
+                list.putExtra(Model.RECEIPT_FILTER,4);
                 startActivity(list);
                 return true;
             case R.id.view_summary:
@@ -192,7 +224,7 @@ ListView summary;
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d("state","Resume");
+
         Model.getInstance().setGetReceiptListener(new Model.GetReceiptListener() {
             @Override
             public void getReceiptSuccess() {
@@ -205,6 +237,7 @@ ListView summary;
             }
         });
 
+        Model.getInstance().GetCategories();
         Model.getInstance().GetAllReceipt();
         Model.getInstance().GetReturnReceipts();
         Model.getInstance().changeDisplayReceipts(0);

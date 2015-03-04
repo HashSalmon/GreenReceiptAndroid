@@ -35,5 +35,8 @@
     <string name="new_receipt">New Receipt</string>
     <string name="receipts">Receipts</string>
     <string name="action_delete">Delete</string>
+    <string name="title_activity_tab_test">TabTest</string>
+    <string name="title_activity_create_budget">CreateBudgetActivity</string>
+    <string name="title_activity_edit_budget">EditBudgetActivity</string>
 
 </resources>

@@ -1,6 +1,5 @@
 package net.greenreceipt.greenreceipt;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -32,8 +31,9 @@ public class NewReceiptActivity extends Activity {
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_receipt);
-        ActionBar bar = getActionBar();
-        bar.setDisplayHomeAsUpEnabled(true);
+//        Toolbar actionBar = (Toolbar) findViewById(R.id.action_bar);
+//        setSupportActionBar(actionBar);
+//        actionBar.set
         icon = (ImageView) findViewById(R.id.icon);
         ImageView code = (ImageView) findViewById(R.id.code);
         icon.setImageResource(R.drawable.ic_action_new);

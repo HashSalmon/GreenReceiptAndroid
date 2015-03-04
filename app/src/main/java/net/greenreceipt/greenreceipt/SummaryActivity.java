@@ -1,88 +1,58 @@
 package net.greenreceipt.greenreceipt;
 
-import android.app.ActionBar;
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v13.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 
-
-public class SummaryActivity extends FragmentActivity {
-
-    FragmentPagerAdapter adapter;
-    ViewPager mViewPager;
+import com.astuetz.PagerSlidingTabStrip;
 
 
+public class SummaryActivity extends Activity {
+
+    PagerSlidingTabStrip tabs;
+    ViewPager pager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_summary);
+//        Toolbar actionBar = (Toolbar) findViewById(R.id.action_bar);
+//        setSupportActionBar(actionBar);
+        // Initialize the ViewPager and set an adapter
+        pager = (ViewPager) findViewById(R.id.pager);
+        pager.setAdapter(new FragmentPagerAdapter(getFragmentManager()) {
+            String[] TITLES = {"Trending Report", "Category Report", "Budget"};
 
-        adapter = new FragmentPagerAdapter(getFragmentManager()) {
             @Override
-            public Fragment getItem(int i) {
-                if(i == 0 )
-                   return new TrendingReportFragment();
-                else if(i == 1)
+            public Fragment getItem(int position) {
+                if (position == 0)
+                    return new TrendingReportFragment();
+                else if (position == 1)
                     return new CategoryReportFragment();
                 else
                     return new BudgetFragment();
             }
 
             @Override
+            public CharSequence getPageTitle(int position) {
+                return TITLES[position];
+            }
+
+            @Override
             public int getCount() {
                 return 3;
             }
-        };
-        mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setAdapter(adapter);
-        mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setOnPageChangeListener(
-                new ViewPager.SimpleOnPageChangeListener() {
-                    @Override
-                    public void onPageSelected(int position) {
-                        // When swiping between pages, select the
-                        // corresponding tab.
-                        getActionBar().setSelectedNavigationItem(position);
-                    }
-                });
+        });
 
-        ActionBar bar = getActionBar();
-        bar.setDisplayHomeAsUpEnabled(true);
-        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        ActionBar.TabListener tabListener = new ActionBar.TabListener() {
-
-            @Override
-            public void onTabSelected(ActionBar.Tab tab, android.app.FragmentTransaction ft)
-            {
-                mViewPager.setCurrentItem(tab.getPosition());
-            }
-
-            @Override
-            public void onTabUnselected(ActionBar.Tab tab, android.app.FragmentTransaction ft) {
-
-            }
-
-            @Override
-            public void onTabReselected(ActionBar.Tab tab, android.app.FragmentTransaction ft) {
-
-            }
-        };
-        bar.addTab(bar.newTab()
-                .setText("Trending\nReport")
-                .setTabListener(tabListener));
-        bar.addTab(bar.newTab()
-                .setText("Category\nReport")
-                .setTabListener(tabListener));
-        bar.addTab(bar.newTab()
-                .setText("Budget")
-                .setTabListener(tabListener));
-
+        // Bind the tabs to the ViewPager
+        tabs = (PagerSlidingTabStrip) findViewById(R.id.tabs);
+        tabs.setViewPager(pager);
     }
+
 
 
     @Override

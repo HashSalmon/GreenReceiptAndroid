@@ -1,6 +1,5 @@
 package net.greenreceipt.greenreceipt;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,9 +15,12 @@ public class SettingsActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-        ActionBar bar = getActionBar();
-        bar.setDisplayHomeAsUpEnabled(true);
+//        ActionBar bar = getActionBar();
+//        bar.setDisplayHomeAsUpEnabled(true);
+
         setContentView(R.layout.activity_settings);
+//        Toolbar actionBar = (Toolbar) findViewById(R.id.action_bar);
+//        setSupportActionBar(actionBar);
         logout = (Button) findViewById(R.id.logoutButton);
         if(logout!=null)
         {

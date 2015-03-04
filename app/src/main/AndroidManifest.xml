@@ -26,15 +26,6 @@
             android:value="splitActionBarWhenNarrow" />
 
         <activity
-            android:name="abbyy.ocrsdk.android.MainActivity"
-            android:label="@string/title_activity_main" >
-
-            <!-- <intent-filter> -->
-            <!-- <action android:name="android.intent.action.MAIN" /> -->
-            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-            <!-- </intent-filter> -->
-        </activity>
-        <activity
             android:name="abbyy.ocrsdk.android.ResultsActivity"
             android:label="@string/title_activity_results" >
         </activity>
@@ -52,7 +43,8 @@
         </activity>
         <activity
             android:name=".HomeActivity"
-            android:label="@string/title_activity_home" >
+            android:label="@string/title_activity_home"
+            >
         </activity>
         <activity
             android:name=".SignUpActivity"
@@ -130,6 +122,19 @@
             android:name=".CheckReturnService"
             android:exported="false" >
         </service>
+
+        <activity
+            android:name=".TabTest"
+            android:label="@string/title_activity_tab_test" >
+        </activity>
+        <activity
+            android:name=".CreateBudgetActivity"
+            android:label="@string/title_activity_create_budget" >
+        </activity>
+        <activity
+            android:name=".EditBudgetActivity"
+            android:label="@string/title_activity_edit_budget" >
+        </activity>
     </application>
 
 </manifest>

@@ -1,6 +1,5 @@
 package net.greenreceipt.greenreceipt;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -51,6 +50,8 @@ public class ListReceiptActivity extends Activity implements ListAdapter{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_receipt);
+//        Toolbar actionBar = (Toolbar) findViewById(R.id.action_bar);
+//        setSupportActionBar(actionBar);
 //        Model.getInstance().GetAllReceipt();
         spinner = ProgressDialog.show(this, null, "Loading...");
 
@@ -68,8 +69,8 @@ public class ListReceiptActivity extends Activity implements ListAdapter{
             }
         });
         list = (ListView) findViewById(R.id.list);
-        ActionBar bar = getActionBar();
-        bar.setDisplayHomeAsUpEnabled(true);
+//        ActionBar bar = getActionBar();
+//        bar.setDisplayHomeAsUpEnabled(true);
 
         list.setAdapter(this);
 //        list.setAdapter(new ListReceiptAdapter(this));
