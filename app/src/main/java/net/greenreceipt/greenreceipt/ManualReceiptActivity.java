@@ -1,12 +1,16 @@
 package net.greenreceipt.greenreceipt;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v4.app.FragmentActivity;
 import android.util.Pair;
 import android.view.View;
@@ -21,6 +25,7 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -30,7 +35,7 @@ import hotchemi.stringpicker.StringPicker;
 import hotchemi.stringpicker.StringPickerDialog;
 
 
-public class ManualReceiptActivity extends FragmentActivity{
+public class ManualReceiptActivity extends FragmentActivity implements View.OnClickListener{
     private static final String TAG = StringPickerDialog.class.getSimpleName();
     LinearLayout itemContainer;
     EditText itemName;
@@ -52,6 +57,14 @@ public class ManualReceiptActivity extends FragmentActivity{
     TextView itemsPurchased;
     List<String> categoryList = new ArrayList<String>();
     StringPicker categoryPicker;
+    ImageView image1;
+    LinearLayout imageContainer;
+    int imageCount=0;
+
+    private final int TAKE_PICTURE = 0;
+    private String resultUrl = "result.txt";
+
+
 
 //    int paymentType;
     @Override
@@ -265,42 +278,73 @@ public class ManualReceiptActivity extends FragmentActivity{
         payment = (Spinner) findViewById(R.id.payment);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, Model.PAYMENT_TYPES);
         payment.setAdapter(adapter);
-//        payment.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                paymentType = position;
-//
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parent) {
-//
-//            }
-//        });
 
-//        category.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                StringPickerDialog dialog = new StringPickerDialog();
-//                Bundle bundle = new Bundle();
-//                String[] values = new String[] {"a","b","c","d","e","f"};
-//                bundle.putStringArray(getString(R.string.string_picker_dialog_values), values);
-//                dialog.setArguments(bundle);
-//                android.support.v4.app.FragmentManager manager = getSupportFragmentManager();
-//                dialog.show(getSupportFragmentManager(),"");
-//            }
-//        });
+        imageContainer = (LinearLayout) findViewById(R.id.image_container);
+
+        image1 = (ImageView) findViewById(R.id.image1);
+        image1.setOnClickListener(this);
+
 
     }
-//    private Pair<Double,Double> getCurrentLocation()
-//    {
-//        LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-//        Location location = lm.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
-//        double longitude = location.getLongitude();
-//        double latitude = location.getLatitude();
-//        Pair<Double,Double> result = new Pair<Double,Double>(longitude,latitude);
-//        return result;
-//    }
+
+    private static Uri getOutputMediaFileUri(){
+        return Uri.fromFile(getOutputMediaFile());
+    }
+
+    /** Create a File for saving an image or video */
+    private static File getOutputMediaFile(){
+        // To be safe, you should check that the SDCard is mounted
+        // using Environment.getExternalStorageState() before doing this.
+
+        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES), "GreenReceipt");
+        // This location works best if you want the created images to be shared
+        // between applications and persist after your app has been uninstalled.
+
+        // Create the storage directory if it does not exist
+        if (! mediaStorageDir.exists()){
+            if (! mediaStorageDir.mkdirs()){
+                return null;
+            }
+        }
+
+        // Create a media file name
+        File mediaFile = new File(mediaStorageDir.getPath() + File.separator + "image.jpg" );
+
+        return mediaFile;
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode != Activity.RESULT_OK)
+            return;
+
+        Uri imageFilePath = null;
+
+        switch (requestCode) {
+            case TAKE_PICTURE:
+                imageFilePath = getOutputMediaFileUri();
+                if(imageCount < 5) {
+                    ImageView newView = new ImageView(this);
+                    newView.setImageURI(imageFilePath);
+                    imageContainer.addView(newView);
+                    imageCount++;
+                }
+
+
+                break;
+
+        }
+
+        //Remove output file
+        deleteFile(resultUrl);
+
+//        Intent results = new Intent( this, ResultsActivity.class);
+//        results.putExtra("IMAGE_PATH", imageFilePath);
+//        results.putExtra("RESULT_PATH", resultUrl);
+//        startActivity(results);
+    }
+
     private boolean checkReceipt(EditText store, EditText date, EditText tax, ArrayList items)
     {
         boolean result = true;
@@ -371,6 +415,17 @@ public class ManualReceiptActivity extends FragmentActivity{
                 dialog.show();
             }
         });
+
+    }
+
+    @Override
+    public void onClick(View v)
+    {
+        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+        Uri fileUri = getOutputMediaFileUri(); // create a file to save the image
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); // set the image file name
+
+        startActivityForResult(intent, TAKE_PICTURE);
 
     }
 

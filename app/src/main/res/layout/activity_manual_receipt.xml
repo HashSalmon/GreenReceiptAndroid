@@ -82,6 +82,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/alertSwitch"/>
         </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -110,6 +111,20 @@
             android:background="@android:drawable/edit_text"
             android:textColor="@android:color/primary_text_light"/>
         </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:id="@+id/image_container"
+        android:layout_gravity="left">
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_weight="1"
+            android:id="@+id/image1"
+            android:src="@drawable/ic_action_camera"
+            android:layout_gravity="left"/>
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -127,7 +142,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="10"
-            android:id="@+id/icon"/>
+            android:id="@+id/icon"
+            android:src="@drawable/ic_action_new"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"

@@ -133,7 +133,7 @@ public class ReceiptDetailActivity extends Activity implements ListAdapter {
         SimpleDateFormat sdf = new SimpleDateFormat("MM/d/yyyy");
         if(position == 0)//header
         {
-            view =View.inflate(this, R.layout.listitem, null);
+            view =View.inflate(this, R.layout.receipt_header, null);
             TextView store = (TextView) view.findViewById(R.id.store);
             store.setText(receipt.Store.Company.Name);
             TextView detail = (TextView) view.findViewById(R.id.detail);
