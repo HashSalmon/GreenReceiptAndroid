@@ -6,8 +6,14 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.util.Pair;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -21,6 +27,9 @@ import java.util.List;
  */
 public class Model
 {
+
+    static final String ACTION_TRENDING_FAIL = "TrendingFail" ;
+    static final String ACTION_TRENDING_SUCCESS = "TrendingSuccess";
 
     public interface OnLoginListener
     {
@@ -105,6 +114,7 @@ public class Model
     static List<Receipt> _displayReceipts;
     static Category[] categories;
     static Budget currentBudget;
+    static TrendingReport trendingReport;
     private static Networking networking;
     public static Model getInstance()
     {
@@ -229,28 +239,28 @@ public class Model
         };
         registerTask.execute(email,firstname,lastname,password,confirm,username);
     }
-    public void AddReceipt(Receipt r)
+    public void AddReceipt(Receipt r, ReceiptImage image)
     {
-        AsyncTask<Receipt,Integer,Boolean> addTask = new AsyncTask<Receipt, Integer, Boolean>() {
+        AsyncTask<Object,Integer,Receipt> addTask = new AsyncTask<Object, Integer, Receipt>() {
             @Override
-            protected Boolean doInBackground(Receipt... params)
+            protected Receipt doInBackground(Object... params)
             {
-                return networking.addReceipt(params[0]);
+                return networking.addReceipt((Receipt)params[0],(ReceiptImage)params[1]);
             }
 
             @Override
-            protected void onPostExecute(Boolean aBoolean) {
-                super.onPostExecute(aBoolean);
+            protected void onPostExecute(Receipt receipt) {
+                super.onPostExecute(receipt);
                 if(_receiptListener!=null)
                 {
-                    if (aBoolean)
+                    if (receipt !=null)
                         _receiptListener.addReceiptSuccess();
                     else
                         _receiptListener.addReceiptFailed(networking.error);
                 }
             }
         };
-        addTask.execute(r);
+        addTask.execute(r,image);
     }
 
     public void DeleteReceipt(long id)
@@ -384,6 +394,33 @@ public class Model
         };
         getReportTask.execute(startDate,endDate);
     }
+    public void GetTrendingReport(final String startDate, final String endDate, final Context c)
+    {
+        final AsyncTask<String,Integer,TrendingReport> getReportTask = new AsyncTask<String, Integer, TrendingReport>() {
+            @Override
+            protected TrendingReport doInBackground(String... params) {
+                return networking.getTrendingReport(params[0], params[1]);
+            }
+
+            @Override
+            protected void onPostExecute(TrendingReport trendingReport) {
+                super.onPostExecute(trendingReport);
+                if(trendingReport !=null) {
+                    Model.trendingReport = trendingReport;
+                    Intent success = new Intent();
+                    success.setAction(Model.ACTION_TRENDING_SUCCESS);
+                    c.sendBroadcast(success);
+                }
+                else
+                {
+                    Intent fail = new Intent();
+                    fail.setAction(Model.ACTION_TRENDING_FAIL);
+                    c.sendBroadcast(fail);
+                }
+            }
+        };
+        getReportTask.execute(startDate,endDate);
+    }
 
     public void GetCurrentBudget()
     {
@@ -484,7 +521,9 @@ public class Model
     {
         int count=0;
         double total=0;
-        String month = ""+Calendar.MONTH;
+        int m = Calendar.MONTH;
+        m++;
+        String month = ""+m;
         Calendar c = Calendar.getInstance();
         String year = c.get(Calendar.YEAR)+"";
         for(Receipt r: _receipts)
@@ -518,8 +557,9 @@ public class Model
     {
         List<Receipt> result = new ArrayList<Receipt>();
         SimpleDateFormat format = new SimpleDateFormat("M");
-
-        String month = ""+Calendar.MONTH;
+        int m = Calendar.MONTH;
+        m++;
+        String month = ""+m;
         month = format.format(new Date());
         Calendar c = Calendar.getInstance();
         String year = c.get(Calendar.YEAR)+"";
@@ -568,6 +608,32 @@ public class Model
         List<Receipt> result = _displayReceipts;
         Collections.sort(result, comparator);
         return result;
+    }
+    public byte[] getByteArrayFromImage(String filePath) throws FileNotFoundException, IOException {
+
+        File file = new File(filePath);
+        System.out.println(file.exists() + "!!");
+
+        FileInputStream fis = new FileInputStream(file);
+        //create FileInputStream which obtains input bytes from a file in a file system
+        //FileInputStream is meant for reading streams of raw bytes such as image data. For reading streams of characters, consider using FileReader.
+
+        //InputStream in = resource.openStream();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        byte[] buf = new byte[1024];
+        try {
+            for (int readNum; (readNum = fis.read(buf)) != -1;) {
+                bos.write(buf, 0, readNum);
+                //no doubt here is 0
+                /*Writes len bytes from the specified byte array starting at offset
+                off to this byte array output stream.*/
+                System.out.println("read " + readNum + " bytes,");
+            }
+        } catch (IOException ex) {
+            Log.d("error", "error");
+        }
+        byte[] bytes = bos.toByteArray();
+        return bytes;
     }
 
 }

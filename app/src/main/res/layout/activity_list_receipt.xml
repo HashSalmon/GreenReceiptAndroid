@@ -6,7 +6,9 @@
     android:orientation="vertical"
     tools:context=".Login$PlaceholderFragment"
     android:background="#ffe6ffca"
-    android:gravity="top">
+    android:gravity="top"
+    android:paddingLeft="5dp"
+    android:paddingRight="5dp">
     <!--<android.support.v7.widget.Toolbar-->
         <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
         <!--android:id="@+id/action_bar"-->
@@ -37,5 +39,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/list"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal"
+        />
 </LinearLayout>

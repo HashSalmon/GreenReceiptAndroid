@@ -6,7 +6,9 @@
     android:orientation="vertical"
     tools:context=".Login$PlaceholderFragment"
     android:background="#ffe6ffca"
-    android:gravity="top">
+    android:gravity="top"
+    android:paddingRight="4dp"
+    android:paddingLeft="4dp">
     <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

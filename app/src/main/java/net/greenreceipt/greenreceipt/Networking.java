@@ -102,7 +102,7 @@ public class Networking {
             return false;
         }
     }
-    public boolean addReceipt(Receipt r)
+    public Receipt addReceipt(Receipt r,ReceiptImage image)
     {
 
         try {
@@ -119,18 +119,23 @@ public class Networking {
             StringEntity entity = new StringEntity(jsonString);
             request.setEntity(entity);
             HttpResponse response = client.execute(request);
-            if(response.getStatusLine().getStatusCode()!=200)
-            {
-                InputStream responseContent = response.getEntity().getContent();
-                Scanner responseScanner = new Scanner(responseContent).useDelimiter("\\A");
-                String responseString = responseScanner.hasNext() ? responseScanner.next() : null;
-                error = responseString;
+            InputStream responseContent = response.getEntity().getContent();
+            Scanner responseScanner = new Scanner(responseContent).useDelimiter("\\A");
+            String responseString = responseScanner.hasNext() ? responseScanner.next() : null;
+            if(responseString == null || response.getStatusLine().getStatusCode() != 200)
+                return null;
+
+            Receipt receipt = gson.fromJson(responseString,Receipt.class);
+            if(image!=null) {
+                image.ReceiptId = receipt.Id;
+                postReceiptImage(image);
             }
-            return response.getStatusLine().getStatusCode() == 200;
+            return receipt;
         }
         catch (Exception e) {
             e.printStackTrace();
-            return false;
+            error = e.getMessage();
+            return null;
         }
     }
     public Receipt[] getAllReceipts()
@@ -405,6 +410,72 @@ public class Networking {
             return false;
         }
     }
+    public boolean postReceiptImage(ReceiptImage image)
+    {
+        try {
+            error = "";
+            HttpParams httpParameters = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+            HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+            HttpClient client = new DefaultHttpClient(httpParameters);
+            HttpPost request = new HttpPost(BASE_URL + "api/Image/ReceiptImage");
+            request.addHeader("Content-Type", "application/json");
+            request.addHeader("Authorization","Bearer "+Model._token);
+
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
+            String jsonString = gson.toJson(image);
+            StringEntity entity = new StringEntity(jsonString);
+            request.setEntity(entity);
+            HttpResponse response = client.execute(request);
+            if(response.getStatusLine().getStatusCode()!=200)
+            {
+                InputStream responseContent = response.getEntity().getContent();
+                Scanner responseScanner = new Scanner(responseContent).useDelimiter("\\A");
+                String responseString = responseScanner.hasNext() ? responseScanner.next() : null;
+                error = responseString;
+            }
+            return response.getStatusLine().getStatusCode() == 200;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            error = e.getMessage();
+            return false;
+        }
+    }
+    public TrendingReport getTrendingReport(String startDate, String endDate)
+    {
+        try {
+            error = "";
+            HttpParams httpParameters = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+            HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+            HttpClient client = new DefaultHttpClient(httpParameters);
+            HttpGet request = new HttpGet(BASE_URL + "api/TrendingReport?startDate="+startDate+"&endDate="+endDate);
+            request.addHeader("Authorization","Bearer "+Model._token);
+            HttpResponse response = client.execute(request);
+
+            InputStream responseContent = response.getEntity().getContent();
+            Scanner responseScanner = new Scanner(responseContent).useDelimiter("\\A");
+            String responseString = responseScanner.hasNext() ? responseScanner.next() : null;
+
+            if(responseString == null || response.getStatusLine().getStatusCode() != 200)
+            {
+                error = "Failed to retrieve data";
+                return null;
+            }
+
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
+            TrendingReport trendingReport = gson.fromJson(responseString, TrendingReport.class);
+            return trendingReport;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            error = e.getMessage();
+            return null;
+        }
+    }
+
+
 
 
 

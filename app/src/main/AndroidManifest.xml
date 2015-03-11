@@ -19,7 +19,7 @@
         android:allowBackup="true"
         android:icon="@drawable/logo"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
+        android:theme="@style/CustomTheme"
         android:uiOptions="splitActionBarWhenNarrow" >
         <meta-data
             android:name="android.support.UI_OPTIONS"
@@ -43,8 +43,7 @@
         </activity>
         <activity
             android:name=".HomeActivity"
-            android:label="@string/title_activity_home"
-            >
+            android:label="@string/title_activity_home" >
         </activity>
         <activity
             android:name=".SignUpActivity"
@@ -134,6 +133,10 @@
         <activity
             android:name=".EditBudgetActivity"
             android:label="@string/title_activity_edit_budget" >
+        </activity>
+        <activity
+            android:name=".FullScreenImageActivity"
+            android:label="@string/title_activity_full_screen_image" >
         </activity>
     </application>
 

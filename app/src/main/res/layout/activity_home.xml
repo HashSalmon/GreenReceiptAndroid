@@ -6,7 +6,9 @@
     android:orientation="vertical"
     tools:context=".Login$PlaceholderFragment"
     android:background="#ffe6ffca"
-    android:gravity="center">
+    android:gravity="center"
+    android:paddingLeft="5dp"
+    android:paddingRight="5dp">
     <!--<android.support.v7.widget.Toolbar-->
         <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
         <!--android:id="@+id/action_bar"-->

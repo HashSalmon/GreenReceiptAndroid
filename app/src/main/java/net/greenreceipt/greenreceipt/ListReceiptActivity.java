@@ -53,13 +53,14 @@ public class ListReceiptActivity extends Activity implements ListAdapter{
 //        Toolbar actionBar = (Toolbar) findViewById(R.id.action_bar);
 //        setSupportActionBar(actionBar);
 //        Model.getInstance().GetAllReceipt();
-        spinner = ProgressDialog.show(this, null, "Loading...");
+
 
         Model.getInstance().setGetReceiptListener(new Model.GetReceiptListener() {
             @Override
             public void getReceiptSuccess() {
                 spinner.dismiss();
                 list.invalidateViews();
+                Model.getInstance().changeDisplayReceipts(filter);
             }
 
             @Override
@@ -256,6 +257,7 @@ public class ListReceiptActivity extends Activity implements ListAdapter{
     protected void onResume() {
         super.onResume();
         Model.getInstance().GetAllReceipt();
+        spinner = ProgressDialog.show(this, null, "Loading...");
         filter = getIntent().getIntExtra(Model.RECEIPT_FILTER,0);
 //        Model.getInstance().changeDisplayReceipts(filter);
         if(filter >= 0 && filter < options.length)//it's with in the option range

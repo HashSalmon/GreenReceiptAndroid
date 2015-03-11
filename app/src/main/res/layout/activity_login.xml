@@ -42,7 +42,7 @@
         android:layout_gravity="center"
         android:textColorHint="#ff606060"
         android:singleLine="true"
-        android:text="test@example.com"
+        android:text="jwanlass8@gmail.com"
         android:background="@android:drawable/edit_text"
         android:textColor="@android:color/primary_text_light"
         />

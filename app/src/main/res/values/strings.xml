@@ -38,5 +38,6 @@
     <string name="title_activity_tab_test">TabTest</string>
     <string name="title_activity_create_budget">CreateBudgetActivity</string>
     <string name="title_activity_edit_budget">EditBudgetActivity</string>
+    <string name="title_activity_full_screen_image">FullScreenImageActivity</string>
 
 </resources>

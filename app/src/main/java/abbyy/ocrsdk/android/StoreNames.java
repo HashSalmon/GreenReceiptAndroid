@@ -14,7 +14,9 @@ public class StoreNames
                 "apple",
                 "walmart",
                 "smith's",
-                "macy's"
+                "macy's",
+                "nordstrom rack",
+                "foot locker"
 
         };
 //        HashMap<String, String> names = new HashMap<String, String>();

@@ -10,6 +10,7 @@ import android.util.Pair;
 import android.view.Menu;
 import android.widget.TextView;
 
+import net.greenreceipt.greenreceipt.Helper;
 import net.greenreceipt.greenreceipt.ListReceiptActivity;
 import net.greenreceipt.greenreceipt.Model;
 import net.greenreceipt.greenreceipt.R;
@@ -219,13 +220,14 @@ public class ResultsActivity extends Activity {
             r.Latitude = location.second;
             r.PurchaseDate = new Date();
             try {
-                r.Total = Double.parseDouble(getTotalAmount());
-                r.Tax = Double.parseDouble(getTotalTax());
-                Model.getInstance().AddReceipt(r);
+                r.Total = Double.parseDouble(getTotalAmount().trim());
+                r.Tax = Double.parseDouble(getTotalTax().trim());
+                Model.getInstance().AddReceipt(r,null);
             }
             catch (Exception e)
             {
-
+                spinner.dismiss();
+                Helper.AlertBox(this,"Error",e.getMessage());
             }
 
 

@@ -30,6 +30,7 @@ public class Receipt
     public int StoreId;
     public Date CreatedDate;
     public int Id;
+    public String picturePath;
 
 
 

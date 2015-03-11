@@ -52,7 +52,7 @@ public class ReceiptDetailActivity extends Activity implements ListAdapter {
                 spinner.dismiss();
                 deleted = true;
                 Intent list = new Intent(getBaseContext(),ListReceiptActivity.class);
-                list.putExtra(Model.RECEIPT_FILTER,-1);
+                list.putExtra(Model.RECEIPT_FILTER,4);
                 startActivity(list);
             }
 
@@ -140,6 +140,29 @@ public class ReceiptDetailActivity extends Activity implements ListAdapter {
             Date date = receipt.PurchaseDate;
             detail.setText(sdf.format(date)+"\n$"+new DecimalFormat("##.##").format(receipt.Total));
             view.setBackgroundColor(Color.WHITE);
+            ImageView image = (ImageView) view.findViewById(R.id.image);
+            if(receipt.Store.Company.Name.equals("ARBY'S")) {
+                image.setImageResource(R.drawable.arby);
+                image.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(ReceiptDetailActivity.this,FullScreenImageActivity.class);
+                        intent.putExtra("resource",R.drawable.arby);
+                        startActivity(intent);
+                    }
+                });
+            }
+            else
+            {
+                image.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(ReceiptDetailActivity.this,FullScreenImageActivity.class);
+                        intent.putExtra("resource",R.drawable.ic_action_camera);
+                        startActivity(intent);
+                    }
+                });
+            }
         }
 
         else if(position == 1)//alert
@@ -359,6 +382,6 @@ public class ReceiptDetailActivity extends Activity implements ListAdapter {
     protected void onPause() {
         super.onPause();
         if(!deleted)
-        Model.getInstance().AddReceipt(receipt);//update if not deleted
+        Model.getInstance().AddReceipt(receipt,null);//update if not deleted
     }
 }

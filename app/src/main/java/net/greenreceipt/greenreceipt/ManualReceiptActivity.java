@@ -60,10 +60,11 @@ public class ManualReceiptActivity extends FragmentActivity implements View.OnCl
     ImageView image1;
     LinearLayout imageContainer;
     int imageCount=0;
+    ArrayList<String> picturePaths = new ArrayList<String>();
 
     private final int TAKE_PICTURE = 0;
     private String resultUrl = "result.txt";
-
+    private String picturePath;
 
 
 //    int paymentType;
@@ -176,7 +177,7 @@ public class ManualReceiptActivity extends FragmentActivity implements View.OnCl
                             receipt.SubTotal = subtotal;
                             receipt.CreatedDate = new Date();
                             receipt.PurchaseDate = new Date(date.getText().toString());
-                            ;
+                            receipt.picturePath = ManualReceiptActivity.this.picturePath;
                             receipt.ReceiptItems.addAll(items);
                             receipt.ReturnReminder = alertSwitch.isChecked();
                             receipt.Total = receipt.SubTotal + receipt.Tax;
@@ -186,9 +187,17 @@ public class ManualReceiptActivity extends FragmentActivity implements View.OnCl
                             Pair<Double, Double> location = Model.getInstance().getCurrentLocation(ManualReceiptActivity.this);
                             receipt.Longitude = location.first;
                             receipt.Latitude = location.second;
+                            ReceiptImage image = null;
+                            if(picturePath!=null) {
+                                image = new ReceiptImage();
+                                image.ImageBytes = Model.getInstance().getByteArrayFromImage(picturePath);
+                                image.FileName = "image.jpg";
+
+                            }
+                            Model.getInstance().AddReceipt(receipt,image);
 
 
-                            Model.getInstance().AddReceipt(receipt);
+
                         }
                         catch (Exception e) {
                             e.printStackTrace();
@@ -324,12 +333,52 @@ public class ManualReceiptActivity extends FragmentActivity implements View.OnCl
         switch (requestCode) {
             case TAKE_PICTURE:
                 imageFilePath = getOutputMediaFileUri();
-                if(imageCount < 5) {
-                    ImageView newView = new ImageView(this);
-                    newView.setImageURI(imageFilePath);
-                    imageContainer.addView(newView);
-                    imageCount++;
-                }
+                picturePath = imageFilePath.getPath();
+                image1.setImageURI(imageFilePath);
+//                String[] filePathColumn = { MediaStore.Images.Media.DATA };
+//                Cursor cursor = getContentResolver().query(imageFilePath,
+//                        filePathColumn, null, null, null);
+//                cursor.moveToFirst();
+//                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+//
+//                picturePath = cursor.getString(columnIndex);
+//                File imgFile = new File(picturePath);
+//                if(imgFile.exists())
+//                {
+//                    ExifInterface exif = null;
+//                    try {
+//                        exif = new ExifInterface(picturePath);
+//
+//                        int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
+//                        Bitmap thumb = MediaStore.Images.Thumbnails.getThumbnail(
+//                                getContentResolver(), Long.parseLong(imageFilePath.getLastPathSegment()),
+//                                MediaStore.Images.Thumbnails.MICRO_KIND,
+//                                (BitmapFactory.Options) null);
+//                        Matrix matrix = new Matrix();
+//                        if (orientation == 6)
+//                            matrix.postRotate(90);
+//                        else if (orientation == 3)
+//                            matrix.postRotate(180);
+//                        else if (orientation == 8)
+//                            matrix.preRotate(90);
+//                        thumb = Bitmap.createBitmap(thumb, 0, 0, thumb.getWidth(), thumb.getHeight(), matrix, true);
+//                        image1.setImageBitmap(thumb);
+//
+//
+//                    }
+//                    catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                }
+//                cursor.close();
+
+//                if(imageCount < 5) {
+//                    ImageView newView = new ImageView(this);
+//                    newView.setImageURI(imageFilePath);
+//                    imageContainer.addView(newView);
+//                    imageCount++;
+//                }
 
 
                 break;
@@ -419,6 +468,11 @@ public class ManualReceiptActivity extends FragmentActivity implements View.OnCl
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
     public void onClick(View v)
     {
         Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
@@ -428,6 +482,12 @@ public class ManualReceiptActivity extends FragmentActivity implements View.OnCl
         startActivityForResult(intent, TAKE_PICTURE);
 
     }
+//    private ReceiptImage createImage()
+//    {
+//        ReceiptImage image = new ReceiptImage();
+//        image.CreatedDate = new Date();
+//
+//    }
 
     //    @Override
 //    public void onClick(String s) {
