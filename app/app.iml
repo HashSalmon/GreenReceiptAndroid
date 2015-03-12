@@ -83,15 +83,25 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 21 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" exported="" name="java2html" level="project" />
+    <orderEntry type="library" exported="" name="Input-2015.1.225-trial-release-" level="project" />
     <orderEntry type="library" exported="" name="support-v4-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="library-1.0.9" level="project" />
+    <orderEntry type="library" exported="" name="Common-2015.1.225-trial-release-" level="project" />
+    <orderEntry type="library" exported="" name="recyclerview-v7-21.0.3" level="project" />
+    <orderEntry type="library" exported="" name="analyticsmonitor" level="project" />
+    <orderEntry type="library" exported="" name="Feedback-2015.1.225-trial-release-" level="project" />
     <orderEntry type="library" exported="" name="httpmime-4.3.6" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="mpandroidchartlibrary-1-7-4" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="stringpicker-0.0.2" level="project" />
     <orderEntry type="library" exported="" name="glassactionbar-0.3.0" level="project" />
+    <orderEntry type="library" exported="" name="Chart-2015.1.225-trial-release-" level="project" />
+    <orderEntry type="library" exported="" name="Data-2015.1.225-trial-release-" level="project" />
+    <orderEntry type="library" exported="" name="List-2015.1.225-trial-release-" level="project" />
     <orderEntry type="library" exported="" name="httpcore-4.3.3" level="project" />
+    <orderEntry type="library" exported="" name="Primitives-2015.1.225-trial-release-" level="project" />
     <orderEntry type="library" exported="" name="floatingactionbutton-1.8.0" level="project" />
     <orderEntry type="library" exported="" name="gson-2.3" level="project" />
     <orderEntry type="library" exported="" name="universal-image-loader-1.9.3" level="project" />

@@ -108,7 +108,10 @@ ListView summary;
                 startActivity(newIntent);
                 return true;
             case R.id.viewReceipts:
-                Intent list = new Intent(this , ListReceiptActivity.class);
+//                Intent list = new Intent(this , ListReceiptActivity.class);
+//                list.putExtra(Model.RECEIPT_FILTER,4);
+//                startActivity(list);
+                Intent list = new Intent(this , ListTest.class);
                 list.putExtra(Model.RECEIPT_FILTER,4);
                 startActivity(list);
                 return true;

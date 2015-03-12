@@ -1,4 +1,11 @@
 apply plugin: 'com.android.application'
+apply plugin: 'android'
+repositories {
+    mavenCentral()
+    flatDir{
+        dirs 'libs'
+    }
+}
 
 android {
     compileSdkVersion 21
@@ -8,6 +15,8 @@ android {
         exclude 'META-INF/NOTICE'
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/DEPENDENCIES'
+        exclude 'bin/AndroidManifest.xml'
+        exclude 'libs/android-support-v4.jar'
 
     }
     defaultConfig {
@@ -34,12 +43,22 @@ dependencies {
     compile 'com.android.support:support-v13:21.0.0'
     compile 'com.android.support:support-v4:21.0.0'
     compile 'com.android.support:appcompat-v7:+'
-//    compile 'com.google.android.gms:play-services-maps:6.5.87'
+    //    compile 'com.google.android.gms:play-services-maps:6.5.87'
     compile 'com.github.hotchemi:stringpicker:0.0.2'
     compile 'com.akexorcist:RoundCornerProgressBar:1.0.0'
     compile 'com.github.manuelpeinado.glassactionbar:glassactionbar:0.3.0'
     compile 'com.jpardogo.materialtabstrip:library:1.0.9'
     compile 'com.getbase:floatingactionbutton:1.8.0'
     compile files('libs/mpandroidchartlibrary-1-7-4.jar')
-
+    compile files('libs/analyticsmonitor.jar')
+    compile files('libs/java2html.jar')
+    compile 'com.android.support:recyclerview-v7:21.0.3'
+    compile files('libs/analyticsmonitor.jar')
+    compile(name:'Common-2015.1.225-trial-release', ext:'aar')
+    compile(name:'Data-2015.1.225-trial-release', ext:'aar')
+    compile(name:'Primitives-2015.1.225-trial-release', ext:'aar')
+    compile(name:'Input-2015.1.225-trial-release', ext:'aar')
+    compile(name:'Chart-2015.1.225-trial-release', ext:'aar')
+    compile(name:'List-2015.1.225-trial-release', ext:'aar')
+    compile(name:'Feedback-2015.1.225-trial-release', ext:'aar')
 }

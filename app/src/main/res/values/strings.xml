@@ -39,5 +39,6 @@
     <string name="title_activity_create_budget">CreateBudgetActivity</string>
     <string name="title_activity_edit_budget">EditBudgetActivity</string>
     <string name="title_activity_full_screen_image">FullScreenImageActivity</string>
+    <string name="title_activity_list_test">ListTest</string>
 
 </resources>
