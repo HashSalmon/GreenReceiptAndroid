@@ -1,0 +1,8 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="net.greenreceipt.greenreceipt.ReceiptDetailActivity" >
+    <item android:id="@+id/delete"
+        android:title="@string/action_delete"
+        android:orderInCategory="100"
+        android:showAsAction="never" />
+</menu>

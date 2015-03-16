@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <!--<RelativeLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent">-->
+
+        <!--<android.support.v7.widget.Toolbar-->
+            <!--android:elevation="4dp"-->
+            <!--android:id="@+id/toolbar"-->
+            <!--app:theme="@style/ThemeOverlay.AppCompat.ActionBar"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content">-->
+
+        <!--</android.support.v7.widget.Toolbar>-->
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/toolbar"
+            android:animateLayoutChanges="true"
+            android:paddingTop="30dp"
+            android:background="@drawable/background_repeater">
+            <ImageView
+                android:layout_weight="15"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:id="@+id/logo"
+                android:src="@drawable/logo"
+                android:layout_centerHorizontal="true"/>
+
+
+            <LinearLayout
+                android:id="@+id/container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_below="@+id/logo">
+                <TextView
+                    android:id="@+id/greeting"
+                    android:text="Welcome Back, John"
+                    android:textSize="25dp"
+                    android:textColor="#000000"
+                    android:gravity="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="60"
+                    />
+                <TextView
+                    android:id="@+id/date"
+                    android:text="November 25 2014"
+                    android:textSize="20dp"
+                    android:textColor="#000000"
+                    android:gravity="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="40" />
+            </LinearLayout>
+            <ListView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/summary"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="30dp"
+                android:layout_below="@+id/container"/>
+        </RelativeLayout>
+    <!--</RelativeLayout>-->
+
+</LinearLayout>

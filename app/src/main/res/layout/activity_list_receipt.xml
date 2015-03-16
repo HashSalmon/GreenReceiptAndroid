@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".Login$PlaceholderFragment"
+    android:background="#ffe6ffca"
+    android:gravity="top"
+    android:paddingLeft="5dp"
+    android:paddingRight="5dp">
+    <!--<android.support.v7.widget.Toolbar-->
+        <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
+        <!--android:id="@+id/action_bar"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:minHeight="?attr/actionBarSize"-->
+        <!--android:background="@color/blue_semi_transparent"-->
+        <!--android:layout_alignParentTop="true"/>-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <Spinner
+            android:id="@+id/filters"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginTop="5dp" />
+        <Spinner
+            android:id="@+id/sort"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginTop="5dp" />
+
+        </LinearLayout>
+
+    <com.telerik.widget.list.RadListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/list"
+        android:layout_gravity="center_horizontal"
+        />
+</LinearLayout>

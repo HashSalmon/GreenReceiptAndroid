@@ -1,0 +1,30 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.cs4962example.finalproject.HomeActivity" >
+    <!--<item android:id="@+id/action_settings"-->
+    <!--android:title="@string/action_settings"-->
+    <!--android:orderInCategory="100"-->
+    <!--android:showAsAction="never" />-->
+    <item android:id="@+id/new_receipt"
+        android:icon="@drawable/ic_action_new"
+        android:title="New Receipt"
+        android:showAsAction="always"/>
+
+    <item android:id="@+id/viewReceipts"
+        android:icon="@drawable/ic_action_labels"
+        android:title="View Receipts"
+        android:showAsAction="always"/>
+
+    <item android:id="@+id/view_summary"
+        android:icon="@drawable/ic_action_web_site"
+        android:title="Summary"
+        android:showAsAction="always"/>
+
+    <item android:id="@+id/action_settings"
+        android:icon="@drawable/ic_action_settings"
+        android:title="Settings"
+        android:showAsAction="always"/>
+
+
+</menu>

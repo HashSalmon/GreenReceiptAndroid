@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/21.0.3/classes.jar"
+        jumboMode="false"
+        revision="21.0.2"
+        sha1="81d42bf983a8741f4888a6e333e454e4a5e0eeb7">
+        <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/classes-eef18b80c9b5dca24792ca27e7f6938300baf5d2.jar" />
+    </item>
+    <item
+        jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/exploded-aar/Feedback-2015.1.225-trial-release/classes.jar"
+        jumboMode="false"
+        revision="21.0.2"
+        sha1="12eae1364c6b4729251a403fd296eb052a7599c2">
+        <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/classes-b6b225b8a23a588f7398ea14254b9e4cb02b82be.jar" />
+    </item>
+    <item
+        jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/libs/httpcore-4.3.3.jar"
+        jumboMode="false"
+        revision="21.0.2"
+        sha1="f91b7a4aadc5cf486df6e4634748d7dd7a73f06d">
+        <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/httpcore-4.3.3-be653e8248e9b875829c0c90ab45918b23a092ea.jar" />
+    </item>
+    <item
+        jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/exploded-aar/com.github.hotchemi/stringpicker/0.0.2/classes.jar"
+        jumboMode="false"
+        revision="21.0.2"
+        sha1="f4cc54f249a830f322cf2ae642deae59f522d55b">
+        <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/classes-1ed350041dca4b7422784900906434d8eb5c18da.jar" />
+    </item>
+    <item
+        jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/libs/gson-2.3.jar"
+        jumboMode="false"
+        revision="21.0.2"
+        sha1="5fc52c41ef0239d1093a1eb7c3697036183677ce">
+        <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/gson-2.3-5b5c31c649729145441d5ce2e6a2a644d7ff5d05.jar" />
+    </item>
+    <item
+        jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/exploded-aar/com.getbase/floatingactionbutton/1.8.0/classes.jar"
+        jumboMode="false"
+        revision="21.0.2"
+        sha1="7a055a4323187e6f6a5e63f01b5a59bff71869a5">
+        <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/classes-d4d74287e3fc95c717611c8eff0081a4a363dd73.jar" />
+    </item>
+    <item
+        jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/exploded-aar/Input-2015.1.225-trial-release/classes.jar"
+        jumboMode="false"
+        revision="21.0.2"
+        sha1="74c4ac29bdd1e2f5d44a6f00f6470432f2874ca9">
+        <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/classes-b662549378169f2b964a43543c55f6a47b58f289.jar" />
+    </item>
+    <item
+        jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/exploded-aar/com.jpardogo.materialtabstrip/library/1.0.9/classes.jar"
+        jumboMode="false"
+        revision="21.0.2"
+        sha1="ed2ab55be78d5d54ac9060d70d65a4573ae3d2ec">
+        <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/classes-eba01317b97fbd67e95ee256db9c309624f2455f.jar" />
+    </item>
+    <item
+        jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/libs/universal-image-loader-1.9.3.jar"
+        jumboMode="false"
+        revision="21.0.2"
+        sha1="a85588bec3e2c4584d593d3f15df1677321bca72">
+        <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/universal-image-loader-1.9.3-79fa1c8c5507350071161b8b41c885be8aee7a57.jar" />
+    </item>
+    <item
+        jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/classes.jar"
+        jumboMode="false"
+        revision="21.0.2"
+        sha1="2c91c949a45a21cdecf26e03951e46c7beec9ad8">
+        <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/classes-db72106d6b2d01048b7714b9b0239688c55a3a63.jar" />
+    </item>
+    <item
+        jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/libs/httpmime-4.3.6.jar"
+        jumboMode="false"
+        revision="21.0.2"
+        sha1="66a39a5e37d5da40fdad6176fc24ef4316e74702">
+        <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/httpmime-4.3.6-802be1e8fcf521f9dd7c4014853573be242d96f4.jar" />
+    </item>
+    <item
+        jar="/Users/Boya/sdk/extras/android/m2repository/com/android/support/support-annotations/21.0.3/support-annotations-21.0.3.jar"
+        jumboMode="false"
+        revision="21.0.2"
+        sha1="4b74cefe1f0c1b819e7260c8627a14674e37fd35">
+        <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/support-annotations-21.0.3-058ade587e778e88d221d941ab7bbd5c9967bbcb.jar" />
+    </item>
+    <item
+        jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/exploded-aar/com.akexorcist/RoundCornerProgressBar/1.0.0/classes.jar"
+        jumboMode="false"
+        revision="21.0.2"
+        sha1="17267d6813298019bcfe7639497f8c5c72f54a21">
+        <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/classes-0fca484699ba0973914e260e17d49afe597d7904.jar" />
+    </item>
+    <item
+        jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/exploded-aar/Data-2015.1.225-trial-release/classes.jar"
+        jumboMode="false"
+        revision="21.0.2"
+        sha1="e73ee94d8636d8f3bddcff393f89e4ea9d59ebb9">
+        <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/classes-64aabdcc2903992b5e6438bc7b2d494028bbf05a.jar" />
+    </item>
+    <item
+        jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/exploded-aar/com.github.manuelpeinado.glassactionbar/glassactionbar/0.3.0/classes.jar"
+        jumboMode="false"
+        revision="21.0.2"
+        sha1="018e6aaefbe75797b879b21274fb2e022c15882e">
+        <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/classes-416786e630f1832afda1b943b4a64079a383aa37.jar" />
+    </item>
+    <item
+        jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/exploded-aar/List-2015.1.225-trial-release/classes.jar"
+        jumboMode="false"
+        revision="21.0.2"
+        sha1="6475c3dfa4c1f019b4b434e918aa1aef857bafba">
+        <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/classes-16ca2ca67ff8841222a3b7c5820c569464316f0c.jar" />
+    </item>
+    <item
+        jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/exploded-aar/Common-2015.1.225-trial-release/classes.jar"
+        jumboMode="false"
+        revision="21.0.2"
+        sha1="a953c581a8d03841b572760c95dc0426a277f794">
+        <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/classes-38ecdb96ad348077d0d94a8615523f97687b693c.jar" />
+    </item>
+    <item
+        jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/libs/mpandroidchartlibrary-1-7-4.jar"
+        jumboMode="false"
+        revision="21.0.2"
+        sha1="c685e45ac6491e51640ce3571606ac22dfd4a6a3">
+        <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/mpandroidchartlibrary-1-7-4-6c579556a06d9379feb282f3af6d27a053ab9543.jar" />
+    </item>
+    <item
+        jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/libs/internal_impl-21.0.3.jar"
+        jumboMode="false"
+        revision="21.0.2"
+        sha1="01ec05bfbafcc07646ba813000bf2ef11742dd03">
+        <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/internal_impl-21.0.3-c260ed71b189adf76b3b2f01c1314bed8309f161.jar" />
+    </item>
+    <item
+        jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/libs/java2html.jar"
+        jumboMode="false"
+        revision="21.0.2"
+        sha1="bd7e81c677833cda822ecfc8f7fbde4ccb28424d">
+        <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/java2html-36fc78525b9592e5aba30857e5195fe1652a179e.jar" />
+    </item>
+    <item
+        jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/libs/analyticsmonitor.jar"
+        jumboMode="false"
+        revision="21.0.2"
+        sha1="afa95676ae1f54beeb42449e126677c7be443b15">
+        <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/analyticsmonitor-59f892b48b5776ba750237eee103227e1e2bdc01.jar" />
+    </item>
+    <item
+        jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/exploded-aar/Primitives-2015.1.225-trial-release/classes.jar"
+        jumboMode="false"
+        revision="21.0.2"
+        sha1="7a8fad6e98f20464a41c102967d0cd5d64d2d734">
+        <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/classes-bd11932d09eafcac218981a64d9bc9cd90b89f5f.jar" />
+    </item>
+    <item
+        jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/exploded-aar/com.android.support/support-v13/21.0.0/classes.jar"
+        jumboMode="false"
+        revision="21.0.2"
+        sha1="0c0c19759e5868604a3b4c2c0074ee9404d73c76">
+        <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/classes-36b4be6a892ccefeb27b3af3db994d2f287b5d4e.jar" />
+    </item>
+    <item
+        jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/exploded-aar/Chart-2015.1.225-trial-release/classes.jar"
+        jumboMode="false"
+        revision="21.0.2"
+        sha1="7b7102f53681ef11c0e8d2f64b4cdb00cda747d3">
+        <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/classes-d37b55164cb98b52a85543d2b784061f63569793.jar" />
+    </item>
+    <item
+        jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/exploded-aar/com.android.support/support-v13/21.0.0/libs/internal_impl-21.0.0.jar"
+        jumboMode="false"
+        revision="21.0.2"
+        sha1="5a8e01742aee890c56fe638ea7c921b91a3fdc62">
+        <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/internal_impl-21.0.0-40f0bbbeff9d9d816995ad079cd69cbd8a01cbeb.jar" />
+    </item>
+    <item
+        jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/exploded-aar/com.android.support/recyclerview-v7/21.0.3/classes.jar"
+        jumboMode="false"
+        revision="21.0.2"
+        sha1="4b8945fc23a7461c6fdde15753456d64b0a9358b">
+        <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/classes-1c0720678c9aadaa80ca3523425480bd703f482a.jar" />
+    </item>
+
+</items>
