@@ -27,7 +27,8 @@
     <color name="custom_progress_red_progress">#ffff4444</color>
     <color name="custom_progress_red_progress_half">#7fff4444</color>
 
-    <color name="primary_title_background">#00BBBC</color>
+    <!--<color name="primary_title_background">#00BBBC</color>-->
+    <color name="primary_accent_color">#ff99cc00</color>
     <color name="secondary_title_background">#2DB245</color>
 
 

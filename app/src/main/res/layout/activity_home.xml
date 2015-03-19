@@ -17,9 +17,10 @@
     <android.support.v7.widget.Toolbar
     android:elevation="4dp"
     android:id="@+id/toolbar"
-    app:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+    app:theme="@style/AppTheme"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="50dp"
+        android:background="@color/primary_accent_color">
 
     </android.support.v7.widget.Toolbar>
 
@@ -31,8 +32,8 @@
         android:paddingTop="30dp">
         <ImageView
             android:layout_weight="15"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:id="@+id/logo"
             android:src="@drawable/logo"
             android:layout_centerHorizontal="true"/>
@@ -45,12 +46,14 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:orientation="vertical"
-            android:layout_below="@+id/logo">
+            android:layout_below="@+id/logo"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp">
             <TextView
                 android:id="@+id/greeting"
                 android:text="Welcome Back, John"
                 android:textSize="25dp"
-                android:textColor="@color/primary_title_background"
+                android:textColor="@color/primary_accent_color"
                 android:gravity="center"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
@@ -60,27 +63,103 @@
                 android:id="@+id/date"
                 android:text="November 25 2014"
                 android:textSize="20dp"
-                android:textColor="@color/primary_title_background"
+                android:textColor="@color/primary_accent_color"
                 android:gravity="center"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="40" />
         </LinearLayout>
-        <com.telerik.widget.list.RadListView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/summary"
-            android:layout_gravity="center_horizontal"
-            android:paddingTop="30dp"
-            android:layout_below="@+id/container"/>
+            android:orientation="vertical"
+            android:background="@color/white"
+            android:gravity="center"
+            android:id="@+id/totalReceipts"
+            android:layout_below="@+id/container">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                >
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="75"
+                    android:text="Total Receipts"
+                    android:paddingTop="5dp"
+                    android:paddingLeft="5dp"
+                    android:textSize="16dp"/>
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="25"
+                    android:id="@+id/detail"
+                    android:paddingTop="5dp"
+                    android:textSize="12dp"
+                    android:paddingRight="5dp"
+                    android:textColor="@color/primary_accent_color"/>
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_action_next_item"
+                    android:paddingLeft="5dp"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"/>
+            </LinearLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="@color/primary_accent_color"
+                android:id="@+id/divider"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/white"
+            android:gravity="center"
+            android:layout_below="@+id/totalReceipts"
+            android:id="@+id/monthly">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="75"
+                    android:paddingTop="5dp"
+                    android:paddingLeft="5dp"
+                    android:textSize="16dp"
+                    android:text="This Month"/>
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="25"
+                    android:id="@+id/mDetail"
+                    android:paddingTop="5dp"
+                    android:textSize="12dp"
+                    android:paddingRight="5dp"
+                    android:textColor="@color/primary_accent_color"/>
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_action_next_item"
+                    android:paddingLeft="5dp"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"/>
+            </LinearLayout>
+        </LinearLayout>
     </RelativeLayout>
     </RelativeLayout>
-    <com.telerik.android.primitives.widget.sidedrawer.RadSideDrawer
+    <ListView android:id="@+id/drawer"
+        android:layout_width="240dp"
         android:layout_height="match_parent"
-        android:layout_width="wrap_content"
-        android:id="@+id/drawer"
-        android:layout_alignParentTop="true"
-        android:layout_gravity="left"
-        />
+        android:layout_gravity="start"
+        android:choiceMode="singleChoice"
+        android:divider="@color/transparent"
+        android:dividerHeight="0dp"
+        android:background="@color/white"/>
 
 </android.support.v4.widget.DrawerLayout>

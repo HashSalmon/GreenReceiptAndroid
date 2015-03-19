@@ -6,12 +6,16 @@ import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Pair;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -31,11 +35,12 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import Util.Helper;
 import hotchemi.stringpicker.StringPicker;
 import hotchemi.stringpicker.StringPickerDialog;
 
 
-public class ManualReceiptActivity extends FragmentActivity implements View.OnClickListener{
+public class ManualReceiptActivity extends ActionBarActivity implements View.OnClickListener{
     private static final String TAG = StringPickerDialog.class.getSimpleName();
     LinearLayout itemContainer;
     EditText itemName;
@@ -62,6 +67,9 @@ public class ManualReceiptActivity extends FragmentActivity implements View.OnCl
     int imageCount=0;
     ArrayList<String> picturePaths = new ArrayList<String>();
 
+    private ColorDrawable currentBgColor;
+    private ActionBar actionBar;
+
     private final int TAKE_PICTURE = 0;
     private String resultUrl = "result.txt";
     private String picturePath;
@@ -72,6 +80,20 @@ public class ManualReceiptActivity extends FragmentActivity implements View.OnCl
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manual_receipt);
+        Resources resources = getResources();
+        ColorDrawable bgColorPrimary = new ColorDrawable(resources.getColor(R.color.primary_accent_color));
+        ColorDrawable bgColorSecondary = new ColorDrawable(resources.getColor(R.color.secondary_title_background));
+        currentBgColor = bgColorPrimary;
+        Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
+        this.setSupportActionBar(tb);
+        tb.setTitleTextColor(Color.WHITE);
+        actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setBackgroundDrawable(currentBgColor);
+        }
+        actionBar.setHomeButtonEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
         if(Model.categories != null)
         {
             for(Category c : Model.categories)
@@ -158,7 +180,7 @@ public class ManualReceiptActivity extends FragmentActivity implements View.OnCl
                 public void onClick(View v) {
                     if (!checkReceipt(storeName, date, tax, items))//there's error
                     {
-                        Helper.AlertBox(ManualReceiptActivity.this,"Error", error);
+                        Helper.AlertBox(ManualReceiptActivity.this, "Error", error);
                     }
                     else {
                         double subtotal = 0;

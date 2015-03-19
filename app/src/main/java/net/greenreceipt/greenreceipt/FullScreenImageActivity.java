@@ -1,9 +1,9 @@
 package net.greenreceipt.greenreceipt;
 
-import android.app.Activity;
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.FloatMath;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -11,7 +11,7 @@ import android.view.View;
 import android.widget.ImageView;
 
 
-public class FullScreenImageActivity extends Activity implements View.OnTouchListener {
+public class FullScreenImageActivity extends ActionBarActivity implements View.OnTouchListener {
     private static final String TAG = "Touch" ;
     // These matrices will be used to move and zoom image
     Matrix matrix = new Matrix();
@@ -32,7 +32,7 @@ public class FullScreenImageActivity extends Activity implements View.OnTouchLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_full_screen_image);
-        getActionBar().hide();
+
         ImageView view = (ImageView) findViewById(R.id.image);
         view.setImageResource(getIntent().getIntExtra("resource", R.drawable.ic_action_camera));
         view.setOnTouchListener(new View.OnTouchListener() {

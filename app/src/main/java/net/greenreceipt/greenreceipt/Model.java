@@ -115,6 +115,8 @@ public class Model
     static Category[] categories;
     static Budget currentBudget;
     static TrendingReport trendingReport;
+    private static int currentPage=1;
+    static int pageSize;
     private static Networking networking;
     public static Model getInstance()
     {
@@ -287,13 +289,13 @@ public class Model
         };
         deleteTask.execute(id);
     }
-    public void GetAllReceipt()
+    public void GetAllReceipt(int pageSize,final int pageCount)
     {
-        AsyncTask<Object,Integer,Receipt[]> getTask = new AsyncTask<Object, Integer, Receipt[]>() {
+        AsyncTask<Integer,Integer,Receipt[]> getTask = new AsyncTask<Integer, Integer, Receipt[]>() {
             @Override
-            protected Receipt[] doInBackground(Object... params)
+            protected Receipt[] doInBackground(Integer... params)
             {
-                return networking.getAllReceipts();
+                return networking.getAllReceipts(params[0],params[1],params[2]);
             }
 
             @Override
@@ -303,6 +305,7 @@ public class Model
                 if(receipts!=null)
                 {
                     _receipts.clear();
+                    Model.currentPage++;
                     for(Receipt r : receipts)
                         _receipts.add(r);
                     GetReturnReceipts();
@@ -317,7 +320,7 @@ public class Model
 
             }
         };
-        getTask.execute();
+        getTask.execute(pageSize,Model.currentPage,pageCount);
     }
     public void GetReturnReceipts()
     {

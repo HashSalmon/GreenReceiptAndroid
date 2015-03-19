@@ -1,26 +1,34 @@
 package net.greenreceipt.greenreceipt;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
 
-public class SignUpActivity extends Activity {
+public class SignUpActivity extends ActionBarActivity {
 
     ProgressDialog spinner;
+    private ActionBar actionBar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
-        ActionBar bar = getActionBar();
-        bar.setDisplayHomeAsUpEnabled(true);
+        Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
+        this.setSupportActionBar(tb);
+        tb.setTitleTextColor(Color.WHITE);
+        actionBar = getSupportActionBar();
+
+        actionBar.setHomeButtonEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
         ImageView logo = (ImageView) findViewById(R.id.logo);
         logo.setImageResource(R.drawable.logo);
         final EditText email = (EditText) findViewById(R.id.emailField);

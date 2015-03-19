@@ -150,5 +150,18 @@
         <style name="PanZoomCheckboxLandscape" parent="PanZoomCheckbox">
             <item name="android:layout_marginBottom">2dp</item>
         </style>
+
+    <style name="WhiteSpinner" parent="@android:style/Theme.NoTitleBar">
+        <item name="android:spinnerItemStyle">@style/SpinnerItem</item>
+        <item name="android:spinnerDropDownItemStyle">@style/SpinnerItem.DropDownItem</item>
+    </style>
+
+    <style name="SpinnerItem" parent="@android:style/Widget.TextView.SpinnerItem">
+        <item name="android:textColor">#ffffff</item>
+    </style>
+
+    <style name="SpinnerItem.DropDownItem" parent="@android:style/Widget.DropDownItem.Spinner">
+        <item name="android:textColor">#ffffff</item>
+    </style>
     </resources>
 

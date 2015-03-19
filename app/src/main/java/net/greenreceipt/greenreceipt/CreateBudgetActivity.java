@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import Util.Helper;
 import hotchemi.stringpicker.StringPicker;
 
 
@@ -57,7 +58,7 @@ public class CreateBudgetActivity extends Activity {
             @Override
             public void onCreateFailed(String error) {
                 spinner.dismiss();
-                Helper.AlertBox(CreateBudgetActivity.this,"Error",error);
+                Helper.AlertBox(CreateBudgetActivity.this, "Error", error);
 
             }
         });

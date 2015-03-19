@@ -1,8 +1,12 @@
 package net.greenreceipt.greenreceipt;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.telerik.widget.list.ListViewAdapter;
@@ -16,8 +20,10 @@ import java.util.List;
  * Created by Boya on 3/11/15.
  */
 public class ListAdapter extends ListViewAdapter {
+    List item;
     public ListAdapter(List items) {
         super(items);
+        item = items;
     }
     @Override
     public ListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -45,5 +51,27 @@ public class ListAdapter extends ListViewAdapter {
             store = (TextView)itemView.findViewById(R.id.store);
             detail = (TextView)itemView.findViewById(R.id.detail);
         }
+    }
+    @Override
+    public void onBindSwipeContentHolder(ListViewHolder holder, final int position) {
+        RelativeLayout mainLayout = (RelativeLayout)holder.itemView;
+        LinearLayout rightLayout = (LinearLayout)mainLayout.getChildAt(1);
+
+        ImageButton rightButton = new ImageButton(mainLayout.getContext());
+        rightButton.setImageResource(R.drawable.ic_action_discard);
+        rightButton.setBackgroundColor(Color.RED);
+        rightButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Receipt r = Model._displayReceipts.get(position);
+                Model.getInstance().DeleteReceipt(r.Id);
+                remove(position);
+                notifyDataSetChanged();
+                notifySwipeExecuteFinished();
+            }
+        });
+
+        rightLayout.removeAllViews();
+        rightLayout.addView(rightButton);
     }
 }

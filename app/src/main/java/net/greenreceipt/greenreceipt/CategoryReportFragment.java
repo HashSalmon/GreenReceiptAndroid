@@ -17,6 +17,8 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import Util.Helper;
+
 
 public class CategoryReportFragment extends Fragment {
     private BarChart barChart;
@@ -89,7 +91,7 @@ public class CategoryReportFragment extends Fragment {
 
             @Override
             public void onGetCategoryReportFailed(String error) {
-                Helper.AlertBox(getActivity(),"Error",error);
+                Helper.AlertBox(getActivity(), "Error", error);
             }
         });
         Model.getInstance().GetCategoryReport(startOfMonth,today);

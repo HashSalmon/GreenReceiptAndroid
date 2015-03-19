@@ -1,13 +1,16 @@
 package net.greenreceipt.greenreceipt;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.database.DataSetObserver;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,7 +29,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 
-public class ReceiptDetailActivity extends Activity implements ListAdapter {
+public class ReceiptDetailActivity extends ActionBarActivity implements ListAdapter {
 
     ListView list;
     Receipt receipt;
@@ -36,12 +39,28 @@ public class ReceiptDetailActivity extends Activity implements ListAdapter {
     int mDay;
     ProgressDialog spinner;
     boolean deleted = false;
+    private ActionBar actionBar;
+    private ColorDrawable currentBgColor;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_receipt_detail);
-        ActionBar bar = getActionBar();
-        bar.setDisplayHomeAsUpEnabled(true);
+        Resources resources = getResources();
+        ColorDrawable bgColorPrimary = new ColorDrawable(resources.getColor(R.color.primary_accent_color));
+        ColorDrawable bgColorSecondary = new ColorDrawable(resources.getColor(R.color.secondary_title_background));
+        currentBgColor = bgColorPrimary;
+        Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
+        this.setSupportActionBar(tb);
+        tb.setTitleTextColor(Color.WHITE);
+        tb.inflateMenu(R.menu.receipt_detail);
+        actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setBackgroundDrawable(currentBgColor);
+        }
+        actionBar.setHomeButtonEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+//        ActionBar bar = getActionBar();
+//        bar.setDisplayHomeAsUpEnabled(true);
         int id = getIntent().getIntExtra(ListReceiptActivity.RECEIPT_ID,-1);
         receipt = Model.getInstance().getReceipt(id);
         list = (ListView) findViewById(R.id.list);
@@ -49,11 +68,13 @@ public class ReceiptDetailActivity extends Activity implements ListAdapter {
         Model.getInstance().setOnDeleteReceiptListener(new Model.OnDeleteReceiptListener() {
             @Override
             public void deleteSuccess() {
-                spinner.dismiss();
+                if(spinner!=null)
+                    spinner.dismiss();
                 deleted = true;
                 Intent list = new Intent(getBaseContext(),ListReceiptActivity.class);
                 list.putExtra(Model.RECEIPT_FILTER,4);
                 startActivity(list);
+                finish();
             }
 
             @Override
@@ -70,7 +91,6 @@ public class ReceiptDetailActivity extends Activity implements ListAdapter {
         getMenuInflater().inflate(R.menu.receipt_detail, menu);
         return true;
     }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -252,7 +272,7 @@ public class ReceiptDetailActivity extends Activity implements ListAdapter {
         }
         else if(position == getCount()-6)//SubTotal
         {
-            view =View.inflate(this, R.layout.listitem, null);
+            view =View.inflate(this, R.layout.listitem_nodivider, null);
             TextView subtotal = (TextView) view.findViewById(R.id.store);
             subtotal.setText("Subtotal");
             TextView detail = (TextView) view.findViewById(R.id.detail);
@@ -265,7 +285,7 @@ public class ReceiptDetailActivity extends Activity implements ListAdapter {
         }
         else if(position == getCount()-5)//Tax
         {
-            view =View.inflate(this, R.layout.listitem, null);
+            view =View.inflate(this, R.layout.listitem_nodivider, null);
             TextView tax = (TextView) view.findViewById(R.id.store);
             tax.setText("Tax");
             TextView detail = (TextView) view.findViewById(R.id.detail);
@@ -277,7 +297,7 @@ public class ReceiptDetailActivity extends Activity implements ListAdapter {
         }
         else if(position == getCount() -4)//total
         {
-            view =View.inflate(this, R.layout.listitem, null);
+            view =View.inflate(this, R.layout.listitem_nodivider, null);
             TextView store = (TextView) view.findViewById(R.id.store);
             store.setText("Total");
             TextView detail = (TextView) view.findViewById(R.id.detail);
@@ -290,7 +310,7 @@ public class ReceiptDetailActivity extends Activity implements ListAdapter {
 
         else if(position == getCount()-3)//card
         {
-            view =View.inflate(this, R.layout.listitem, null);
+            view =View.inflate(this, R.layout.listitem_nodivider, null);
             TextView card = (TextView) view.findViewById(R.id.store);
             card.setText("Payment: "+getCardType(receipt.CardType));
             TextView detail = (TextView) view.findViewById(R.id.detail);
@@ -302,7 +322,7 @@ public class ReceiptDetailActivity extends Activity implements ListAdapter {
         }
         else if(position == getCount()-2)//discount
         {
-            view =View.inflate(this, R.layout.listitem, null);
+            view =View.inflate(this, R.layout.listitem_nodivider, null);
             TextView discount = (TextView) view.findViewById(R.id.store);
             discount.setText("Discount");
             TextView detail = (TextView) view.findViewById(R.id.detail);
@@ -315,14 +335,14 @@ public class ReceiptDetailActivity extends Activity implements ListAdapter {
         else if(position == getCount()-1)//barcode
         {
             ImageView barcode = new ImageView(this);
-            barcode.setImageResource(R.drawable.barcode);
+//            barcode.setImageResource(R.drawable.barcode);
             view = barcode;
 
         }
         else{
             Item item = receipt.getItem(position - 2);
 
-            view =View.inflate(this, R.layout.listitem, null);
+            view =View.inflate(this, R.layout.listitem_nodivider, null);
             view.setPadding(5, 0, 0, 5);
             TextView store = (TextView) view.findViewById(R.id.store);
             store.setText(item.ItemName);

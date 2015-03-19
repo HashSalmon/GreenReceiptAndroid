@@ -3,12 +3,11 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ffe6ffca">
+    android:background="@color/primary_accent_color">
 <LinearLayout
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="#ffe6ffca"
     android:paddingTop="30dp"
     android:paddingBottom="30dp"
     android:paddingLeft="30dp"
@@ -64,7 +63,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Keep me logged in"
-        android:id="@+id/keeplogin"/>
+        android:id="@+id/keeplogin"
+        android:textColor="@color/white"/>
     <TextView
         android:text="Forgot Password?"
         android:layout_width="match_parent"
@@ -90,14 +90,16 @@
             android:text="Login"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
-            android:gravity="center" />
+            android:gravity="center"
+            android:textColor="@color/white"/>
         <Button
             android:id="@+id/signupButton"
             android:layout_gravity="center"
             android:text="Sign Up"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
-            android:gravity="center" />
+            android:gravity="center"
+            android:textColor="@color/white"/>
     </LinearLayout>
 </LinearLayout>
 </ScrollView>

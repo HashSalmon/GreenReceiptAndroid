@@ -6,7 +6,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="150dp"
-        android:background="@color/primary_material_light"
+        android:background="@color/primary_accent_color"
         android:paddingLeft="20dp"
         android:paddingTop="20dp">
         <ImageView
@@ -18,34 +18,50 @@
         </RelativeLayout>
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
+        android:layout_height="match_parent">
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Home"
+            android:onClick="viewReceipt"
+            android:textColor="@color/primary_accent_color"
+            android:id="@+id/home"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_action_new"
+            android:id="@+id/newIcon"
+            android:layout_below="@id/home"
+            android:layout_alignParentLeft="true"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add Receipt"
+            android:id="@+id/addReceipt"
+            android:layout_toRightOf="@id/newIcon"
+            android:layout_below="@id/home"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="View Receipts"
+            android:onClick="viewReceipt"
+            android:id="@+id/viewReceipts"
+            android:layout_below="@id/newIcon"
+            />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Reports and Budget"
+            android:id="@+id/report"
+            android:layout_below="@id/viewReceipts"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Settings"
+            android:layout_below="@id/report"/>
         </RelativeLayout>
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Home"
-        android:textSize="@dimen/abc_text_size_title_material"
-        android:onClick="viewReceipt"/>
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="View Receipts"
-        android:textSize="@dimen/abc_text_size_title_material"
-        android:onClick="viewReceipt"/>
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Reports and Budget"
-        android:textSize="@dimen/abc_text_size_title_material"
-        android:onClick="viewReceipt"/>
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Settings"
-        android:textSize="@dimen/abc_text_size_title_material"
-        android:onClick="viewReceipt"/>
+
 
 
 </LinearLayout>

@@ -1,10 +1,12 @@
-package net.greenreceipt.greenreceipt;
+package Util;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.widget.ImageView;
+
+import net.greenreceipt.greenreceipt.R;
 
 /**
  * Created by Boya on 2/12/15.

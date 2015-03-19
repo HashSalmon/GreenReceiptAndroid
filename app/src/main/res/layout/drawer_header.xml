@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="150dp"
+    android:background="@color/primary_accent_color"
+    android:paddingLeft="20dp"
+    android:paddingTop="30dp"
+    >
+    <ImageView
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:src="@drawable/profile"
+        android:id="@+id/profile"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="email"
+        android:layout_below="@id/profile"
+        android:paddingTop="10dp"
+        android:id="@+id/email"
+        android:textColor="@color/white"/>
+</RelativeLayout>

@@ -10,7 +10,6 @@ import android.util.Pair;
 import android.view.Menu;
 import android.widget.TextView;
 
-import net.greenreceipt.greenreceipt.Helper;
 import net.greenreceipt.greenreceipt.ListReceiptActivity;
 import net.greenreceipt.greenreceipt.Model;
 import net.greenreceipt.greenreceipt.R;
@@ -22,6 +21,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Date;
 import java.util.HashMap;
+
+import Util.Helper;
 
 import static net.greenreceipt.greenreceipt.Model.RECEIPT_FILTER;
 

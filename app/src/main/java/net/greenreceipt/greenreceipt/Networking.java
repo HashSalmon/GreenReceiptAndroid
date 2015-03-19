@@ -138,7 +138,7 @@ public class Networking {
             return null;
         }
     }
-    public Receipt[] getAllReceipts()
+    public Receipt[] getAllReceipts(int pageSize,int currentPage, int pageCount)
     {
         try {
             HttpParams httpParameters = new BasicHttpParams();
@@ -147,6 +147,12 @@ public class Networking {
             HttpClient client = new DefaultHttpClient(httpParameters);
             HttpGet request = new HttpGet(BASE_URL + "api/Receipt");
             request.addHeader("Authorization","Bearer "+Model._token);
+            JSONObject json = new JSONObject();
+            json.put("PageSize", pageSize);
+            json.put("CurrentPage", currentPage);
+            json.put("PageCount", pageCount);
+            StringEntity entity = new StringEntity(json.toString());
+
             HttpResponse response = client.execute(request);
 
             InputStream responseContent = response.getEntity().getContent();

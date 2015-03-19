@@ -3,11 +3,14 @@ package net.greenreceipt.greenreceipt;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -26,19 +29,27 @@ public class NewReceiptActivity extends ActionBarActivity {
     private final int SELECT_FILE = 1;
 
     private String resultUrl = "result.txt";
+    ActionBar actionBar;
     Bitmap myBit;//use this to hold image
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_receipt);
+        Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
+        this.setSupportActionBar(tb);
+        tb.setTitleTextColor(Color.WHITE);
+        actionBar = getSupportActionBar();
+        actionBar.setHomeButtonEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
 //        Toolbar actionBar = (Toolbar) findViewById(R.id.action_bar);
 //        setSupportActionBar(actionBar);
 //        actionBar.set
         icon = (ImageView) findViewById(R.id.icon);
-        ImageView code = (ImageView) findViewById(R.id.code);
+//        ImageView code = (ImageView) findViewById(R.id.code);
         icon.setImageResource(R.drawable.ic_action_new);
-        code.setImageResource(R.drawable.code);
+//        code.setImageResource(R.drawable.code);
         icon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
