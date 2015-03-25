@@ -9,7 +9,7 @@ public class ReceiptImage
 {
     int ReceiptId;
     String FileName;
-    byte[] ImageBytes;
+    byte[] Base64Image;
     int ImageSize;
     String FileExtension;
     String UserId;

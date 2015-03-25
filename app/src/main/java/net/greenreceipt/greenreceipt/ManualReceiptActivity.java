@@ -212,7 +212,7 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
                             ReceiptImage image = null;
                             if(picturePath!=null) {
                                 image = new ReceiptImage();
-                                image.ImageBytes = Model.getInstance().getByteArrayFromImage(picturePath);
+                                image.Base64Image = Model.getInstance().getByteArrayFromImage(picturePath);
                                 image.FileName = "image.jpg";
 
                             }
@@ -242,7 +242,7 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
                         //make sure there's valid info to add
                         if(!itemName.getText().toString().isEmpty() && !itemPrice.getText().toString().isEmpty())
                         {
-                            View view = View.inflate(getBaseContext(), R.layout.listitem, null);
+                            View view = View.inflate(getBaseContext(), R.layout.purchaseitem, null);
                             TextView name = (TextView) view.findViewById(R.id.store);
                             name.setText(itemName.getText().toString());
                             TextView price = (TextView) view.findViewById(R.id.detail);

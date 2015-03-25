@@ -427,8 +427,8 @@ public class Networking {
             HttpPost request = new HttpPost(BASE_URL + "api/Image/ReceiptImage");
             request.addHeader("Content-Type", "application/json");
             request.addHeader("Authorization","Bearer "+Model._token);
-
-            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
+            Gson gson = GsonHelper.customGson;
+//            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
             String jsonString = gson.toJson(image);
             StringEntity entity = new StringEntity(jsonString);
             request.setEntity(entity);
@@ -478,6 +478,66 @@ public class Networking {
             e.printStackTrace();
             error = e.getMessage();
             return null;
+        }
+    }
+    public ReceiptImage[] getReceiptImages(int id)
+    {
+        try {
+            error = "";
+            HttpParams httpParameters = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+            HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+            HttpClient client = new DefaultHttpClient(httpParameters);
+            HttpPost request = new HttpPost(BASE_URL + "api/Image/ReceiptImages?receiptId="+id);
+            request.addHeader("Content-Type", "application/json");
+            request.addHeader("Authorization","Bearer "+Model._token);
+
+            HttpResponse response = client.execute(request);
+
+            InputStream responseContent = response.getEntity().getContent();
+            Scanner responseScanner = new Scanner(responseContent).useDelimiter("\\A");
+            String responseString = responseScanner.hasNext() ? responseScanner.next() : null;
+            if(responseString == null || response.getStatusLine().getStatusCode() != 200)
+            {
+                error = "Bad call";
+                return null;
+            }
+
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
+            ReceiptImage[] images = gson.fromJson(responseString, ReceiptImage[].class);
+            return images;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            error = e.getMessage();
+            return null;
+        }
+    }
+    public boolean deleteBudgetItem(int id)
+    {
+        try {
+            error = "";
+            HttpParams httpParameters = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+            HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+            HttpClient client = new DefaultHttpClient(httpParameters);
+            HttpDelete request = new HttpDelete(BASE_URL + "api/BudgetItem?id="+id);
+            request.addHeader("Authorization","Bearer "+Model._token);
+            HttpResponse response = client.execute(request);
+
+            if(response.getStatusLine().getStatusCode()!=200)
+            {
+                InputStream responseContent = response.getEntity().getContent();
+                Scanner responseScanner = new Scanner(responseContent).useDelimiter("\\A");
+                String responseString = responseScanner.hasNext() ? responseScanner.next() : null;
+                error = responseString;
+            }
+            return response.getStatusLine().getStatusCode() == 200;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            error = e.getMessage();
+            return false;
         }
     }
 

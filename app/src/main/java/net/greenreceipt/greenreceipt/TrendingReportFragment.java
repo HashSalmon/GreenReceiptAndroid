@@ -1,5 +1,6 @@
 package net.greenreceipt.greenreceipt;
 
+import android.app.DatePickerDialog;
 import android.app.Fragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -10,7 +11,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
+import android.widget.DatePicker;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.data.BarData;
@@ -25,11 +28,18 @@ import java.util.Calendar;
 public class TrendingReportFragment extends Fragment {
     private BarChart barChart;
     BroadcastReceiver receiver;
-    EditText endDate;
-    EditText startDate;
+    TextView endDate;
+    TextView startDate;
     String today;
     String startOfMonth;
     ArrayList<Integer> colors;
+    int mYear;
+    int mMonth;
+    int mDay;
+    int eYear;
+    int eMonth;
+    int eDay;
+    ImageButton update;
     public TrendingReportFragment() {
         // Required empty public constructor
     }
@@ -43,13 +53,76 @@ public class TrendingReportFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState)
     {
-        View view = inflater.inflate(R.layout.fragment_category_report, container, false);
-        endDate = (EditText) view.findViewById(R.id.endDate);
+        View view = inflater.inflate(R.layout.fragment_report, container, false);
+        final Calendar c = Calendar.getInstance();
+        mYear = c.get(Calendar.YEAR);
+        mMonth = c.get(Calendar.MONTH);
+        mDay = c.get(Calendar.DAY_OF_MONTH);
 
-        startDate = (EditText) view.findViewById(R.id.startDate);
+        eYear = c.get(Calendar.YEAR);
+        eMonth = c.get(Calendar.MONTH);
+        eDay = c.get(Calendar.DAY_OF_MONTH);
 
-            view.setBackgroundColor(Color.WHITE);
-            barChart = (BarChart) view.findViewById(R.id.barChart);
+
+        endDate = (TextView) view.findViewById(R.id.endDate);
+        endDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+
+                DatePickerDialog dpd = new DatePickerDialog(getActivity(),
+                        new DatePickerDialog.OnDateSetListener() {
+
+                            @Override
+                            public void onDateSet(DatePicker view, int year,int monthOfYear, int dayOfMonth)
+                            {
+                                endDate.setText((monthOfYear + 1) + "/"+ dayOfMonth + "/" + year);
+                                eYear = year;
+                                eMonth = monthOfYear;
+                                eDay = dayOfMonth;
+                            }
+                        }, eYear, eMonth, eDay);
+                dpd.setIcon(R.drawable.ic_action_time);
+                dpd.setTitle("Set Start Date");
+
+                dpd.show();
+            }
+        });
+        startDate = (TextView) view.findViewById(R.id.startDate);
+        startDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+
+                DatePickerDialog dpd = new DatePickerDialog(getActivity(),
+                        new DatePickerDialog.OnDateSetListener() {
+
+                            @Override
+                            public void onDateSet(DatePicker view, int year,int monthOfYear, int dayOfMonth)
+                            {
+                                startDate.setText((monthOfYear + 1) + "/"+ dayOfMonth + "/" + year);
+                                mYear = year;
+                                mMonth = monthOfYear;
+                                mDay = dayOfMonth;
+                            }
+                        }, mYear, mMonth, mDay);
+                dpd.setIcon(R.drawable.ic_action_time);
+                dpd.setTitle("Set Start Date");
+
+                dpd.show();
+            }
+        });
+        update = (ImageButton) view.findViewById(R.id.update);
+        update.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Model.getInstance().GetTrendingReport(startDate.getText().toString(),endDate.getText().toString(),getActivity());
+            }
+        });
+        view.setBackgroundColor(Color.WHITE);
+        barChart = (BarChart) view.findViewById(R.id.barChart);
 
         return view;
         // add a lot of colors
@@ -72,9 +145,9 @@ public class TrendingReportFragment extends Fragment {
         m++;
         String month = ""+ m;
         String year = calendar.get(Calendar.YEAR)+"";
-        startOfMonth = year+"-"+month+"-01";
+        startOfMonth = year+"/"+month+"/01";
 
-        today = year+"-"+month+"-"+calendar.get(Calendar.DAY_OF_MONTH);
+        today = year+"/"+month+"/"+calendar.get(Calendar.DAY_OF_MONTH);
         endDate.setText(today);
         startDate.setText(startOfMonth);
         receiver = new BroadcastReceiver()

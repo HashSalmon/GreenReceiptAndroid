@@ -30,6 +30,8 @@ public class Model
 
     static final String ACTION_TRENDING_FAIL = "TrendingFail" ;
     static final String ACTION_TRENDING_SUCCESS = "TrendingSuccess";
+    static final String DELETE_BUDGET_ITEM_SUCCESS = "DeleteBItemSuccess";
+    static final String DELETE_BUDGET_ITEM_FAIL = "DeleteBItemFail";
 
     public interface OnLoginListener
     {
@@ -493,6 +495,34 @@ public class Model
             }
         };
         saveTask.execute(items);
+    }
+    public void DeleteBudgetItem(final int id, final Context c)
+    {
+        AsyncTask<Integer,Integer,Boolean> deleteTask = new AsyncTask<Integer, Integer, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Integer... params) {
+                return networking.deleteBudgetItem(params[0]);
+            }
+
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                super.onPostExecute(aBoolean);
+                if(aBoolean)
+                {
+                    Intent success = new Intent();
+                    success.setAction(Model.DELETE_BUDGET_ITEM_SUCCESS);
+                    success.putExtra("id",id);
+                    c.sendBroadcast(success);
+                }
+                else
+                {
+                    Intent success = new Intent();
+                    success.setAction(Model.DELETE_BUDGET_ITEM_FAIL);
+                    c.sendBroadcast(success);
+                }
+            }
+        };
+        deleteTask.execute(id);
     }
 
     /*

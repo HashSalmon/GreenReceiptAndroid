@@ -4,14 +4,14 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
@@ -28,8 +28,6 @@ public class BudgetFragment extends Fragment {
     LinearLayout container;
     TextView message;
     Button createBudget;
-    Spinner options;
-    String[] optionItem = {"Options","Edit Budget","Delete Budget"};
     StringPicker categoryPicker;
     EditText limit;
     List<String> categoryList = new ArrayList<>();
@@ -38,7 +36,11 @@ public class BudgetFragment extends Fragment {
 
 
     }
-
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -47,35 +49,37 @@ public class BudgetFragment extends Fragment {
         this.container = (LinearLayout) view.findViewById(R.id.budgetContainer);
         message = (TextView) view.findViewById(R.id.message);
         createBudget = (Button) view.findViewById(R.id.createBudget);
-        options = (Spinner) view.findViewById(R.id.options);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_item,optionItem);
-        options.setAdapter(adapter);
-        options.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                switch (position){
-                    case 1:
-                        options.setSelection(0);
-                        Intent editIntent = new Intent(getActivity(),EditBudgetActivity.class);
 
-                        startActivity(editIntent);
-                        break;
-                    case 2:
-                        options.setSelection(0);
-                        //delete
-
-
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
         return view;
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+
+        inflater.inflate(R.menu.budget, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        switch (item.getItemId())
+        {
+            case R.id.delete:
+//                spinner = ProgressDialog.show(this, null, "Deleting...");
+//                Model.getInstance().DeleteReceipt(receipt.Id);
+                return true;
+            case R.id.edit:
+                Intent editIntent = new Intent(getActivity(),EditBudgetActivity.class);
+
+                startActivity(editIntent);
+                return true;
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
     @Override
     public void onResume() {
         super.onResume();
@@ -90,7 +94,6 @@ public class BudgetFragment extends Fragment {
                 if(Model.currentBudget.BudgetItems.size()>0)
                 {
                     container.removeAllViews();
-                    options.setVisibility(View.VISIBLE);
                     for(BudgetItem item : Model.currentBudget.BudgetItems)
                     {
                         View budgetItem = getActivity().getLayoutInflater().inflate(R.layout.budget_item, container, false);
