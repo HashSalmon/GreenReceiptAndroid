@@ -128,7 +128,7 @@ public class CategoryReportFragment extends Fragment {
         super.onResume();
 
         Calendar calendar = Calendar.getInstance();
-        int m = Calendar.MONTH;
+        int m = calendar.get(Calendar.MONTH);
         m++;
         String month = ""+ m;
         String year = calendar.get(Calendar.YEAR)+"";

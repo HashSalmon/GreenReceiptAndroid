@@ -32,6 +32,18 @@ public class Model
     static final String ACTION_TRENDING_SUCCESS = "TrendingSuccess";
     static final String DELETE_BUDGET_ITEM_SUCCESS = "DeleteBItemSuccess";
     static final String DELETE_BUDGET_ITEM_FAIL = "DeleteBItemFail";
+    static final String GET_RECEIPT_COUNT_SUCCESS = "GetReceiptCountSuccess";
+    static final String GET_RECEIPT_COUNT_FAIL = "GetReceiptCountFail";
+    static final String GET_RECEIPT_TOTAL_SUCCESS = "GetReceiptTotalSuccess";
+    static final String GET_RECEIPT_TOTAL_FAIL = "GetReceiptTotalFail";
+    static final String GET_MONTHLY_RECEIPT_COUNT_SUCCESS = "GetMReceiptCountSuccess";
+    static final String GET_MONTHLY_RECEIPT_COUNT_FAIL = "GetMReceiptCountFail";
+    static final String GET_MONTHLY_RECEIPT_TOTAL_SUCCESS = "GetMReceiptTotalSuccess";
+    static final String GET_MONTHLY_RECEIPT_TOTAL_FAIL = "GetMReceiptTotalFail";
+    static final String GET_RECEIPT_IMAGE_SUCCESS = "GetReceiptImageSuccess";
+    static final String GET_RECEIPT_IMAGE_FAIL = "GetReceiptImageFail";
+    static final String ADD_RECEIPT_SUCCESS = "AddReceiptSuccess";
+    static final String ADD_RECEIPT_FAILED = "AddReceiptFailed";
 
     public interface OnLoginListener
     {
@@ -81,6 +93,11 @@ public class Model
         public void onCreateSuccess();
         public void onCreateFailed(String error);
     }
+    public interface GetReceiptImageListener
+    {
+        public void onGetImageSuccess(ReceiptImage[] images);
+        public void onGetImageFailed(String error);
+    }
 
 
     public static final String RECEIPT_FILTER="filter";
@@ -107,24 +124,34 @@ public class Model
     private GetCateogryReportListener _getCategoryReportListener;
     private GetCurrentBudgetListener _getCurrentBudgetListener;
     private CreateBudgetListener _createBudgetListener;
+    private GetReceiptImageListener _getReceiptImageListener;
 
     private static Model _instance;
-    static User _currentUser = null;
+
+    User _currentUser = null;
     public static String _token;
-    static List<Receipt> _receipts;
-    static List<Receipt> _returnReceipts;
-    static List<Receipt> _displayReceipts;
-    static Category[] categories;
-    static Budget currentBudget;
-    static TrendingReport trendingReport;
+    List<Receipt> _receipts;
+    List<Receipt> _returnReceipts;
+    List<Receipt> _displayReceipts;
+    Category[] categories;
+    Budget currentBudget;
+    TrendingReport trendingReport;
     private static int currentPage=1;
-    static int pageSize;
+    static int pageSize = 25;
     private static Networking networking;
+
+    private static final Object _modelLock = new Object();
     public static Model getInstance()
     {
         if (_instance == null)
         {
-            _instance = new Model ();
+            synchronized (_modelLock)
+            {
+                if(_instance == null)
+                {
+                    _instance = new Model();
+                }
+            }
         }
         return _instance;
     }
@@ -179,6 +206,10 @@ public class Model
     public void setCreateBudgetListener(CreateBudgetListener listener)
     {
         _createBudgetListener = listener;
+    }
+    public void setGetReceiptImageListener(GetReceiptImageListener listener)
+    {
+        _getReceiptImageListener = listener;
     }
     /*
     ****************Server calls******************
@@ -245,19 +276,19 @@ public class Model
     }
     public void AddReceipt(Receipt r, ReceiptImage image)
     {
-        AsyncTask<Object,Integer,Receipt> addTask = new AsyncTask<Object, Integer, Receipt>() {
+        AsyncTask<Object,Integer,Boolean> addTask = new AsyncTask<Object, Integer, Boolean>() {
             @Override
-            protected Receipt doInBackground(Object... params)
+            protected Boolean doInBackground(Object... params)
             {
                 return networking.addReceipt((Receipt)params[0],(ReceiptImage)params[1]);
             }
 
             @Override
-            protected void onPostExecute(Receipt receipt) {
-                super.onPostExecute(receipt);
+            protected void onPostExecute(Boolean result) {
+                super.onPostExecute(result);
                 if(_receiptListener!=null)
                 {
-                    if (receipt !=null)
+                    if (result)
                         _receiptListener.addReceiptSuccess();
                     else
                         _receiptListener.addReceiptFailed(networking.error);
@@ -306,10 +337,13 @@ public class Model
                 super.onPostExecute(receipts);
                 if(receipts!=null)
                 {
-                    _receipts.clear();
-                    Model.currentPage++;
-                    for(Receipt r : receipts)
-                        _receipts.add(r);
+//                    _receipts.clear();
+                    if(receipts.length>0)
+                    {
+                        Model.currentPage++;
+                        for (Receipt r : receipts)
+                            _receipts.add(r);
+                    }
                     GetReturnReceipts();
                     if(_getReceiptListener!=null)
                     _getReceiptListener.getReceiptSuccess();
@@ -411,7 +445,7 @@ public class Model
             protected void onPostExecute(TrendingReport trendingReport) {
                 super.onPostExecute(trendingReport);
                 if(trendingReport !=null) {
-                    Model.trendingReport = trendingReport;
+                    Model.getInstance().trendingReport = trendingReport;
                     Intent success = new Intent();
                     success.setAction(Model.ACTION_TRENDING_SUCCESS);
                     c.sendBroadcast(success);
@@ -475,7 +509,7 @@ public class Model
 
     }
 
-    public void SaveBudgetItem(List<BudgetItem> items, final Context c)
+    public void SaveBudgetItems(List<BudgetItem> items, final Context c)
     {
         AsyncTask<List,Integer,Boolean> saveTask = new AsyncTask<List, Integer, Boolean>() {
             @Override
@@ -524,7 +558,191 @@ public class Model
         };
         deleteTask.execute(id);
     }
+    public void DeleteBudgetItems(final List<Integer> id, final Context c)
+    {
+        AsyncTask<List,Integer,Boolean> deleteTask = new AsyncTask<List, Integer, Boolean>() {
+            @Override
+            protected Boolean doInBackground(List... params) {
+                return networking.deleteBudgetItem(params[0]);
+            }
 
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                super.onPostExecute(aBoolean);
+                if(aBoolean)
+                {
+                    Intent success = new Intent();
+                    success.setAction(Model.DELETE_BUDGET_ITEM_SUCCESS);
+                    c.sendBroadcast(success);
+                }
+                else
+                {
+                    Intent success = new Intent();
+                    success.setAction(Model.DELETE_BUDGET_ITEM_FAIL);
+                    c.sendBroadcast(success);
+                }
+            }
+        };
+        deleteTask.execute(id);
+    }
+    public void GetReceiptImages(int id)
+    {
+        AsyncTask<Integer,Integer,ReceiptImage[]> task = new AsyncTask<Integer, Integer, ReceiptImage[]>() {
+            @Override
+            protected ReceiptImage[] doInBackground(Integer... params) {
+                return networking.getReceiptImages(params[0]);
+            }
+
+            @Override
+            protected void onPostExecute(ReceiptImage[] receiptImages) {
+                super.onPostExecute(receiptImages);
+                if(receiptImages!=null)
+                {
+                    if(_getReceiptImageListener!=null)
+                        _getReceiptImageListener.onGetImageSuccess(receiptImages);
+                }
+                else
+                {
+                    if(_getReceiptImageListener!=null)
+                        _getReceiptImageListener.onGetImageFailed(networking.error);
+                }
+            }
+        };
+        task.execute(id);
+    }
+    public void GetTotalReceiptCount(final Context c)
+    {
+        AsyncTask<String, Integer, Integer> task = new AsyncTask<String, Integer, Integer>() {
+            @Override
+            protected Integer doInBackground(String... params) {
+                return networking.getReceiptCount(params[0],params[1]);
+            }
+
+            @Override
+            protected void onPostExecute(Integer integer) {
+                super.onPostExecute(integer);
+                if(integer > -1)
+                {
+                    Intent intent = new Intent();
+                    intent.setAction(GET_RECEIPT_COUNT_SUCCESS);
+                    intent.putExtra("count",integer);
+                    c.sendBroadcast(intent);
+                }
+                else
+                {
+                    Intent intent = new Intent();
+                    intent.setAction(GET_RECEIPT_COUNT_FAIL);
+                    c.sendBroadcast(intent);
+                }
+
+            }
+        };
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+        Date start = new Date(0);
+        Date end = new Date();
+        task.execute(sdf.format(start),sdf.format(end));
+    }
+    public void GetMonthReceiptCount(final Context c)
+    {
+        AsyncTask<String, Integer, Integer> task = new AsyncTask<String, Integer, Integer>() {
+            @Override
+            protected Integer doInBackground(String... params) {
+                return networking.getReceiptCount(params[0],params[1]);
+            }
+
+            @Override
+            protected void onPostExecute(Integer integer) {
+                super.onPostExecute(integer);
+                if(integer > -1)
+                {
+                    Intent intent = new Intent();
+                    intent.setAction(GET_MONTHLY_RECEIPT_COUNT_SUCCESS);
+                    intent.putExtra("count",integer);
+                    c.sendBroadcast(intent);
+                }
+                else
+                {
+                    Intent intent = new Intent();
+                    intent.setAction(GET_MONTHLY_RECEIPT_COUNT_FAIL);
+                    c.sendBroadcast(intent);
+                }
+
+            }
+        };
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+        Calendar calendar = Calendar.getInstance();
+        int month = calendar.get(Calendar.MONTH);
+        month++;
+        int year = calendar.get(Calendar.YEAR);
+        Date end = new Date();
+        task.execute(month+"/01/"+year,sdf.format(end));
+    }
+    public void GetTotalReceiptTotal(final Context c)
+    {
+        final AsyncTask<String,Integer,Double> task = new AsyncTask<String, Integer, Double>() {
+            @Override
+            protected Double doInBackground(String... params) {
+                return networking.getReceiptTotal(params[0],params[1]);
+            }
+
+            @Override
+            protected void onPostExecute(Double aDouble) {
+                super.onPostExecute(aDouble);
+                if(aDouble > -1)
+                {
+                    Intent intent = new Intent();
+                    intent.setAction(GET_RECEIPT_TOTAL_SUCCESS);
+                    intent.putExtra("total",aDouble);
+                    c.sendBroadcast(intent);
+                }
+                else
+                {
+                    Intent intent = new Intent();
+                    intent.setAction(GET_RECEIPT_TOTAL_FAIL);
+                    c.sendBroadcast(intent);
+                }
+            }
+        };
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+        Date start = new Date(0);
+        Date end = new Date();
+        task.execute(sdf.format(start),sdf.format(end));
+    }
+    public void GetMonthReceiptTotal(final Context c)
+    {
+        final AsyncTask<String,Integer,Double> task = new AsyncTask<String, Integer, Double>() {
+            @Override
+            protected Double doInBackground(String... params) {
+                return networking.getReceiptTotal(params[0],params[1]);
+            }
+
+            @Override
+            protected void onPostExecute(Double aDouble) {
+                super.onPostExecute(aDouble);
+                if(aDouble > -1)
+                {
+                    Intent intent = new Intent();
+                    intent.setAction(GET_MONTHLY_RECEIPT_TOTAL_SUCCESS);
+                    intent.putExtra("total",aDouble);
+                    c.sendBroadcast(intent);
+                }
+                else
+                {
+                    Intent intent = new Intent();
+                    intent.setAction(GET_MONTHLY_RECEIPT_TOTAL_FAIL);
+                    c.sendBroadcast(intent);
+                }
+            }
+        };
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+        Calendar calendar = Calendar.getInstance();
+        int month = calendar.get(Calendar.MONTH);
+        month++;
+        int year = calendar.get(Calendar.YEAR);
+        Date end = new Date();
+        task.execute(month+"/01/"+year,sdf.format(end));
+
+    }
     /*
     *****************None server call below*********************
      */
@@ -605,6 +823,21 @@ public class Model
         }
         return result;
     }
+    public List<Receipt> getCurrentYearReceipt()
+    {
+        List<Receipt> result = new ArrayList<Receipt>();
+
+        Calendar c = Calendar.getInstance();
+        String year = c.get(Calendar.YEAR)+"";
+        for(Receipt r: _receipts)
+        {
+            if(android.text.format.DateFormat.format("yyyy", r.PurchaseDate).equals(year))
+            {
+                result.add(r);
+            }
+        }
+        return result;
+    }
 
     public void changeDisplayReceipts(int display)
     {
@@ -616,6 +849,7 @@ public class Model
                 _displayReceipts = getCurrentMonthReceipt();
                 break;
             case 3://year
+                _displayReceipts = getCurrentYearReceipt();
                 break;
             case 4:
                 _displayReceipts = _receipts;
@@ -668,5 +902,31 @@ public class Model
         byte[] bytes = bos.toByteArray();
         return bytes;
     }
+    public boolean removeBudgetItem(int id)
+    {
+        if(currentBudget!=null && currentBudget.BudgetItems != null)
+        {
+            for(BudgetItem b :currentBudget.BudgetItems)
+                if(b.Id == id)
+                   return currentBudget.BudgetItems.remove(b);
+        }
+        return false;
+    }
+    public void resetCurrentPage()
+    {
+        currentPage = 1;
+        _receipts.clear();
+
+    }
+    public int getCategoryIndex(String name)
+    {
+        for(int i = 0; i<categories.length; i++)
+        {
+            if(categories[i].Name.equals(name))
+                return i;
+        }
+        return -1;
+    }
+
 
 }

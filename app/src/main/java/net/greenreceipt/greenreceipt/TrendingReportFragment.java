@@ -141,12 +141,13 @@ public class TrendingReportFragment extends Fragment {
     public void onResume() {
         super.onResume();
         Calendar calendar = Calendar.getInstance();
-        int m = Calendar.MONTH;
-        m++;
+        int m = calendar.get(Calendar.MONTH);
+        m--;
         String month = ""+ m;
         String year = calendar.get(Calendar.YEAR)+"";
         startOfMonth = year+"/"+month+"/01";
-
+        m = m+2;
+        month = m+"";
         today = year+"/"+month+"/"+calendar.get(Calendar.DAY_OF_MONTH);
         endDate.setText(today);
         startDate.setText(startOfMonth);
@@ -160,7 +161,7 @@ public class TrendingReportFragment extends Fragment {
                     ArrayList<BarEntry> yVals1 = new ArrayList<BarEntry>();
                     ArrayList<String> xVals = new ArrayList<String>();
                     int count = 0;
-                    for(TrendingReportItem item : Model.trendingReport.TrendingReportItems)
+                    for(TrendingReportItem item : Model.getInstance().trendingReport.TrendingReportItems)
                     {
                         yVals1.add(new BarEntry((float)item.Total,count));
                         xVals.add(item.Month);

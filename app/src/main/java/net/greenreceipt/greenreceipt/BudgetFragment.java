@@ -1,7 +1,9 @@
 package net.greenreceipt.greenreceipt;
 
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -31,6 +33,8 @@ public class BudgetFragment extends Fragment {
     StringPicker categoryPicker;
     EditText limit;
     List<String> categoryList = new ArrayList<>();
+    StringPicker editName;
+    ProgressDialog spinner;
     public BudgetFragment() {
         // Required empty public constructor
 
@@ -40,6 +44,7 @@ public class BudgetFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -67,14 +72,18 @@ public class BudgetFragment extends Fragment {
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId())
         {
-            case R.id.delete:
-//                spinner = ProgressDialog.show(this, null, "Deleting...");
-//                Model.getInstance().DeleteReceipt(receipt.Id);
-                return true;
             case R.id.edit:
-                Intent editIntent = new Intent(getActivity(),EditBudgetActivity.class);
+                if(Model.getInstance().currentBudget!=null) {
+                    Intent editIntent = new Intent(getActivity(), EditBudgetActivity.class);
 
-                startActivity(editIntent);
+                    startActivity(editIntent);
+                }
+                else
+                {
+                    Intent createIntent = new Intent(getActivity(), CreateBudgetActivity.class);
+
+                    startActivity(createIntent);
+                }
                 return true;
 
         }
@@ -88,13 +97,14 @@ public class BudgetFragment extends Fragment {
         Model.getInstance().setGetCurrentBudgetListener(new Model.GetCurrentBudgetListener() {
             @Override
             public void onGetBudgetSuccess() {
+                spinner.dismiss();
                 message.setVisibility(View.GONE);
                 createBudget.setVisibility(View.GONE);
 
-                if(Model.currentBudget.BudgetItems.size()>0)
+                if(Model.getInstance().currentBudget.BudgetItems.size()>0)
                 {
                     container.removeAllViews();
-                    for(BudgetItem item : Model.currentBudget.BudgetItems)
+                    for(BudgetItem item : Model.getInstance().currentBudget.BudgetItems)
                     {
                         View budgetItem = getActivity().getLayoutInflater().inflate(R.layout.budget_item, container, false);
                         TextView name = (TextView) budgetItem.findViewById(R.id.categoryName);
@@ -105,7 +115,21 @@ public class BudgetFragment extends Fragment {
                         allowed.setText(item.AmountAllowed+"");
                         RoundCornerProgressBar bar = (RoundCornerProgressBar) budgetItem.findViewById(R.id.amtProgress);
                         bar.setMax(1);
+                        double progress = (float) item.AmountUsed / (float) item.AmountAllowed;
                         bar.setProgress((float) item.AmountUsed / (float) item.AmountAllowed);
+                        Resources resources = getResources();
+                        if(progress < 0.8)
+                        {
+                            bar.setProgressColor(resources.getColor(R.color.custom_progress_green_progress));
+                        }
+                        else if(progress > 0.8 && progress < 0.9)
+                        {
+                            bar.setProgressColor(resources.getColor(R.color.custom_progress_orange_header));
+                        }
+                        else
+                        {
+                            bar.setProgressColor(resources.getColor(R.color.custom_progress_red_progress));
+                        }
                         container.addView(budgetItem);
                     }
                 }
@@ -113,6 +137,7 @@ public class BudgetFragment extends Fragment {
 
             @Override
             public void onGetBudgetFailed(String error) {
+                spinner.dismiss();
 //                Helper.AlertBox(getActivity(),"Error",error);
                 message.setVisibility(View.VISIBLE);
                 createBudget.setVisibility(View.VISIBLE);
@@ -128,7 +153,9 @@ public class BudgetFragment extends Fragment {
             }
         });
         Model.getInstance().GetCurrentBudget();
+        spinner = ProgressDialog.show(getActivity(), null, "Loading...");
     }
+
 //    private void addBudgetCategory()
 //    {
 //        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());

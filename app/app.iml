@@ -94,6 +94,7 @@
     <orderEntry type="library" exported="" name="httpmime-4.3.6" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="mpandroidchartlibrary-1-7-4" level="project" />
+    <orderEntry type="library" exported="" name="core-3.2.0" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="stringpicker-0.0.2" level="project" />
     <orderEntry type="library" exported="" name="Chart-2015.1.225-trial-release-" level="project" />
@@ -104,8 +105,8 @@
     <orderEntry type="library" exported="" name="floatingactionbutton-1.8.0" level="project" />
     <orderEntry type="library" exported="" name="gson-2.3" level="project" />
     <orderEntry type="library" exported="" name="universal-image-loader-1.9.3" level="project" />
-    <orderEntry type="library" exported="" name="support-v13-21.0.0" level="project" />
     <orderEntry type="library" exported="" name="RoundCornerProgressBar-1.0.0" level="project" />
+    <orderEntry type="library" exported="" name="support-v13-21.0.0" level="project" />
   </component>
 </module>
 

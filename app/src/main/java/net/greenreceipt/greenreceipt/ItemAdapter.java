@@ -19,16 +19,16 @@ import java.util.List;
 /**
  * Created by Boya on 3/11/15.
  */
-public class ListAdapter extends ListViewAdapter {
+public class ItemAdapter extends ListViewAdapter {
     List item;
-    public ListAdapter(List items) {
+    public ItemAdapter(List items) {
         super(items);
         item = items;
     }
     @Override
     public ListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View view = inflater.inflate(R.layout.listitem, parent, false);
+        View view = inflater.inflate(R.layout.purchaseitem, parent, false);
         return new ReceiptViewHolder(view);
     }
 

@@ -102,7 +102,7 @@ public class Networking {
             return false;
         }
     }
-    public Receipt addReceipt(Receipt r,ReceiptImage image)
+    public boolean addReceipt(Receipt r,ReceiptImage image)
     {
 
         try {
@@ -123,19 +123,19 @@ public class Networking {
             Scanner responseScanner = new Scanner(responseContent).useDelimiter("\\A");
             String responseString = responseScanner.hasNext() ? responseScanner.next() : null;
             if(responseString == null || response.getStatusLine().getStatusCode() != 200)
-                return null;
+                return false;
 
             Receipt receipt = gson.fromJson(responseString,Receipt.class);
             if(image!=null) {
                 image.ReceiptId = receipt.Id;
                 postReceiptImage(image);
             }
-            return receipt;
+            return response.getStatusLine().getStatusCode() == 200;
         }
         catch (Exception e) {
             e.printStackTrace();
             error = e.getMessage();
-            return null;
+            return false;
         }
     }
     public Receipt[] getAllReceipts(int pageSize,int currentPage, int pageCount)
@@ -145,14 +145,15 @@ public class Networking {
             HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
             HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
             HttpClient client = new DefaultHttpClient(httpParameters);
-            HttpGet request = new HttpGet(BASE_URL + "api/Receipt");
+            HttpPost request = new HttpPost(BASE_URL + "api/Receipt/Receipts");
             request.addHeader("Authorization","Bearer "+Model._token);
+            request.addHeader("Content-Type", "application/json");
             JSONObject json = new JSONObject();
             json.put("PageSize", pageSize);
             json.put("CurrentPage", currentPage);
             json.put("PageCount", pageCount);
             StringEntity entity = new StringEntity(json.toString());
-
+            request.setEntity(entity);
             HttpResponse response = client.execute(request);
 
             InputStream responseContent = response.getEntity().getContent();
@@ -361,7 +362,7 @@ public class Networking {
             HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
             HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
             HttpClient client = new DefaultHttpClient(httpParameters);
-            HttpPost request = new HttpPost(BASE_URL + "api/BudgetItem");
+            HttpPost request = new HttpPost(BASE_URL + "api/BudgetItem/BudgetItems");
             request.addHeader("Content-Type", "application/json");
             request.addHeader("Authorization","Bearer "+Model._token);
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
@@ -427,8 +428,8 @@ public class Networking {
             HttpPost request = new HttpPost(BASE_URL + "api/Image/ReceiptImage");
             request.addHeader("Content-Type", "application/json");
             request.addHeader("Authorization","Bearer "+Model._token);
-            Gson gson = GsonHelper.customGson;
-//            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
+//            Gson gson = GsonHelper.customGson;
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
             String jsonString = gson.toJson(image);
             StringEntity entity = new StringEntity(jsonString);
             request.setEntity(entity);
@@ -488,14 +489,14 @@ public class Networking {
             HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
             HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
             HttpClient client = new DefaultHttpClient(httpParameters);
-            HttpPost request = new HttpPost(BASE_URL + "api/Image/ReceiptImages?receiptId="+id);
+            HttpGet request = new HttpGet(BASE_URL + "api/Image/ReceiptImages?receiptId="+id);
             request.addHeader("Content-Type", "application/json");
             request.addHeader("Authorization","Bearer "+Model._token);
 
             HttpResponse response = client.execute(request);
 
             InputStream responseContent = response.getEntity().getContent();
-            Scanner responseScanner = new Scanner(responseContent).useDelimiter("\\A");
+            Scanner responseScanner = new Scanner(responseContent);
             String responseString = responseScanner.hasNext() ? responseScanner.next() : null;
             if(responseString == null || response.getStatusLine().getStatusCode() != 200)
             {
@@ -540,7 +541,102 @@ public class Networking {
             return false;
         }
     }
+    public boolean addBudgetItem(BudgetItem item)
+    {
+        try {
+            error = "";
+            HttpParams httpParameters = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+            HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+            HttpClient client = new DefaultHttpClient(httpParameters);
+            HttpPost request = new HttpPost(BASE_URL + "api/BudgetItem");
+            request.addHeader("Content-Type", "application/json");
+            request.addHeader("Authorization","Bearer "+Model._token);
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
+            String jsonString = gson.toJson(item);
+            StringEntity entity = new StringEntity(jsonString);
+            request.setEntity(entity);
+            HttpResponse response = client.execute(request);
+            if(response.getStatusLine().getStatusCode()!=200)
+            {
+                InputStream responseContent = response.getEntity().getContent();
+                Scanner responseScanner = new Scanner(responseContent).useDelimiter("\\A");
+                String responseString = responseScanner.hasNext() ? responseScanner.next() : null;
+                error = responseString;
+            }
+            return response.getStatusLine().getStatusCode() == 200;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            error = e.getMessage();
+            return false;
+        }
+    }
+    public int getReceiptCount(String startDate, String endDate)
+    {
+        try {
+            error = "";
+            HttpParams httpParameters = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+            HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+            HttpClient client = new DefaultHttpClient(httpParameters);
+            HttpGet request = new HttpGet(BASE_URL + "api/Receipt/ReceiptCount?startDate="+startDate+"&endDate="+endDate);
+            request.addHeader("Authorization","Bearer "+Model._token);
+            HttpResponse response = client.execute(request);
 
+            InputStream responseContent = response.getEntity().getContent();
+            Scanner responseScanner = new Scanner(responseContent).useDelimiter("\\A");
+            String responseString = responseScanner.hasNext() ? responseScanner.next() : null;
+
+            if(responseString == null || response.getStatusLine().getStatusCode() != 200)
+            {
+                error = "Failed to retrieve data";
+                return -1;
+            }
+
+            Gson gson = new Gson();
+            int count = gson.fromJson(responseString, Integer.class);
+            return count;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            error = e.getMessage();
+            return -1;
+        }
+    }
+
+    public double getReceiptTotal(String startDate, String endDate)
+    {
+        try {
+            error = "";
+            HttpParams httpParameters = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+            HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+            HttpClient client = new DefaultHttpClient(httpParameters);
+            HttpGet request = new HttpGet(BASE_URL + "api/Receipt/ReceiptTotal?startDate="+startDate+"&endDate="+endDate);
+            request.addHeader("Authorization","Bearer "+Model._token);
+            HttpResponse response = client.execute(request);
+
+            InputStream responseContent = response.getEntity().getContent();
+            Scanner responseScanner = new Scanner(responseContent).useDelimiter("\\A");
+            String responseString = responseScanner.hasNext() ? responseScanner.next() : null;
+
+            if(responseString == null || response.getStatusLine().getStatusCode() != 200)
+            {
+                error = "Failed to retrieve data";
+                return -1;
+            }
+
+            Gson gson = new Gson();
+            double total = gson.fromJson(responseString, Double.class);
+            return total;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            error = e.getMessage();
+            return -1;
+        }
+    }
 
 
 

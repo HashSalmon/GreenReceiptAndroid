@@ -34,7 +34,6 @@
             android:layout_weight="1"
             android:id="@+id/amtProgress"
             app:backgroundColor="@color/background_content"
-            app:progressColor="@color/custom_progress_red_progress"
             app:backgroundPadding="1dp"
             app:backgroundRadius="5dp"
             />

@@ -8,8 +8,8 @@ import java.util.Date;
 public class ReceiptImage
 {
     int ReceiptId;
-    String FileName;
-    byte[] Base64Image;
+    public String FileName;
+    public String Base64Image;
     int ImageSize;
     String FileExtension;
     String UserId;

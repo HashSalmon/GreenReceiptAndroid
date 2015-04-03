@@ -10,7 +10,12 @@ import android.util.Pair;
 import android.view.Menu;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import net.greenreceipt.greenreceipt.Item;
 import net.greenreceipt.greenreceipt.ListReceiptActivity;
+import net.greenreceipt.greenreceipt.ManualReceiptActivity;
 import net.greenreceipt.greenreceipt.Model;
 import net.greenreceipt.greenreceipt.R;
 import net.greenreceipt.greenreceipt.Receipt;
@@ -19,8 +24,11 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import Util.Helper;
 
@@ -33,14 +41,19 @@ public class ResultsActivity extends Activity {
 	TextView tv;
     private String parsedStr = "";
 	private String totalAmount = "";
+    private String subTotal = "";
     private String totalTax = "";
     private String storeName = "";
     private HashMap<String, Integer> itemList;
     private boolean foundStoreName = false;
     private boolean foundTotalTax = false;
     private boolean foundTotalAmount = false;
+    private boolean foundSubTotal = false;
     private boolean foundItemList = false;
     ProgressDialog spinner;
+    String imageUrl;
+    private ArrayList<Item> itemsList = new ArrayList<>();
+    private double sum = 0.0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +88,7 @@ public class ResultsActivity extends Activity {
 		tv = new TextView(this);
 		setContentView(tv);
 		
-		String imageUrl = "unknown";
+		imageUrl = "unknown";
 		
 		Bundle extras = getIntent().getExtras();
 		if( extras != null) {
@@ -107,6 +120,7 @@ public class ResultsActivity extends Activity {
 
                     if (!foundTotalAmount)
                     {
+                        isItem(text.toLowerCase());
                         getTotalAmount(text.toLowerCase());
                     }
 
@@ -115,10 +129,7 @@ public class ResultsActivity extends Activity {
                         getTotalTax(text.toLowerCase());
                     }
 
-                    if (!foundItemList)
-                    {
-                        //getItemList(text.toLowerCase());
-                    }
+
 
                     contents.append(text).append(System.getProperty("line.separator"));
 				}
@@ -133,7 +144,37 @@ public class ResultsActivity extends Activity {
 			createReceipt("Error: " + e.getMessage());
 		}
 	}
+    public void isItem(String str)
+    {
+        try {
+            String pattern = "(\\w+\\s)+(\\s)+\\$?(\\d)+.(\\d)+";
 
+            Pattern r = Pattern.compile(pattern);
+            Matcher match = r.matcher(str);
+
+            if (match.find()) {
+                String itemNamePattern = "(\\w+\\s)+";
+                Pattern p1 = Pattern.compile(itemNamePattern);
+                Matcher m1 = p1.matcher(str);
+
+                if (m1.find()) {
+                    String itemName = str.substring(m1.start(), m1.end()).trim();
+                    String itemPrice = str.substring(m1.end()).trim();
+                    double price = Double.parseDouble(itemPrice.substring(1));
+                    Item item = new Item();
+                    item.ItemName = itemName;
+                    item.Price = price;
+                    itemsList.add(item);
+                    sum += sum;
+                    System.out.println("Item Name: " + itemName + "\n" + "Item Price: " + itemPrice);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Helper.AlertBox(this,"Error",e.getMessage());
+        }
+    }
     public String getStoreName()
     {
         return this.storeName;
@@ -169,6 +210,24 @@ public class ResultsActivity extends Activity {
                 {
                     this.totalAmount = contents.substring(i);
                     this.foundTotalAmount = true;
+                    break;
+                }
+            }
+        }
+    }
+    private void getSubtotal(String contents)
+    {
+
+        if (contents.contains("total") && !contents.contains("subtotal"))
+        {
+            for (int i = 0; i < contents.length(); i++)
+            {
+                if (contents.charAt(i) == '1' || contents.charAt(i) == '2' || contents.charAt(i) == '3' ||
+                        contents.charAt(i) == '4' || contents.charAt(i) == '5' || contents.charAt(i) == '6' ||
+                        contents.charAt(i) == '7' || contents.charAt(i) == '8' || contents.charAt(i) == '9')
+                {
+                    this.subTotal = contents.substring(i);
+                    this.foundSubTotal = true;
                     break;
                 }
             }
@@ -212,22 +271,31 @@ public class ResultsActivity extends Activity {
 		tv.post( new MessagePoster( text ) );
         else
         {
-            spinner = ProgressDialog.show(ResultsActivity.this,null,"Working...");
-            Receipt r = new Receipt();
-            r.Store.Company.Name = getStoreName();
-            r.CreatedDate = new Date();
-            Pair<Double,Double> location = Model.getInstance().getCurrentLocation(this);
-            r.Longitude = location.first;
-            r.Latitude = location.second;
-            r.PurchaseDate = new Date();
             try {
-                r.Total = Double.parseDouble(getTotalAmount().trim());
-                r.Tax = Double.parseDouble(getTotalTax().trim());
-                Model.getInstance().AddReceipt(r,null);
+//                spinner = ProgressDialog.show(ResultsActivity.this,null,"Working...");
+                Receipt r = new Receipt();
+                r.Store.Company.Name = getStoreName();
+                r.CreatedDate = new Date();
+                Pair<Double,Double> location = Model.getInstance().getCurrentLocation(this);
+                r.Longitude = location.first;
+                r.Latitude = location.second;
+                r.PurchaseDate = new Date();
+
+                r.total = getTotalAmount().trim();
+                r.tax = getTotalTax().trim();
+                r.ReceiptItems = itemsList;
+                Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
+                String receiptString = gson.toJson(r,Receipt.class);
+                Intent newReceiptIntent = new Intent(this, ManualReceiptActivity.class);
+                newReceiptIntent.putExtra("receipt",receiptString);
+                newReceiptIntent.putExtra("image",imageUrl);
+                startActivity(newReceiptIntent);
+                finish();
+//            Model.getInstance().AddReceipt(r,image);
             }
             catch (Exception e)
             {
-                spinner.dismiss();
+//                spinner.dismiss();
                 Helper.AlertBox(this,"Error",e.getMessage());
             }
 

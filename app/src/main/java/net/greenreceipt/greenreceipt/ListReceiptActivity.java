@@ -12,6 +12,8 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -20,6 +22,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.telerik.widget.list.LoadOnDemandBehavior;
 import com.telerik.widget.list.RadListView;
 import com.telerik.widget.list.SwipeExecuteBehavior;
 
@@ -64,10 +67,10 @@ public class ListReceiptActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_test);
 
-
+    Model.getInstance().resetCurrentPage();
     spinner = ProgressDialog.show(this, null, "Loading...");
         list = (RadListView) findViewById(R.id.list);
-        adapter = new ListAdapter(Model._displayReceipts);
+        adapter = new ListAdapter(Model.getInstance()._displayReceipts);
         list.setAdapter(adapter);
         list.addItemClickListener(new RadListView.ItemClickListener() {
             @Override
@@ -85,7 +88,25 @@ public class ListReceiptActivity extends ActionBarActivity {
         });
         SwipeExecuteBehavior swipeExecuteBehavior = new SwipeExecuteBehavior();
         list.addBehavior(swipeExecuteBehavior);
+        LoadOnDemandBehavior loadOnDemandBehavior = new LoadOnDemandBehavior();
+        list.addBehavior(loadOnDemandBehavior);
 
+        LoadOnDemandBehavior.LoadOnDemandListener loadOnDemandListener =
+                new LoadOnDemandBehavior.LoadOnDemandListener() {
+
+                    @Override
+                    public void onLoadStarted() {
+                        Model.getInstance().GetAllReceipt(Model.pageSize,1);
+                    }
+
+                    @Override
+                    public void onLoadFinished() {
+                    }
+                };
+
+        loadOnDemandBehavior.addListener(loadOnDemandListener);
+//        loadOnDemandBehavior.setMode(LoadOnDemandBehavior.LoadOnDemandMode.AUTOMATIC);
+//        loadOnDemandBehavior.setMaxRemainingItems(5);
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         nav_options = getResources().getStringArray(R.array.nav_array);
@@ -94,13 +115,13 @@ public class ListReceiptActivity extends ActionBarActivity {
         drawerItem[0] = new DrawerItem(R.drawable.ic_menu_home, nav_options[0]);
         drawerItem[1] = new DrawerItem(R.drawable.ic_action_new, nav_options[1]);
         drawerItem[2] = new DrawerItem(R.drawable.ic_action_labels, nav_options[2]);
-        drawerItem[3] = new DrawerItem(R.drawable.ic_action_location_searching, nav_options[3]);
+        drawerItem[3] = new DrawerItem(R.drawable.ic_action_place, nav_options[3]);
         drawerItem[4] = new DrawerItem(R.drawable.ic_action_settings, nav_options[4]);
         drawer = (ListView) findViewById(R.id.drawer);
         LayoutInflater lf = this.getLayoutInflater();
         View headerView = (View)lf.inflate(R.layout.drawer_header, drawer, false);
         TextView email = (TextView) headerView.findViewById(R.id.email);
-        email.setText(Model._currentUser.Email);
+        email.setText(Model.getInstance()._currentUser.Email);
         drawer.addHeaderView(headerView);
         drawer.setAdapter(new DrawerAdapter(this, R.layout.drawer_list_item, drawerItem, 2));
         drawer.setOnItemClickListener(new DrawerOnItemClickListener(this,drawerLayout,drawer,3));
@@ -138,7 +159,7 @@ public class ListReceiptActivity extends ActionBarActivity {
                 filter = position;
                 //update result
                 Model.getInstance().changeDisplayReceipts(filter);
-                adapter.setItems(Model._displayReceipts);
+                adapter.setItems(Model.getInstance()._displayReceipts);
 
             }
 
@@ -190,6 +211,25 @@ public class ListReceiptActivity extends ActionBarActivity {
 //            }
 //        });
     }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.list_receipt, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        switch (item.getItemId())
+        {
+
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 
     @Override
     protected void onResume() {
@@ -200,11 +240,14 @@ public class ListReceiptActivity extends ActionBarActivity {
 //                Model.getInstance().changeDisplayReceipts(filter);
                 spinner.dismiss();
                 Model.getInstance().changeDisplayReceipts(filter);
-                adapter.notifyDataSetChanged();
+                adapter.setItems(Model.getInstance()._displayReceipts);
+//                adapter.notifyDataSetChanged();
+                adapter.notifyLoadingFinished();
             }
 
             @Override
             public void getReceiptFailed() {
+                spinner.dismiss();
                 Helper.AlertBox(ListReceiptActivity.this, "Error", "Failed to retrieve data.\nPlease check your internet connection.");
             }
         });

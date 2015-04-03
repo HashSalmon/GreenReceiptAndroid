@@ -15,53 +15,54 @@
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         android:background="@color/primary_accent_color">
     </android.support.v7.widget.Toolbar>
-    <!--<TextView-->
-        <!--android:text="Add with your Green Receipt Number"-->
-        <!--android:textSize="20dip"-->
-        <!--android:textColor="#000000"-->
-        <!--android:gravity="center"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="0dip"-->
-        <!--android:layout_weight="15" />-->
-    <!--<TextView-->
-        <!--android:id="@+id/greenReceiptNumber"-->
-        <!--android:text="0012345678"-->
-        <!--android:textSize="20dip"-->
-        <!--android:textColor="#000000"-->
-        <!--android:gravity="center"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="0dip"-->
-        <!--android:layout_weight="9" />-->
-    <!--<TextView-->
-        <!--android:text="OR"-->
-        <!--android:textSize="20dip"-->
-        <!--android:textColor="#000000"-->
-        <!--android:gravity="center"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="0dip"-->
-        <!--android:layout_weight="10" />-->
-    <!--<TextView-->
-        <!--android:text="Scan the following code"-->
-        <!--android:textSize="20dip"-->
-        <!--android:textColor="#000000"-->
-        <!--android:gravity="center"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="0dip"-->
-        <!--android:layout_weight="10" />-->
-    <!--<ImageView-->
-        <!--android:layout_weight="30"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="0dip"-->
-        <!--android:id="@+id/code"-->
-        <!--android:gravity="center" />-->
-    <!--<TextView-->
-        <!--android:text="OR"-->
-        <!--android:textSize="20dip"-->
-        <!--android:textColor="#000000"-->
-        <!--android:gravity="center"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="0dip"-->
-        <!--android:layout_weight="10" />-->
+    <TextView
+        android:text="Add with your Green Receipt Number"
+        android:textSize="20dip"
+        android:textColor="#000000"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="15" />
+    <TextView
+        android:id="@+id/greenReceiptNumber"
+        android:text="0012345678"
+        android:textSize="20dip"
+        android:textColor="#000000"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="9" />
+    <TextView
+        android:text="OR"
+        android:textSize="20dip"
+        android:textColor="#000000"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="10" />
+    <TextView
+        android:text="Scan the following code"
+        android:textSize="20dip"
+        android:textColor="#000000"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="10" />
+    <ImageView
+        android:layout_weight="30"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:id="@+id/code"
+        android:gravity="center"
+        android:src="@drawable/code"/>
+    <TextView
+        android:text="OR"
+        android:textSize="20dip"
+        android:textColor="#000000"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="10" />
     <TextView
         android:text="Enter a receipt by hand"
         android:textSize="20dip"
@@ -82,7 +83,8 @@
             android:layout_height="wrap_content"
             android:id="@+id/icon"
             android:gravity="center"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"
+            android:src="@drawable/ic_action_new"/>
     </LinearLayout>
     <TextView
         android:text="OR"
@@ -112,6 +114,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/cam_icon"
             android:gravity="center"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"
+            android:src="@drawable/ic_action_camera"/>
     </LinearLayout>
 </LinearLayout>

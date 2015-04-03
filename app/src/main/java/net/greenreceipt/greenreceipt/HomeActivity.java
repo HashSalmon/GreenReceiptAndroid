@@ -1,6 +1,9 @@
 package net.greenreceipt.greenreceipt;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -9,7 +12,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -33,6 +35,11 @@ public class HomeActivity extends ActionBarActivity{
     private ListView drawer;
     private LinearLayout total;
     private LinearLayout monthly;
+    private BroadcastReceiver receiver;
+    private int totalCount;
+    private double totalAmt;
+    private int monthCount;
+    private double monthAmt;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,13 +51,13 @@ public class HomeActivity extends ActionBarActivity{
         drawerItem[0] = new DrawerItem(R.drawable.ic_menu_home, nav_options[0]);
         drawerItem[1] = new DrawerItem(R.drawable.ic_action_new, nav_options[1]);
         drawerItem[2] = new DrawerItem(R.drawable.ic_action_labels, nav_options[2]);
-        drawerItem[3] = new DrawerItem(R.drawable.ic_action_location_searching, nav_options[3]);
+        drawerItem[3] = new DrawerItem(R.drawable.ic_action_place, nav_options[3]);
         drawerItem[4] = new DrawerItem(R.drawable.ic_action_settings, nav_options[4]);
         drawer = (ListView) findViewById(R.id.drawer);
         LayoutInflater lf = this.getLayoutInflater();
         View headerView = (View)lf.inflate(R.layout.drawer_header, drawer, false);
         TextView email = (TextView) headerView.findViewById(R.id.email);
-        email.setText(Model._currentUser.Email);
+        email.setText(Model.getInstance()._currentUser.Email);
         drawer.addHeaderView(headerView);
         drawer.setAdapter(new DrawerAdapter(this, R.layout.drawer_list_item, drawerItem, 0));
         drawer.setOnItemClickListener(new DrawerOnItemClickListener(this, drawerLayout, drawer, 1));
@@ -76,8 +83,8 @@ public class HomeActivity extends ActionBarActivity{
 
         TextView date = (TextView) findViewById(R.id.date);
         TextView greeting = (TextView) findViewById(R.id.greeting);
-        if(Model._currentUser!=null)
-        greeting.setText("Welcome back, "+Model._currentUser.FirstName+"!");
+        if(Model.getInstance()._currentUser!=null)
+        greeting.setText("Welcome back, "+Model.getInstance()._currentUser.FirstName+"!");
         Date now = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("MMMM d yyyy");
         String currentDate = sdf.format(new Date());
@@ -104,6 +111,14 @@ public class HomeActivity extends ActionBarActivity{
 
     }
     @Override
+    public void onBackPressed() {
+        if (drawerLayout.isDrawerOpen(drawer)) {
+            drawerLayout.closeDrawer(drawer);
+        } else {
+            super.onBackPressed();
+        }
+    }
+    @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         // Forward the new configuration the drawer toggle component.
@@ -111,31 +126,66 @@ public class HomeActivity extends ActionBarActivity{
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(receiver);
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
-        Model.getInstance().setGetReceiptListener(new Model.GetReceiptListener() {
+        receiver = new BroadcastReceiver()
+        {
             @Override
-            public void getReceiptSuccess()
+            public void onReceive(Context context, Intent intent)
             {
-                TextView tTotal = (TextView) total.findViewById(R.id.detail);
-                tTotal.setText(Model.getInstance().getTotalReceiptCount() + "\n$ " + new DecimalFormat("##.##").format(Model.getInstance().getReceiptsTotal()));
-                TextView mTotal = (TextView) monthly.findViewById(R.id.mDetail);
-                Pair currentMonth = Model.getInstance().getCurrentMonthReceiptCount();
-                mTotal.setText(currentMonth.first + "\n$ " + new DecimalFormat("##.##").format(currentMonth.second));
+                if(intent.getAction().equals(Model.GET_RECEIPT_COUNT_SUCCESS))
+                {
+                    totalCount = intent.getIntExtra("count",0);
+                    TextView tTotal = (TextView) total.findViewById(R.id.detail);
+                    tTotal.setText(totalCount+"\n$"+new DecimalFormat("##.##").format(totalAmt));
+                }
+                else if(intent.getAction().equals(Model.GET_RECEIPT_TOTAL_SUCCESS))
+                {
+                    totalAmt = intent.getDoubleExtra("total",0);
+                    TextView tTotal = (TextView) total.findViewById(R.id.detail);
+                    tTotal.setText(totalCount+"\n$"+new DecimalFormat("##.##").format(totalAmt));
+                }
+                else if(intent.getAction().equals(Model.GET_MONTHLY_RECEIPT_COUNT_SUCCESS))
+                {
+                    monthCount = intent.getIntExtra("count",0);
+                    TextView mTotal = (TextView) monthly.findViewById(R.id.mDetail);
+                    mTotal.setText(monthCount+ "\n$ " + new DecimalFormat("##.##").format(monthAmt));
+                }
+                else
+                {
+                    monthAmt = intent.getIntExtra("total",0);
+                    TextView mTotal = (TextView) monthly.findViewById(R.id.mDetail);
+                    mTotal.setText(monthCount+ "\n$ " + new DecimalFormat("##.##").format(monthAmt));
+                }
 
             }
+        };
 
-            @Override
-            public void getReceiptFailed() {
+        IntentFilter filter = new IntentFilter(Model.GET_RECEIPT_COUNT_SUCCESS);
+        registerReceiver(receiver, filter);
+        IntentFilter filter1 = new IntentFilter(Model.GET_RECEIPT_TOTAL_SUCCESS);
+        registerReceiver(receiver, filter1);
+        IntentFilter filter2 = new IntentFilter(Model.GET_MONTHLY_RECEIPT_COUNT_SUCCESS);
+        registerReceiver(receiver, filter2);
+        IntentFilter filter3 = new IntentFilter(Model.GET_MONTHLY_RECEIPT_TOTAL_SUCCESS);
+        registerReceiver(receiver, filter3);
 
-            }
-        });
 
 
         Model.getInstance().GetCategories();
-        Model.getInstance().GetAllReceipt(Model.pageSize,1);
+//        Model.getInstance().GetAllReceipt(Model.pageSize,1);
         Model.getInstance().GetReturnReceipts();
-        Model.getInstance().changeDisplayReceipts(0);
+        Model.getInstance().GetTotalReceiptCount(this);
+        Model.getInstance().GetTotalReceiptTotal(this);
+        Model.getInstance().GetMonthReceiptCount(this);
+        Model.getInstance().GetMonthReceiptTotal(this);
+//        Model.getInstance().changeDisplayReceipts(0);
 //        summary.invalidateViews();
 
     }

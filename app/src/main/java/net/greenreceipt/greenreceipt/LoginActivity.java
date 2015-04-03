@@ -30,10 +30,10 @@ public class LoginActivity extends Activity {
         if(pref.getString("token","")!="")//user is logged in
         {
             Model._token = pref.getString("token","");
-            Model._currentUser = new User();
-            Model._currentUser.FirstName = pref.getString("FirstName","");
-            Model._currentUser.LastName = pref.getString("LastName","");
-            Model._currentUser.Email = pref.getString("Email","");
+            Model.getInstance()._currentUser = new User();
+            Model.getInstance()._currentUser.FirstName = pref.getString("FirstName","");
+            Model.getInstance()._currentUser.LastName = pref.getString("LastName","");
+            Model.getInstance()._currentUser.Email = pref.getString("Email","");
             Intent checkReturnIntent = new Intent(this,CheckReturnService.class);
             startService(checkReturnIntent);
             Intent home = new Intent(getBaseContext(),HomeActivity.class);
@@ -68,9 +68,9 @@ public class LoginActivity extends Activity {
                         SharedPreferences pref = getApplicationContext().getSharedPreferences("GreenReceipt", 0); // 0 - for private mode
                         SharedPreferences.Editor editor = pref.edit();
                         editor.putString("token", Model._token);
-                        editor.putString("FirstName", Model._currentUser.FirstName);
-                        editor.putString("LastName", Model._currentUser.LastName);
-                        editor.putString("Email", Model._currentUser.Email);
+                        editor.putString("FirstName", Model.getInstance()._currentUser.FirstName);
+                        editor.putString("LastName", Model.getInstance()._currentUser.LastName);
+                        editor.putString("Email", Model.getInstance()._currentUser.Email);
                         editor.commit();
                     }
                     Intent checkReturnIntent = new Intent(LoginActivity.this,CheckReturnService.class);

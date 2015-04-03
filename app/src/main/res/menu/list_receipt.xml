@@ -1,8 +1,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="net.greenreceipt.greenreceipt.ListReceiptActivityOld" >
-    <item android:id="@+id/action_settings"
-        android:title="@string/action_settings"
+    <item android:id="@+id/search"
+        android:title="Search"
         android:orderInCategory="100"
-        android:showAsAction="never" />
+        app:showAsAction="always"
+        android:icon="@drawable/ic_action_search"/>
+    <item android:id="@+id/filter"
+        android:title="Filter"
+        android:orderInCategory="100"
+        app:showAsAction="always"
+        android:icon="@drawable/filter"/>
 </menu>

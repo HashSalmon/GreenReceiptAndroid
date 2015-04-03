@@ -15,8 +15,14 @@ public class StoreNames
                 "walmart",
                 "smith's",
                 "macy's",
-                "nordstrom rack",
-                "foot locker"
+                "nordstrom",
+                "target",
+                "foot locker",
+                "BJ's Chandler",
+                "JC Penny",
+                "k mart",
+                "wholefoods",
+                "trader joe's"
 
         };
 //        HashMap<String, String> names = new HashMap<String, String>();

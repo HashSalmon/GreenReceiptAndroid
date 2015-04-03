@@ -7,6 +7,8 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -16,6 +18,7 @@ import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Pair;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -23,13 +26,19 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -48,6 +57,7 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
     EditText storeName;
     EditText date;
     EditText tax;
+    EditText lastFour;
     TextView returnDate;
     Button add;
     DatePickerDialog picker;
@@ -56,7 +66,7 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
     int mDay;
     Switch alertSwitch;
     ProgressDialog spinner;
-    ArrayList<Item> items = new ArrayList<Item>();
+    List<Item> items = new ArrayList<Item>();
     Spinner payment;
     String error;
     TextView itemsPurchased;
@@ -64,7 +74,10 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
     StringPicker categoryPicker;
     ImageView image1;
     LinearLayout imageContainer;
+    String mode = "Add";
     int imageCount=0;
+    int Id = 0;
+    boolean switchOn=true;
     ArrayList<String> picturePaths = new ArrayList<String>();
 
     private ColorDrawable currentBgColor;
@@ -73,13 +86,14 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
     private final int TAKE_PICTURE = 0;
     private String resultUrl = "result.txt";
     private String picturePath;
-
+    Bitmap bitmap;
 
 //    int paymentType;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manual_receipt);
+
         Resources resources = getResources();
         ColorDrawable bgColorPrimary = new ColorDrawable(resources.getColor(R.color.primary_accent_color));
         ColorDrawable bgColorSecondary = new ColorDrawable(resources.getColor(R.color.secondary_title_background));
@@ -94,9 +108,9 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        if(Model.categories != null)
+        if(Model.getInstance().categories != null)
         {
-            for(Category c : Model.categories)
+            for(Category c : Model.getInstance().categories)
                 categoryList.add(c.Name);
         }
         itemsPurchased = (TextView) findViewById(R.id.itemsPurchased);
@@ -105,18 +119,21 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
 
 
 
-        final ImageView alertIcon = (ImageView) findViewById(R.id.alertIcon);
-        alertIcon.setImageResource(R.drawable.ic_action_time);
+
 //        ImageView categoryIcon = (ImageView) findViewById(R.id.categoryIcon);
 //        categoryIcon.setImageResource(R.drawable.ic_action_labels);
         itemContainer = (LinearLayout) findViewById(R.id.itemContainer);
+        lastFour = (EditText) findViewById(R.id.lastFour);
         storeName = (EditText) findViewById(R.id.store);
         alertSwitch = (Switch) findViewById(R.id.alertSwitch);
+
         alertSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked)
+
+                if(isChecked && switchOn)
                 {
+                    switchOn = true;
                     final Calendar c = Calendar.getInstance();
                     mYear = c.get(Calendar.YEAR);
                     mMonth = c.get(Calendar.MONTH);
@@ -135,12 +152,17 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
                                 }
                             }, mYear, mMonth, mDay);
                     dpd.setIcon(R.drawable.ic_action_time);
-                    dpd.setTitle("Date");
+                    dpd.setTitle("Return Date");
                     dpd.show();
+                }
+                else if(!isChecked && switchOn)
+                {
+                    switchOn = true;
+                    returnDate.setText("Return Alert");
                 }
                 else
                 {
-                    returnDate.setText("Return Alert");
+                    switchOn = true;
                 }
             }
         });
@@ -167,13 +189,14 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
                             }
                         }, mYear, mMonth, mDay);
                 dpd.setIcon(R.drawable.ic_action_time);
-                dpd.setTitle("Date");
+                dpd.setTitle("Return Date");
                 dpd.show();
             }
         });
         tax = (EditText) findViewById(R.id.tax);
         returnDate = (TextView) findViewById(R.id.returnAlert);
         add = (Button) findViewById(R.id.addButton);
+
         if(add!=null)
             add.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -192,6 +215,7 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
                             spinner = ProgressDialog.show(ManualReceiptActivity.this, null, "Processing...");
                             spinner.setCanceledOnTouchOutside(true);
                             Receipt receipt = new Receipt();
+                            receipt.Id = Id;
                             Store store = new Store();
                             store.Company.Name = storeName.getText().toString();
                             receipt.Store = store;
@@ -204,6 +228,7 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
                             receipt.ReturnReminder = alertSwitch.isChecked();
                             receipt.Total = receipt.SubTotal + receipt.Tax;
                             receipt.CardType = payment.getSelectedItemPosition();
+                            receipt.LastFourCardNumber = lastFour.getText().toString();
                             if (alertSwitch.isChecked())
                                 receipt.ReturnDate = new Date(returnDate.getText().toString());
                             Pair<Double, Double> location = Model.getInstance().getCurrentLocation(ManualReceiptActivity.this);
@@ -212,7 +237,8 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
                             ReceiptImage image = null;
                             if(picturePath!=null) {
                                 image = new ReceiptImage();
-                                image.Base64Image = Model.getInstance().getByteArrayFromImage(picturePath);
+                                byte[] imageBytes = Model.getInstance().getByteArrayFromImage(picturePath);
+                                image.Base64Image = Base64.encodeToString(imageBytes,Base64.NO_WRAP);
                                 image.FileName = "image.jpg";
 
                             }
@@ -231,7 +257,6 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
 
 
         //add item dialog
-        icon.setImageResource(R.drawable.ic_action_new);
         icon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -248,16 +273,33 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
                             TextView price = (TextView) view.findViewById(R.id.detail);
                             price.setText(itemPrice.getText().toString());
                             view.setBackgroundColor(Color.WHITE);
-                            Item item = new Item();
+                            ImageButton remove = (ImageButton) view.findViewById(R.id.remove);
+                            remove.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+
+                                    int index = itemContainer.indexOfChild((View) v.getParent().getParent());
+                                    itemContainer.removeViewAt(index);
+                                    items.remove(index);
+                                }
+                            });
+                            final Item item = new Item();
                             item.ItemName = itemName.getText().toString();
                             item.Price = Double.parseDouble(itemPrice.getText().toString());
                             item.CreatedDate = new Date();
-                            item.Category = Model.categories[categoryPicker.getCurrent()];
+                            item.Category = Model.getInstance().categories[categoryPicker.getCurrent()];
                             items.add(item);
                             itemContainer.addView(view);
                             itemName.setText("");
                             itemPrice.setText("");
                             itemsPurchased.setTextColor(Color.GRAY);
+                            view.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    int finalJ = itemContainer.indexOfChild(v);
+                                    editItem(finalJ);
+                                }
+                            });
 
                         }
                     }
@@ -304,8 +346,7 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
                 dpd.show();
             }
         });
-        ImageView paymentIcon = (ImageView) findViewById(R.id.paymentIcon);
-        paymentIcon.setImageResource(R.drawable.ic_action_labels);
+//        ImageView paymentIcon = (ImageView) findViewById(R.id.paymentIcon);
         payment = (Spinner) findViewById(R.id.payment);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, Model.PAYMENT_TYPES);
         payment.setAdapter(adapter);
@@ -314,7 +355,7 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
 
         image1 = (ImageView) findViewById(R.id.image1);
         image1.setOnClickListener(this);
-
+        preFill();
 
     }
 
@@ -357,52 +398,6 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
                 imageFilePath = getOutputMediaFileUri();
                 picturePath = imageFilePath.getPath();
                 image1.setImageURI(imageFilePath);
-//                String[] filePathColumn = { MediaStore.Images.Media.DATA };
-//                Cursor cursor = getContentResolver().query(imageFilePath,
-//                        filePathColumn, null, null, null);
-//                cursor.moveToFirst();
-//                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-//
-//                picturePath = cursor.getString(columnIndex);
-//                File imgFile = new File(picturePath);
-//                if(imgFile.exists())
-//                {
-//                    ExifInterface exif = null;
-//                    try {
-//                        exif = new ExifInterface(picturePath);
-//
-//                        int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
-//                        Bitmap thumb = MediaStore.Images.Thumbnails.getThumbnail(
-//                                getContentResolver(), Long.parseLong(imageFilePath.getLastPathSegment()),
-//                                MediaStore.Images.Thumbnails.MICRO_KIND,
-//                                (BitmapFactory.Options) null);
-//                        Matrix matrix = new Matrix();
-//                        if (orientation == 6)
-//                            matrix.postRotate(90);
-//                        else if (orientation == 3)
-//                            matrix.postRotate(180);
-//                        else if (orientation == 8)
-//                            matrix.preRotate(90);
-//                        thumb = Bitmap.createBitmap(thumb, 0, 0, thumb.getWidth(), thumb.getHeight(), matrix, true);
-//                        image1.setImageBitmap(thumb);
-//
-//
-//                    }
-//                    catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//
-//                }
-//                cursor.close();
-
-//                if(imageCount < 5) {
-//                    ImageView newView = new ImageView(this);
-//                    newView.setImageURI(imageFilePath);
-//                    imageContainer.addView(newView);
-//                    imageCount++;
-//                }
-
-
                 break;
 
         }
@@ -416,7 +411,7 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
 //        startActivity(results);
     }
 
-    private boolean checkReceipt(EditText store, EditText date, EditText tax, ArrayList items)
+    private boolean checkReceipt(EditText store, EditText date, EditText tax, List items)
     {
         boolean result = true;
         error = "";
@@ -463,6 +458,7 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
         Model.getInstance().setAddReceiptListener(new Model.AddReceiptListener() {
             @Override
             public void addReceiptSuccess() {
+                if(spinner!=null)
                 spinner.dismiss();
                 Intent intent = new Intent(getBaseContext(),ListReceiptActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
@@ -491,7 +487,10 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
 
     @Override
     protected void onPause() {
+
         super.onPause();
+        if(bitmap != null)
+            bitmap.recycle();
     }
 
     @Override
@@ -504,15 +503,136 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
         startActivityForResult(intent, TAKE_PICTURE);
 
     }
-//    private ReceiptImage createImage()
-//    {
-//        ReceiptImage image = new ReceiptImage();
-//        image.CreatedDate = new Date();
-//
-//    }
+    public void preFill()
+    {
+        Receipt r;
+//        ReceiptImage image = null;
+        Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
+        String receiptString = getIntent().getStringExtra("receipt");
+        String currentMode = getIntent().getStringExtra("mode");
+        if(currentMode!=null) {
+            mode = currentMode;
+            add.setText(mode);
+        }
+        picturePath = getIntent().getStringExtra("image");
+        if(receiptString != null) {
+            try {
+                r = gson.fromJson(receiptString, Receipt.class);
+                SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+//                image = new ReceiptImage();
+                if(picturePath!=null) {
+                    byte[] imageBytes = Model.getInstance().getByteArrayFromImage(picturePath);
+//                    image.Base64Image = Base64.encodeToString(imageBytes, Base64.NO_WRAP);
+//                    image.FileName = "image.jpg";
+                    bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+                    image1.setImageBitmap(bitmap);
+                }
 
-    //    @Override
-//    public void onClick(String s) {
-//        category.setText(s);
-//    }
+                Id = r.Id;
+                storeName.setText(r.Store.Company.Name);
+                tax.setText(r.Tax + "");
+                date.setText(sdf.format(r.PurchaseDate));
+                if(r.ReturnReminder)
+                {
+                    returnDate.setText(sdf.format(r.ReturnDate));
+                    switchOn = false;
+                    alertSwitch.setChecked(r.ReturnReminder);
+                }
+
+
+
+                lastFour.setText(r.LastFourCardNumber);
+                payment.setSelection(r.CardType);
+                items = r.ReceiptItems;
+                for(int j = 0; j < items.size(); j++){
+                    final int finalJ = j;
+                    Item i = items.get(finalJ);
+                    View view = View.inflate(getBaseContext(), R.layout.purchaseitem, null);
+                    final TextView name = (TextView) view.findViewById(R.id.store);
+                    name.setText(i.ItemName);
+                    TextView price = (TextView) view.findViewById(R.id.detail);
+                    price.setText(i.Price + "");
+                    ImageButton delete = (ImageButton) view.findViewById(R.id.remove);
+                    delete.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            int index = itemContainer.indexOfChild((View) v.getParent().getParent());
+                            itemContainer.removeViewAt(index);
+                            items.remove(index);
+                        }
+                    });
+                    view.setBackgroundColor(Color.WHITE);
+
+                    view.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            editItem(finalJ);
+                        }
+                    });
+                    itemContainer.addView(view);
+                    itemsPurchased.setTextColor(Color.GRAY);
+                }
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
+    }
+    public void editItem(int itemIndex)
+    {
+        final int finalJ = itemIndex;
+        AlertDialog.Builder builder = new AlertDialog.Builder(ManualReceiptActivity.this);
+        builder.setPositiveButton("Done",new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //make sure there's valid info to add
+                if(!itemName.getText().toString().isEmpty() && !itemPrice.getText().toString().isEmpty())
+                {
+                    View view = itemContainer.getChildAt(finalJ);
+                    TextView name = (TextView) view.findViewById(R.id.store);
+                    name.setText(itemName.getText().toString());
+                    TextView price = (TextView) view.findViewById(R.id.detail);
+                    price.setText(itemPrice.getText().toString());
+                    view.setBackgroundColor(Color.WHITE);
+                    Item item = new Item();
+                    item.ItemName = itemName.getText().toString();
+                    item.Price = Double.parseDouble(itemPrice.getText().toString());
+                    item.CreatedDate = new Date();
+                    item.Category = Model.getInstance().categories[categoryPicker.getCurrent()];
+                    items.set(finalJ, item);
+                    itemName.setText("");
+                    itemPrice.setText("");
+                    itemsPurchased.setTextColor(Color.GRAY);
+                    itemContainer.invalidate();
+
+                }
+            }
+        });
+        Item i = items.get(finalJ);
+        builder.setTitle("Edit Item");
+        View add = View.inflate(getBaseContext(),R.layout.add_item,null);
+        builder.setView(add);
+        itemName = (EditText) add.findViewById(R.id.itemName);
+        itemName.setText(i.ItemName);
+        itemPrice = (EditText) add.findViewById(R.id.price);
+        itemPrice.setText(i.Price+"");
+        categoryPicker = (StringPicker) add.findViewById(R.id.category);
+
+        categoryPicker.setValues(categoryList);
+        if(categoryList.size()==0)
+        {
+            categoryList.add("");
+        }
+        if(i.Category!=null)
+        {
+            int index = Model.getInstance().getCategoryIndex(i.Category.Name);
+            if(index>-1)
+                categoryPicker.setCurrent(index);
+        }
+
+        AlertDialog addDialog = builder.create();
+        addDialog.show();
+    }
+
 }

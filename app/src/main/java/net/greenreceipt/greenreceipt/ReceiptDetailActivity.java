@@ -2,15 +2,18 @@ package net.greenreceipt.greenreceipt;
 
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.database.DataSetObserver;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,6 +25,9 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -39,24 +45,24 @@ public class ReceiptDetailActivity extends ActionBarActivity implements ListAdap
     int mDay;
     ProgressDialog spinner;
     boolean deleted = false;
+    boolean editing = false;
     private ActionBar actionBar;
     private ColorDrawable currentBgColor;
+    private BroadcastReceiver receiver;
+    Bitmap decodedByte;
+    ImageView picture;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_receipt_detail);
-        Resources resources = getResources();
-        ColorDrawable bgColorPrimary = new ColorDrawable(resources.getColor(R.color.primary_accent_color));
-        ColorDrawable bgColorSecondary = new ColorDrawable(resources.getColor(R.color.secondary_title_background));
-        currentBgColor = bgColorPrimary;
+
+
         Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
         this.setSupportActionBar(tb);
         tb.setTitleTextColor(Color.WHITE);
         tb.inflateMenu(R.menu.receipt_detail);
         actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setBackgroundDrawable(currentBgColor);
-        }
+
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
 //        ActionBar bar = getActionBar();
@@ -83,6 +89,24 @@ public class ReceiptDetailActivity extends ActionBarActivity implements ListAdap
 
             }
         });
+        Model.getInstance().setGetReceiptImageListener(new Model.GetReceiptImageListener() {
+            @Override
+            public void onGetImageSuccess(ReceiptImage[] images) {
+                if(images.length > 0) {
+                    byte[] decodedString = Base64.decode(images[0].Base64Image,Base64.NO_WRAP);
+                    decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                    picture.setImageBitmap(decodedByte);
+                    picture.invalidate();
+                    list.invalidateViews();
+                }
+            }
+
+            @Override
+            public void onGetImageFailed(String error) {
+
+            }
+        });
+        Model.getInstance().GetReceiptImages(receipt.Id);
     }
 
     @Override
@@ -98,6 +122,15 @@ public class ReceiptDetailActivity extends ActionBarActivity implements ListAdap
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId())
         {
+            case R.id.edit:
+                Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
+                Intent intent = new Intent(this,ManualReceiptActivity.class);
+                intent.putExtra("receipt",gson.toJson(receipt,Receipt.class));
+                intent.putExtra("mode","Edit");
+                startActivity(intent);
+                editing = true;
+                finish();
+                return true;
             case R.id.delete:
                 spinner = ProgressDialog.show(this,null,"Deleting...");
                 Model.getInstance().DeleteReceipt(receipt.Id);
@@ -160,29 +193,35 @@ public class ReceiptDetailActivity extends ActionBarActivity implements ListAdap
             Date date = receipt.PurchaseDate;
             detail.setText(sdf.format(date)+"\n$"+new DecimalFormat("##.##").format(receipt.Total));
             view.setBackgroundColor(Color.WHITE);
-            ImageView image = (ImageView) view.findViewById(R.id.image);
-            if(receipt.Store.Company.Name.equals("ARBY'S")) {
-                image.setImageResource(R.drawable.arby);
-                image.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(ReceiptDetailActivity.this,FullScreenImageActivity.class);
-                        intent.putExtra("resource",R.drawable.arby);
-                        startActivity(intent);
-                    }
-                });
-            }
+            picture = (ImageView) view.findViewById(R.id.image);
+            if(decodedByte!=null)
+                picture.setImageBitmap(decodedByte);
             else
             {
-                image.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(ReceiptDetailActivity.this,FullScreenImageActivity.class);
-                        intent.putExtra("resource",R.drawable.ic_action_camera);
-                        startActivity(intent);
-                    }
-                });
+
             }
+//            if(receipt.Store.Company.Name.equals("ARBY'S")) {
+//                image.setImageResource(R.drawable.arby);
+//                image.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        Intent intent = new Intent(ReceiptDetailActivity.this,FullScreenImageActivity.class);
+//                        intent.putExtra("resource",R.drawable.arby);
+//                        startActivity(intent);
+//                    }
+//                });
+//            }
+//            else
+//            {
+//                image.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        Intent intent = new Intent(ReceiptDetailActivity.this,FullScreenImageActivity.class);
+//                        intent.putExtra("resource",R.drawable.ic_action_camera);
+//                        startActivity(intent);
+//                    }
+//                });
+//            }
         }
 
         else if(position == 1)//alert
@@ -401,7 +440,9 @@ public class ReceiptDetailActivity extends ActionBarActivity implements ListAdap
     @Override
     protected void onPause() {
         super.onPause();
-        if(!deleted)
+        if(!deleted && !editing)
         Model.getInstance().AddReceipt(receipt,null);//update if not deleted
+        if(decodedByte!=null)
+        decodedByte.recycle();
     }
 }

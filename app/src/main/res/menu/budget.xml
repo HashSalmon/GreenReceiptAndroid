@@ -7,9 +7,5 @@
         android:orderInCategory="100"
         app:showAsAction="always"
         android:icon="@drawable/ic_action_edit"/>
-    <item android:id="@+id/delete"
-        android:title="Edit"
-        android:orderInCategory="100"
-        app:showAsAction="always"
-        android:icon="@drawable/ic_action_discard"/>
+
 </menu>

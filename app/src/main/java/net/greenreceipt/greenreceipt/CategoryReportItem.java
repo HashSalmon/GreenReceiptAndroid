@@ -5,6 +5,7 @@ package net.greenreceipt.greenreceipt;
  */
 public class CategoryReportItem
 {
+    public int CategoryId;
     public String CategoryName;
     public double Total;
 }

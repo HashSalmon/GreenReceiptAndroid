@@ -31,6 +31,8 @@ public class Receipt
     public Date CreatedDate;
     public int Id;
     public String picturePath;
+    public String total;
+    public String tax;
 
 
 

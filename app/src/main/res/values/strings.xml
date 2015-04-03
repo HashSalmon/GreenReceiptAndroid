@@ -36,10 +36,10 @@
     <string name="receipts">Receipts</string>
     <string name="action_delete">Delete</string>
     <string name="title_activity_tab_test">TabTest</string>
-    <string name="title_activity_create_budget">CreateBudgetActivity</string>
-    <string name="title_activity_edit_budget">EditBudgetActivity</string>
-    <string name="title_activity_full_screen_image">FullScreenImageActivity</string>
-    <string name="title_activity_list_test">ListTest</string>
+    <string name="title_activity_create_budget">Create Budget</string>
+    <string name="title_activity_edit_budget">Edit Budget</string>
+    <string name="title_activity_full_screen_image">Receipt Image</string>
+    <string name="title_activity_list_test">Receipts</string>
 
 
     <string name="analytics_message_send"><b>Send statistics</b></string>
