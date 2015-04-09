@@ -75,7 +75,7 @@ public class Networking {
         }
     }
 
-    public static boolean Register(String email, String firstname, String lastname, String password, String confirm, String username)
+    public static boolean Register(String email, String firstname, String lastname, String password, String confirm, String username, String PushNotificationId)
     {
         try {
             HttpParams httpParameters = new BasicHttpParams();
@@ -89,6 +89,7 @@ public class Networking {
             json.put("LastName", lastname);
             json.put("Password", password);
             json.put("ConfirmPassword", confirm);
+            json.put("PushNotificationId",PushNotificationId);
             json.put("Email", email);
             json.put("Username", username);
             StringEntity entity = new StringEntity(json.toString());

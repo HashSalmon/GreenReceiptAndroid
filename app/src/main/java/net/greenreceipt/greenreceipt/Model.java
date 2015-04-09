@@ -255,12 +255,12 @@ public class Model
     }
 
 
-    public void Register(final String email, String firstname, String lastname, final String password, String confirm, String username)
+    public void Register(final String email, String firstname, String lastname, final String password, String confirm, String username, String PushNotificationId)
     {
         AsyncTask<String,Integer,Boolean> registerTask = new AsyncTask<String, Integer, Boolean>() {
             @Override
             protected Boolean doInBackground(String... params) {
-                return Networking.Register(params[0],params[1],params[2],params[3],params[4],params[5]);
+                return Networking.Register(params[0],params[1],params[2],params[3],params[4],params[5],params[6]);
             }
 
             @Override
@@ -272,7 +272,7 @@ public class Model
                     _registerUserListener.userRegisterFailed();
             }
         };
-        registerTask.execute(email,firstname,lastname,password,confirm,username);
+        registerTask.execute(email,firstname,lastname,password,confirm,username,PushNotificationId);
     }
     public void AddReceipt(Receipt r, List<ReceiptImage> image)
     {

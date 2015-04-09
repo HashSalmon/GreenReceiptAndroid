@@ -43,19 +43,7 @@ public class SignUpActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
-        if(checkPlayServices())
-        {
-            SharedPreferences prefs = getSharedPreferences("UserDetails",
-                    Context.MODE_PRIVATE);
-            String registrationId = prefs.getString(REG_ID, "");
-            if(registrationId==null)
-            {
-
-            }
-        }
-        else {
-            Log.i("Error", "No valid Google Play Services APK found.");
-        }
+        
 
         Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
         this.setSupportActionBar(tb);
@@ -112,9 +100,22 @@ public class SignUpActivity extends ActionBarActivity {
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    if(checkPlayServices()){
+                        try {
+                            if (gcm == null) {
+                                gcm = GoogleCloudMessaging
+                                        .getInstance(getApplicationContext());
+                            }
+                            regId = gcm
+                                    .register(ApplicationConstants.GOOGLE_PROJ_ID);
+
+
+                        } catch (IOException ex) {
+                        }
+                    }
                     spinner = ProgressDialog.show(SignUpActivity.this, null, "Registering...");
                     Model.getInstance().Register(email.getText().toString(),firstname.getText().toString(),
-                            lastname.getText().toString(),password.getText().toString(),confirm.getText().toString(),username.getText().toString());
+                            lastname.getText().toString(),password.getText().toString(),confirm.getText().toString(),username.getText().toString(),regId);
                 }
             });
 
