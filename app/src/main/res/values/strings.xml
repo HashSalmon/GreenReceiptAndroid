@@ -40,8 +40,6 @@
     <string name="title_activity_edit_budget">Edit Budget</string>
     <string name="title_activity_full_screen_image">Receipt Image</string>
     <string name="title_activity_list_test">Receipts</string>
-
-
     <string name="analytics_message_send"><b>Send statistics</b></string>
     <string name="analytics_message_dont_send">Do not send statistics</string>
     <string name="analytics_message">It is our goal to always provide the best products and user experience to our customers. By enabling this option anonymous data will be collected and sent to Telerik detailing how the Telerik Examples application is being used. No information is collected that could be used to either identify or contact you. \nYou can change this anytime from the Settings menu.</string>
@@ -52,15 +50,18 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-<string-array name="nav_array">
-    <item>Home</item>
-    <item>Add Receipt</item>
-    <item>View Receipts</item>
-    <item>Reports and Budget</item>
-    <item>Settings</item>
-</string-array>
-<string name="drawer_open">Open navigation drawer</string>
-<string name="drawer_close">Close navigation drawer</string>
-<string name="action_websearch">Web search</string>
-<string name="app_not_available">Sorry, there\'s no web browser available</string>
+    <string-array name="nav_array">
+        <item>Home</item>
+        <item>Add Receipt</item>
+        <item>View Receipts</item>
+        <item>Reports and Budget</item>
+        <item>Settings</item>
+    </string-array>
+
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+    <string name="action_websearch">Web search</string>
+    <string name="app_not_available">Sorry, there\'s no web browser available</string>
+    <string name="title_activity_picture_list">PictureListActivity</string>
+
 </resources>

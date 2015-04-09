@@ -102,7 +102,7 @@ public class Networking {
             return false;
         }
     }
-    public boolean addReceipt(Receipt r,ReceiptImage image)
+    public Receipt addReceipt(Receipt r,List<ReceiptImage> images)
     {
 
         try {
@@ -123,19 +123,22 @@ public class Networking {
             Scanner responseScanner = new Scanner(responseContent).useDelimiter("\\A");
             String responseString = responseScanner.hasNext() ? responseScanner.next() : null;
             if(responseString == null || response.getStatusLine().getStatusCode() != 200)
-                return false;
+                return null;
 
             Receipt receipt = gson.fromJson(responseString,Receipt.class);
-            if(image!=null) {
-                image.ReceiptId = receipt.Id;
-                postReceiptImage(image);
+            if(images!=null && images.size()>0) {
+                //TODO async
+                for(ReceiptImage image:images) {
+                    image.ReceiptId = receipt.Id;
+                    postReceiptImage(image);
+                }
             }
-            return response.getStatusLine().getStatusCode() == 200;
+            return receipt;
         }
         catch (Exception e) {
             e.printStackTrace();
             error = e.getMessage();
-            return false;
+            return null;
         }
     }
     public Receipt[] getAllReceipts(int pageSize,int currentPage, int pageCount)

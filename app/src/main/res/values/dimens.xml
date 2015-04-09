@@ -1,8 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-
-    <!-- Per the design guidelines, navigation drawers should be between 240dp and 320dp:
-     https://developer.android.com/design/patterns/navigation-drawer.html -->
+    <!--
+     Per the design guidelines, navigation drawers should be between 240dp and 320dp:
+     https://developer.android.com/design/patterns/navigation-drawer.html
+    -->
     <dimen name="action_bar_drop_down_min_width">135dp</dimen>
     <dimen name="example_group_action_bar_control_logo_left_margin">60dp</dimen>
     <dimen name="weather_data_button_padding_bottom">4dp</dimen>
@@ -15,10 +17,12 @@
     <dimen name="example_group_list_item_size">100dp</dimen>
     <dimen name="example_group_list_item_badge_left_margin">84dp</dimen>
     <dimen name="example_group_header_height">167dp</dimen>
+
     <integer name="example_list_fragment_columns">1</integer>
     <integer name="example_list_fragment_columns_wrap">2</integer>
     <integer name="example_controls_list_fragment_columns">2</integer>
     <integer name="example_controls_list_fragment_columns_wrap">3</integer>
+
     <dimen name="example_list_right_margin">16dp</dimen>
     <dimen name="example_list_left_margin">@dimen/example_list_right_margin</dimen>
     <dimen name="example_list_spacing">16dp</dimen>
@@ -30,14 +34,11 @@
     <dimen name="pie_margin">20dp</dimen>
     <dimen name="drawer_caption_fontsize">20dp</dimen>
     <dimen name="example_group_action_button_width">55dp</dimen>
-
     <dimen name="example_list_control_badge_size">32dp</dimen>
-
     <dimen name="example_list_item_text_margin_top">8dp</dimen>
     <dimen name="example_list_item_text_margin_right">16dp</dimen>
     <dimen name="example_list_item_text_margin_left">16dp</dimen>
     <dimen name="example_list_item_text_margin_bottom">8dp</dimen>
-
     <dimen name="example_list_wrap_item_text_margin_top">12dp</dimen>
     <dimen name="example_list_wrap_item_text_margin_right">8dp</dimen>
     <dimen name="example_list_wrap_item_text_margin_left">8dp</dimen>
@@ -46,4 +47,7 @@
     <dimen name="tips_title_font_size">23sp</dimen>
     <dimen name="tips_font_size">15sp</dimen>
     <dimen name="example_group_bar_tabs_font_size">13sp</dimen>
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
 </resources>

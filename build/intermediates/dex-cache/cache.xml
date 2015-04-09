@@ -37,11 +37,11 @@
         <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/classes-eef18b80c9b5dca24792ca27e7f6938300baf5d2.jar" />
     </item>
     <item
-        jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/exploded-aar/Feedback-2015.1.225-trial-release/classes.jar"
+        jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/exploded-aar/Common-2015.1.225-trial-release/classes.jar"
         jumboMode="false"
         revision="21.0.2"
-        sha1="12eae1364c6b4729251a403fd296eb052a7599c2">
-        <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/classes-b6b225b8a23a588f7398ea14254b9e4cb02b82be.jar" />
+        sha1="a953c581a8d03841b572760c95dc0426a277f794">
+        <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/classes-38ecdb96ad348077d0d94a8615523f97687b693c.jar" />
     </item>
     <item
         jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/exploded-aar/List-2015.1.225-trial-release/classes.jar"
@@ -51,18 +51,11 @@
         <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/classes-16ca2ca67ff8841222a3b7c5820c569464316f0c.jar" />
     </item>
     <item
-        jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/exploded-aar/Common-2015.1.225-trial-release/classes.jar"
+        jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/exploded-aar/Feedback-2015.1.225-trial-release/classes.jar"
         jumboMode="false"
         revision="21.0.2"
-        sha1="a953c581a8d03841b572760c95dc0426a277f794">
-        <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/classes-38ecdb96ad348077d0d94a8615523f97687b693c.jar" />
-    </item>
-    <item
-        jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/libs/httpcore-4.3.3.jar"
-        jumboMode="false"
-        revision="21.0.2"
-        sha1="f91b7a4aadc5cf486df6e4634748d7dd7a73f06d">
-        <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/httpcore-4.3.3-be653e8248e9b875829c0c90ab45918b23a092ea.jar" />
+        sha1="12eae1364c6b4729251a403fd296eb052a7599c2">
+        <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/classes-b6b225b8a23a588f7398ea14254b9e4cb02b82be.jar" />
     </item>
     <item
         jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/libs/mpandroidchartlibrary-1-7-4.jar"
@@ -70,6 +63,13 @@
         revision="21.0.2"
         sha1="c685e45ac6491e51640ce3571606ac22dfd4a6a3">
         <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/mpandroidchartlibrary-1-7-4-6c579556a06d9379feb282f3af6d27a053ab9543.jar" />
+    </item>
+    <item
+        jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/libs/httpcore-4.3.3.jar"
+        jumboMode="false"
+        revision="21.0.2"
+        sha1="f91b7a4aadc5cf486df6e4634748d7dd7a73f06d">
+        <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/httpcore-4.3.3-be653e8248e9b875829c0c90ab45918b23a092ea.jar" />
     </item>
     <item
         jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/libs/internal_impl-21.0.3.jar"
@@ -84,6 +84,13 @@
         revision="21.0.2"
         sha1="f4cc54f249a830f322cf2ae642deae59f522d55b">
         <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/classes-1ed350041dca4b7422784900906434d8eb5c18da.jar" />
+    </item>
+    <item
+        jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/exploded-aar/com.google.android.gms/play-services/3.1.59/classes.jar"
+        jumboMode="false"
+        revision="21.0.2"
+        sha1="2dd7b1a9ea65bb03d9cd16df777eeaf537a1fc81">
+        <dex dex="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/build/intermediates/pre-dexed/debug/classes-c4f0f31e357c3e3c04279f831d8516136ae67724.jar" />
     </item>
     <item
         jar="/Users/Boya/AndroidStudioProjects/GreenReceiptAndroid-master/app/libs/gson-2.3.jar"

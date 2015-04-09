@@ -73,27 +73,29 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
     List<String> categoryList = new ArrayList<String>();
     StringPicker categoryPicker;
     ImageView image1;
-    LinearLayout imageContainer;
+    ImageView camera;
     String mode = "Add";
     int imageCount=0;
     int Id = 0;
     boolean switchOn=true;
-    ArrayList<String> picturePaths = new ArrayList<String>();
+    ArrayList<String> picturePaths;
 
     private ColorDrawable currentBgColor;
     private ActionBar actionBar;
 
     private final int TAKE_PICTURE = 0;
     private String resultUrl = "result.txt";
-    private String picturePath;
+//    private String picturePath;
     Bitmap bitmap;
+    Receipt original;
 
 //    int paymentType;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manual_receipt);
-
+        if(picturePaths == null)
+        picturePaths = new ArrayList<String>();
         Resources resources = getResources();
         ColorDrawable bgColorPrimary = new ColorDrawable(resources.getColor(R.color.primary_accent_color));
         ColorDrawable bgColorSecondary = new ColorDrawable(resources.getColor(R.color.secondary_title_background));
@@ -212,37 +214,75 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
                         }
 
                         try {
-                            spinner = ProgressDialog.show(ManualReceiptActivity.this, null, "Processing...");
-                            spinner.setCanceledOnTouchOutside(true);
                             Receipt receipt = new Receipt();
-                            receipt.Id = Id;
-                            Store store = new Store();
-                            store.Company.Name = storeName.getText().toString();
-                            receipt.Store = store;
-                            receipt.Tax = Double.parseDouble(tax.getText().toString());
-                            receipt.SubTotal = subtotal;
-                            receipt.CreatedDate = new Date();
-                            receipt.PurchaseDate = new Date(date.getText().toString());
-                            receipt.picturePath = ManualReceiptActivity.this.picturePath;
-                            receipt.ReceiptItems.addAll(items);
-                            receipt.ReturnReminder = alertSwitch.isChecked();
-                            receipt.Total = receipt.SubTotal + receipt.Tax;
-                            receipt.CardType = payment.getSelectedItemPosition();
-                            receipt.LastFourCardNumber = lastFour.getText().toString();
-                            if (alertSwitch.isChecked())
-                                receipt.ReturnDate = new Date(returnDate.getText().toString());
-                            Pair<Double, Double> location = Model.getInstance().getCurrentLocation(ManualReceiptActivity.this);
-                            receipt.Longitude = location.first;
-                            receipt.Latitude = location.second;
-                            ReceiptImage image = null;
-                            if(picturePath!=null) {
-                                image = new ReceiptImage();
-                                byte[] imageBytes = Model.getInstance().getByteArrayFromImage(picturePath);
-                                image.Base64Image = Base64.encodeToString(imageBytes,Base64.NO_WRAP);
-                                image.FileName = "image.jpg";
+                            List<ReceiptImage> images = new ArrayList<ReceiptImage>();
+                            if(mode.equals("Add")) {
+                                spinner = ProgressDialog.show(ManualReceiptActivity.this, null, "Processing...");
+                                spinner.setCanceledOnTouchOutside(true);
+                                receipt.Id = Id;
+                                Store store = new Store();
+                                store.Company.Name = storeName.getText().toString();
+                                receipt.Store = store;
+                                receipt.Tax = Double.parseDouble(tax.getText().toString());
+                                receipt.SubTotal = subtotal;
+                                receipt.CreatedDate = new Date();
+                                receipt.PurchaseDate = new Date(date.getText().toString());
+                                receipt.picturePath = ManualReceiptActivity.this.picturePaths;
+                                receipt.ReceiptItems.addAll(items);
+                                receipt.ReturnReminder = alertSwitch.isChecked();
+                                receipt.Total = receipt.SubTotal + receipt.Tax;
+                                receipt.CardType = payment.getSelectedItemPosition();
+                                receipt.LastFourCardNumber = lastFour.getText().toString();
+                                if (alertSwitch.isChecked())
+                                    receipt.ReturnDate = new Date(returnDate.getText().toString());
+                                Pair<Double, Double> location = Model.getInstance().getCurrentLocation(ManualReceiptActivity.this);
+                                receipt.Longitude = location.first;
+                                receipt.Latitude = location.second;
 
+                                if (picturePaths.size()>0) {
+                                    for(String s:picturePaths) {
+                                        ReceiptImage image = new ReceiptImage();
+                                        byte[] imageBytes = Model.getInstance().getByteArrayFromImage(s);
+                                        image.Base64Image = Base64.encodeToString(imageBytes, Base64.NO_WRAP);
+                                        image.FileName = "image.jpg";
+                                        images.add(image);
+                                    }
+
+                                }
                             }
-                            Model.getInstance().AddReceipt(receipt,image);
+                            else
+                            {
+                                receipt = original;
+                                spinner = ProgressDialog.show(ManualReceiptActivity.this, null, "Processing...");
+                                spinner.setCanceledOnTouchOutside(true);
+
+                                Store store = new Store();
+                                store.Company.Name = storeName.getText().toString();
+                                receipt.Store = store;
+                                receipt.Tax = Double.parseDouble(tax.getText().toString());
+                                receipt.SubTotal = subtotal;
+                                receipt.PurchaseDate = new Date(date.getText().toString());
+                                receipt.picturePath = ManualReceiptActivity.this.picturePaths;
+                                receipt.ReceiptItems=items;
+                                receipt.ReturnReminder = alertSwitch.isChecked();
+                                receipt.Total = receipt.SubTotal + receipt.Tax;
+                                receipt.CardType = payment.getSelectedItemPosition();
+                                receipt.LastFourCardNumber = lastFour.getText().toString();
+                                if (alertSwitch.isChecked())
+                                    receipt.ReturnDate = new Date(returnDate.getText().toString());
+
+                                if (picturePaths.size()>0) {
+                                    for(String s:picturePaths) {
+                                        ReceiptImage image = new ReceiptImage();
+                                        byte[] imageBytes = Model.getInstance().getByteArrayFromImage(s);
+                                        image.Base64Image = Base64.encodeToString(imageBytes, Base64.NO_WRAP);
+                                        image.FileName = "image.jpg";
+                                        images.add(image);
+                                    }
+
+                                }
+                            }
+                            Model.getInstance().AddReceipt(receipt,images);
 
 
 
@@ -351,20 +391,30 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, Model.PAYMENT_TYPES);
         payment.setAdapter(adapter);
 
-        imageContainer = (LinearLayout) findViewById(R.id.image_container);
 
         image1 = (ImageView) findViewById(R.id.image1);
-        image1.setOnClickListener(this);
+        camera = (ImageView) findViewById(R.id.camera);
+        camera.setOnClickListener(this);
+
+        TextView viewall = (TextView) findViewById(R.id.viewAll);
+        viewall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent all = new Intent(ManualReceiptActivity.this,PictureListActivity.class);
+                all.putStringArrayListExtra("paths",picturePaths);
+                startActivity(all);
+            }
+        });
         preFill();
 
     }
 
-    private static Uri getOutputMediaFileUri(){
+    private  Uri getOutputMediaFileUri(){
         return Uri.fromFile(getOutputMediaFile());
     }
 
     /** Create a File for saving an image or video */
-    private static File getOutputMediaFile(){
+    private  File getOutputMediaFile(){
         // To be safe, you should check that the SDCard is mounted
         // using Environment.getExternalStorageState() before doing this.
 
@@ -381,7 +431,7 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
         }
 
         // Create a media file name
-        File mediaFile = new File(mediaStorageDir.getPath() + File.separator + "image.jpg" );
+        File mediaFile = new File(mediaStorageDir.getPath() + File.separator + "image"+picturePaths.size()+".jpg" );
 
         return mediaFile;
     }
@@ -396,7 +446,9 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
         switch (requestCode) {
             case TAKE_PICTURE:
                 imageFilePath = getOutputMediaFileUri();
-                picturePath = imageFilePath.getPath();
+                if(picturePaths == null)
+                    picturePaths = new ArrayList<>();
+                picturePaths.add(imageFilePath.getPath());
                 image1.setImageURI(imageFilePath);
                 break;
 
@@ -505,7 +557,6 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
     }
     public void preFill()
     {
-        Receipt r;
 //        ReceiptImage image = null;
         Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
         String receiptString = getIntent().getStringExtra("receipt");
@@ -514,36 +565,38 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
             mode = currentMode;
             add.setText(mode);
         }
-        picturePath = getIntent().getStringExtra("image");
+        picturePaths = getIntent().getStringArrayListExtra("images");
+        if(picturePaths == null)
+            picturePaths = new ArrayList<>();
         if(receiptString != null) {
             try {
-                r = gson.fromJson(receiptString, Receipt.class);
+                original = gson.fromJson(receiptString, Receipt.class);
                 SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
 //                image = new ReceiptImage();
-                if(picturePath!=null) {
-                    byte[] imageBytes = Model.getInstance().getByteArrayFromImage(picturePath);
+                if(picturePaths.size()>0) {
+                    byte[] imageBytes = Model.getInstance().getByteArrayFromImage(picturePaths.get(0));
 //                    image.Base64Image = Base64.encodeToString(imageBytes, Base64.NO_WRAP);
 //                    image.FileName = "image.jpg";
                     bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
                     image1.setImageBitmap(bitmap);
                 }
 
-                Id = r.Id;
-                storeName.setText(r.Store.Company.Name);
-                tax.setText(r.Tax + "");
-                date.setText(sdf.format(r.PurchaseDate));
-                if(r.ReturnReminder)
+                Id = original.Id;
+                storeName.setText(original.Store.Company.Name);
+                tax.setText(original.Tax + "");
+                date.setText(sdf.format(original.PurchaseDate));
+                if(original.ReturnReminder)
                 {
-                    returnDate.setText(sdf.format(r.ReturnDate));
+                    returnDate.setText(sdf.format(original.ReturnDate));
                     switchOn = false;
-                    alertSwitch.setChecked(r.ReturnReminder);
+                    alertSwitch.setChecked(original.ReturnReminder);
                 }
 
 
 
-                lastFour.setText(r.LastFourCardNumber);
-                payment.setSelection(r.CardType);
-                items = r.ReceiptItems;
+                lastFour.setText(original.LastFourCardNumber);
+                payment.setSelection(original.CardType);
+                items = original.ReceiptItems;
                 for(int j = 0; j < items.size(); j++){
                     final int finalJ = j;
                     Item i = items.get(finalJ);

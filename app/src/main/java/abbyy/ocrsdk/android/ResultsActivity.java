@@ -146,21 +146,70 @@ public class ResultsActivity extends Activity {
 	}
     public void isItem(String str)
     {
+//        try {
+//
+//            String pattern = "(\\w+\\s)+(\\s)+\\$?(\\d)+.(\\d)+";
+//
+//            Pattern r = Pattern.compile(pattern);
+//            Matcher match = r.matcher(str);
+//
+//            if (match.find()) {
+//                String itemNamePattern = "(\\w+\\s)+";
+//                Pattern p1 = Pattern.compile(itemNamePattern);
+//                Matcher m1 = p1.matcher(str);
+//
+//                if (m1.find()) {
+//                    String itemName = str.substring(m1.start(), m1.end()).trim();
+//                    String itemPrice = str.substring(m1.end()).trim();
+//                    double price = Double.parseDouble(itemPrice.substring(1));
+//                    Item item = new Item();
+//                    item.ItemName = itemName;
+//                    item.Price = price;
+//                    itemsList.add(item);
+//                    sum += sum;
+//                    System.out.println("Item Name: " + itemName + "\n" + "Item Price: " + itemPrice);
+//                }
+//            }
+//        }
+//        catch (Exception e)
+//        {
+//            Helper.AlertBox(this,"Error",e.getMessage());
+//        }
+        // BestBuy, Costco, Walmart, 7-11, Smith, Liquor store, Nordstrom rack, Mimis cafe
         try {
-            String pattern = "(\\w+\\s)+(\\s)+\\$?(\\d)+.(\\d)+";
+            String generalPattern = "(\\w+\\s)+(\\s)*\\$?(\\d)+.(\\d)+(\\s)?(R)?((\\s)*\\(?(\\d)+.(\\d)+\\)?)?";
+
+            String smithPattern = "(\\d)+.(\\d)+(\\s)*\\((\\d)+.(\\d)+\\)(\\s)*lb(\\s)*@(\\s)*(\\d)+.(\\d)+(\\s)*\\/lb(\\s)*WT(\\s)*(\\d)+(\\s)*(\\w+\\s)+(\\d)+.(\\d)+(\\s)";
+
+            String pattern = generalPattern + "|" + smithPattern;
 
             Pattern r = Pattern.compile(pattern);
             Matcher match = r.matcher(str);
 
             if (match.find()) {
-                String itemNamePattern = "(\\w+\\s)+";
+                String itemNamePattern = "((\\d)+.(\\d)+(\\s)*\\((\\d)+.(\\d)+\\)(\\s)*lb(\\s)*@(\\s)*(\\d)+.(\\d)+(\\s)*\\/lb(\\s)*WT(\\s)*(\\d)+(\\s)*(\\w+\\s)+)"
+                        + "|((\\w+\\s)+(:)?(\\w+\\s)+)";
                 Pattern p1 = Pattern.compile(itemNamePattern);
                 Matcher m1 = p1.matcher(str);
 
                 if (m1.find()) {
                     String itemName = str.substring(m1.start(), m1.end()).trim();
                     String itemPrice = str.substring(m1.end()).trim();
-                    double price = Double.parseDouble(itemPrice.substring(1));
+
+                    double price = 0.0;
+                    try {
+                        price = Double.parseDouble(itemPrice.substring(1));
+                    } catch (NumberFormatException e) {
+                        String pricePattern = "(\\d)+.(\\d)+";
+                        Pattern p2 = Pattern.compile(pricePattern);
+                        Matcher m2 = p2.matcher(itemPrice);
+
+                        if (m2.find()) {
+                            itemPrice = itemPrice.substring(m2.start(), m2.end()).trim();
+                            price = Double.parseDouble(itemPrice);
+                        }
+                    }
+
                     Item item = new Item();
                     item.ItemName = itemName;
                     item.Price = price;
@@ -284,11 +333,13 @@ public class ResultsActivity extends Activity {
                 r.total = getTotalAmount().trim();
                 r.tax = getTotalTax().trim();
                 r.ReceiptItems = itemsList;
+                ArrayList<String> images = new ArrayList<>();
+                images.add(imageUrl);
                 Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
                 String receiptString = gson.toJson(r,Receipt.class);
                 Intent newReceiptIntent = new Intent(this, ManualReceiptActivity.class);
                 newReceiptIntent.putExtra("receipt",receiptString);
-                newReceiptIntent.putExtra("image",imageUrl);
+                newReceiptIntent.putExtra("images",images);
                 startActivity(newReceiptIntent);
                 finish();
 //            Model.getInstance().AddReceipt(r,image);

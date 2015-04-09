@@ -4,7 +4,11 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.util.Log;
 import android.widget.ImageView;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 
 import net.greenreceipt.greenreceipt.R;
 
@@ -40,8 +44,5 @@ public class Helper
 
         dialog.show();
     }
-    public static void setUpActionBar()
-    {
 
-    }
 }

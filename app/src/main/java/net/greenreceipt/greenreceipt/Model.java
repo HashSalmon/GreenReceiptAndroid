@@ -274,22 +274,32 @@ public class Model
         };
         registerTask.execute(email,firstname,lastname,password,confirm,username);
     }
-    public void AddReceipt(Receipt r, ReceiptImage image)
+    public void AddReceipt(Receipt r, List<ReceiptImage> image)
     {
-        AsyncTask<Object,Integer,Boolean> addTask = new AsyncTask<Object, Integer, Boolean>() {
+        AsyncTask<Object,Integer,Receipt> addTask = new AsyncTask<Object, Integer, Receipt>() {
             @Override
-            protected Boolean doInBackground(Object... params)
+            protected Receipt doInBackground(Object... params)
             {
-                return networking.addReceipt((Receipt)params[0],(ReceiptImage)params[1]);
+                return networking.addReceipt((Receipt)params[0],(List<ReceiptImage>)params[1]);
             }
 
             @Override
-            protected void onPostExecute(Boolean result) {
+            protected void onPostExecute(Receipt result) {
                 super.onPostExecute(result);
                 if(_receiptListener!=null)
                 {
-                    if (result)
+                    if (result!=null) {
+                        int index = getReceiptById(result.Id);
+                        if(index > -1)
+                        {
+                            _receipts.set(index,result);
+                        }
+                        else
+                        {
+                            _receipts.add(result);
+                        }
                         _receiptListener.addReceiptSuccess();
+                    }
                     else
                         _receiptListener.addReceiptFailed(networking.error);
                 }

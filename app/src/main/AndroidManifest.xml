@@ -14,6 +14,12 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <permission android:name="net.greenreceipt.greenreceipt.permission.C2D_MESSAGE" />
+
+    <uses-permission android:name="net.greenreceipt.greenreceipt.permission.C2D_MESSAGE" />
 
     <application
         android:allowBackup="true"
@@ -46,7 +52,7 @@
             android:label="@string/title_activity_home"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden|adjustResize">
+            android:windowSoftInputMode="stateHidden|adjustResize" >
         </activity>
         <activity
             android:name=".SignUpActivity"
@@ -115,7 +121,7 @@
             android:launchMode="singleTask"
             android:parentActivityName=".SummaryActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden|adjustResize">
+            android:windowSoftInputMode="stateHidden|adjustResize" >
         </activity>
         <activity
             android:name=".EditBudgetActivity"
@@ -133,6 +139,25 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustResize" >
         </activity>
+        <activity
+            android:name=".PictureListActivity"
+            android:label="@string/title_activity_picture_list" >
+        </activity>
+
+        <receiver
+            android:name=".NotificationReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+
+                <category android:name="com.example.gcm" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".NotificationService"
+            android:exported="false" >
+        </service>
     </application>
 
 </manifest>

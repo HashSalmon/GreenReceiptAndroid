@@ -22,7 +22,9 @@ public class StoreNames
                 "JC Penny",
                 "k mart",
                 "wholefoods",
-                "trader joe's"
+                "trader joe's",
+                "subway",
+                "cafe rio"
 
         };
 //        HashMap<String, String> names = new HashMap<String, String>();

@@ -28,11 +28,18 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.EnumMap;
+import java.util.Map;
 
 
 public class ReceiptDetailActivity extends ActionBarActivity implements ListAdapter {
@@ -373,9 +380,27 @@ public class ReceiptDetailActivity extends ActionBarActivity implements ListAdap
         }
         else if(position == getCount()-1)//barcode
         {
-            ImageView barcode = new ImageView(this);
+            view =View.inflate(this, R.layout.barcode, null);
+            ImageView barcode = (ImageView) view.findViewById(R.id.barcode);
+            if(receipt.Barcode!=null)
+            {
+                Bitmap bitmap = null;
+                TextView number = (TextView) view.findViewById(R.id.number);
+                number.setText(receipt.Barcode);
+                try {
+
+                    bitmap = encodeAsBitmap(receipt.Barcode, BarcodeFormat.CODE_128, 600, 100);
+                    barcode.setImageBitmap(bitmap);
+//                    bitmap.recycle();
+
+                } catch (WriterException e) {
+                    e.printStackTrace();
+                }
+            }
+            else {
 //            barcode.setImageResource(R.drawable.barcode);
             view = barcode;
+            }
 
         }
         else{
@@ -445,4 +470,52 @@ public class ReceiptDetailActivity extends ActionBarActivity implements ListAdap
         if(decodedByte!=null)
         decodedByte.recycle();
     }
+    private static final int WHITE = 0xFFFFFFFF;
+    private static final int BLACK = 0xFF000000;
+
+    Bitmap encodeAsBitmap(String contents, BarcodeFormat format, int img_width, int img_height) throws WriterException {
+        String contentsToEncode = contents;
+        if (contentsToEncode == null) {
+            return null;
+        }
+        Map<EncodeHintType, Object> hints = null;
+        String encoding = guessAppropriateEncoding(contentsToEncode);
+        if (encoding != null) {
+            hints = new EnumMap<EncodeHintType, Object>(EncodeHintType.class);
+            hints.put(EncodeHintType.CHARACTER_SET, encoding);
+        }
+        MultiFormatWriter writer = new MultiFormatWriter();
+        BitMatrix result;
+        try {
+            result = writer.encode(contentsToEncode, format, img_width, img_height, hints);
+        } catch (IllegalArgumentException iae) {
+            // Unsupported format
+            return null;
+        }
+        int width = result.getWidth();
+        int height = result.getHeight();
+        int[] pixels = new int[width * height];
+        for (int y = 0; y < height; y++) {
+            int offset = y * width;
+            for (int x = 0; x < width; x++) {
+                pixels[offset + x] = result.get(x, y) ? BLACK : WHITE;
+            }
+        }
+
+        Bitmap bitmap = Bitmap.createBitmap(width, height,
+                Bitmap.Config.ARGB_8888);
+        bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
+        return bitmap;
+    }
+
+    private static String guessAppropriateEncoding(CharSequence contents) {
+        // Very crude at the moment
+        for (int i = 0; i < contents.length(); i++) {
+            if (contents.charAt(i) > 0xFF) {
+                return "UTF-8";
+            }
+        }
+        return null;
+    }
+
 }

@@ -61,4 +61,5 @@ dependencies {
     compile(name: 'List-2015.1.225-trial-release', ext: 'aar')
     compile(name: 'Feedback-2015.1.225-trial-release', ext: 'aar')
     compile files('libs/core-3.2.0.jar')
+    compile "com.google.android.gms:play-services:3.1.+"
 }

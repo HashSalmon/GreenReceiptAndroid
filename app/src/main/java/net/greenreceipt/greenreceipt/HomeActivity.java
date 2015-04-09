@@ -28,6 +28,8 @@ import Util.DrawerOnItemClickListener;
 
 
 public class HomeActivity extends ActionBarActivity{
+
+
     private ActionBar actionBar;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle toggle;
@@ -44,6 +46,7 @@ public class HomeActivity extends ActionBarActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         nav_options = getResources().getStringArray(R.array.nav_array);
         DrawerItem[] drawerItem = new DrawerItem[5];
@@ -134,6 +137,7 @@ public class HomeActivity extends ActionBarActivity{
     @Override
     protected void onResume() {
         super.onResume();
+
         receiver = new BroadcastReceiver()
         {
             @Override
@@ -159,7 +163,7 @@ public class HomeActivity extends ActionBarActivity{
                 }
                 else
                 {
-                    monthAmt = intent.getIntExtra("total",0);
+                    monthAmt = intent.getDoubleExtra("total",0);
                     TextView mTotal = (TextView) monthly.findViewById(R.id.mDetail);
                     mTotal.setText(monthCount+ "\n$ " + new DecimalFormat("##.##").format(monthAmt));
                 }
@@ -189,4 +193,7 @@ public class HomeActivity extends ActionBarActivity{
 //        summary.invalidateViews();
 
     }
+
+
+
 }

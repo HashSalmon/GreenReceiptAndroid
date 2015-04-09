@@ -67,7 +67,26 @@ public class ListReceiptActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_test);
 
-    Model.getInstance().resetCurrentPage();
+
+        Model.getInstance().setGetReceiptListener(new Model.GetReceiptListener() {
+            @Override
+            public void getReceiptSuccess() {
+//                Model.getInstance().changeDisplayReceipts(filter);
+                spinner.dismiss();
+                Model.getInstance().changeDisplayReceipts(filter);
+                adapter.setItems(Model.getInstance()._displayReceipts);
+//                adapter.notifyDataSetChanged();
+                adapter.notifyLoadingFinished();
+            }
+
+            @Override
+            public void getReceiptFailed() {
+                spinner.dismiss();
+                Helper.AlertBox(ListReceiptActivity.this, "Error", "Failed to retrieve data.\nPlease check your internet connection.");
+            }
+        });
+        Model.getInstance().resetCurrentPage();
+        Model.getInstance().GetAllReceipt(Model.pageSize,1);
     spinner = ProgressDialog.show(this, null, "Loading...");
         list = (RadListView) findViewById(R.id.list);
         adapter = new ListAdapter(Model.getInstance()._displayReceipts);
@@ -234,25 +253,12 @@ public class ListReceiptActivity extends ActionBarActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Model.getInstance().setGetReceiptListener(new Model.GetReceiptListener() {
-            @Override
-            public void getReceiptSuccess() {
-//                Model.getInstance().changeDisplayReceipts(filter);
-                spinner.dismiss();
-                Model.getInstance().changeDisplayReceipts(filter);
-                adapter.setItems(Model.getInstance()._displayReceipts);
-//                adapter.notifyDataSetChanged();
-                adapter.notifyLoadingFinished();
-            }
-
-            @Override
-            public void getReceiptFailed() {
-                spinner.dismiss();
-                Helper.AlertBox(ListReceiptActivity.this, "Error", "Failed to retrieve data.\nPlease check your internet connection.");
-            }
-        });
-        Model.getInstance().GetAllReceipt(Model.pageSize,1);
 
 
+        filter = getIntent().getIntExtra(Model.RECEIPT_FILTER,0);
+//        Model.getInstance().changeDisplayReceipts(filter);
+        if(filter >= 0 && filter < options.length)//it's with in the option range
+            filters.setSelection(filter);
+        adapter.notifyDataSetChanged();
     }
 }

@@ -20,7 +20,7 @@ public class Receipt
     public String Address;
     public Date ReturnDate;
     public boolean ReturnReminder;
-    public String BarCode;
+    public String Barcode;
     public Date PurchaseDate;
     public int CardType;
     public String LastFourCardNumber;
@@ -30,7 +30,7 @@ public class Receipt
     public int StoreId;
     public Date CreatedDate;
     public int Id;
-    public String picturePath;
+    public ArrayList<String> picturePath;
     public String total;
     public String tax;
 
