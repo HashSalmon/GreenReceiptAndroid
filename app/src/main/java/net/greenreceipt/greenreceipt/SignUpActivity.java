@@ -40,7 +40,6 @@ public class SignUpActivity extends ActionBarActivity {
     EditText username;
 
     public static final String REG_ID = "regId";
-    String SENDER_ID = "410621452988";
     GoogleCloudMessaging gcm;
     String regId = "";
     @Override
