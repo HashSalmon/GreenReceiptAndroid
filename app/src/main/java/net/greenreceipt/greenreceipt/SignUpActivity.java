@@ -32,6 +32,12 @@ public class SignUpActivity extends ActionBarActivity {
 
     ProgressDialog spinner;
     private ActionBar actionBar;
+    EditText email;
+    EditText firstname;
+    EditText lastname;
+    EditText password;
+    EditText confirm;
+    EditText username;
 
     public static final String REG_ID = "regId";
     String SENDER_ID = "410621452988";
@@ -52,12 +58,12 @@ public class SignUpActivity extends ActionBarActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         ImageView logo = (ImageView) findViewById(R.id.logo);
         logo.setImageResource(R.drawable.logo);
-        final EditText email = (EditText) findViewById(R.id.emailField);
-        final EditText firstname = (EditText) findViewById(R.id.firstNameField);
-        final EditText lastname = (EditText) findViewById(R.id.lastNameField);
-        final EditText password = (EditText) findViewById(R.id.passwordField);
-        final EditText confirm = (EditText) findViewById(R.id.comfirmField);
-        final EditText username = (EditText) findViewById(R.id.usernameField);
+        email = (EditText) findViewById(R.id.emailField);
+        firstname = (EditText) findViewById(R.id.firstNameField);
+        lastname = (EditText) findViewById(R.id.lastNameField);
+        password = (EditText) findViewById(R.id.passwordField);
+        confirm = (EditText) findViewById(R.id.comfirmField);
+        username = (EditText) findViewById(R.id.usernameField);
         Button button = (Button) findViewById(R.id.signupButton);
 
         Model.getInstance().setRegisterUserListener(new Model.RegisterUserListener() {
@@ -98,22 +104,15 @@ public class SignUpActivity extends ActionBarActivity {
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(checkPlayServices()){
-                        try {
-                            if (gcm == null) {
-                                gcm = GoogleCloudMessaging
-                                        .getInstance(getApplicationContext());
-                            }
-                            regId = gcm
-                                    .register(ApplicationConstants.GOOGLE_PROJ_ID);
-
-
-                        } catch (IOException ex) {
-                        }
-                    }
                     spinner = ProgressDialog.show(SignUpActivity.this, null, "Registering...");
-                    Model.getInstance().Register(email.getText().toString(),firstname.getText().toString(),
-                            lastname.getText().toString(),password.getText().toString(),confirm.getText().toString(),username.getText().toString(),regId);
+                    if(checkPlayServices()){
+
+                            registerInBackground();
+
+                    }
+
+//                    Model.getInstance().Register(email.getText().toString(),firstname.getText().toString(),
+//                            lastname.getText().toString(),password.getText().toString(),confirm.getText().toString(),username.getText().toString(),regId);
                 }
             });
 
@@ -138,7 +137,7 @@ public class SignUpActivity extends ActionBarActivity {
         return true;
     }
     // AsyncTask to register Device in GCM Server
-    private void registerInBackground(final String emailID) {
+    private void registerInBackground() {
         new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... params) {
@@ -162,11 +161,8 @@ public class SignUpActivity extends ActionBarActivity {
             protected void onPostExecute(String msg) {
                 if (!TextUtils.isEmpty(regId)) {
                     // Store RegId created by GCM Server in SharedPref
-                    storeRegIdinSharedPref(getApplicationContext(), regId);
-                    Toast.makeText(
-                            getApplicationContext(),
-                            "Registered with GCM Server successfully.\n\n"
-                                    + msg, Toast.LENGTH_SHORT).show();
+                    Model.getInstance().Register(email.getText().toString(),firstname.getText().toString(),
+                            lastname.getText().toString(),password.getText().toString(),confirm.getText().toString(),username.getText().toString(),regId);
                 } else {
                     Toast.makeText(
                             getApplicationContext(),
