@@ -13,4 +13,5 @@ public class Token
     public String issued;
     public String expires;
     public String error;
+    public String PushNotificationId;
 }

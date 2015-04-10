@@ -63,7 +63,7 @@ public class Model
     public interface GetReceiptListener
     {
         public void getReceiptSuccess();
-        public void getReceiptFailed();
+        public void getReceiptFailed(String error);
     }
     public interface ReturnReceiptListener
     {
@@ -361,7 +361,7 @@ public class Model
                 else
                 {
                     if (_getReceiptListener != null)
-                        _getReceiptListener.getReceiptFailed();
+                        _getReceiptListener.getReceiptFailed(networking.error);
                 }
 
             }

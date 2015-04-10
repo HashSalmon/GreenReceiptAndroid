@@ -36,14 +36,12 @@ public class SignUpActivity extends ActionBarActivity {
     public static final String REG_ID = "regId";
     String SENDER_ID = "410621452988";
     GoogleCloudMessaging gcm;
-    String regid;
-    SharedPreferences prefs;
     String regId = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
-        
+
 
         Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
         this.setSupportActionBar(tb);

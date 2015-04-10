@@ -80,9 +80,9 @@ public class ListReceiptActivity extends ActionBarActivity {
             }
 
             @Override
-            public void getReceiptFailed() {
+            public void getReceiptFailed(String error) {
                 spinner.dismiss();
-                Helper.AlertBox(ListReceiptActivity.this, "Error", "Failed to retrieve data.\nPlease check your internet connection.");
+                Helper.AlertBox(ListReceiptActivity.this, "Error", error);
             }
         });
         Model.getInstance().resetCurrentPage();

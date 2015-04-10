@@ -29,7 +29,7 @@ import java.util.Scanner;
 public class Networking {
 
 //    private static String BASE_URL = "https://www.greenreceipt.net/";
-    private static String BASE_URL = "https://www.greenreceipt.net/";
+    private static String BASE_URL = "https://api.greenreceipt.net/";
     private static int timeoutConnection = 3000;
     private static int timeoutSocket = 5000;
     String error;
@@ -165,7 +165,10 @@ public class Networking {
             String responseString = responseScanner.hasNext() ? responseScanner.next() : null;
 
             if(responseString == null || response.getStatusLine().getStatusCode() != 200)
+            {
+                error = response.getStatusLine().toString();
                 return null;
+            }
 
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
             Receipt[] receipts = gson.fromJson(responseString,Receipt[].class);
@@ -173,6 +176,7 @@ public class Networking {
         }
         catch (Exception e) {
             e.printStackTrace();
+
             return null;
         }
     }
