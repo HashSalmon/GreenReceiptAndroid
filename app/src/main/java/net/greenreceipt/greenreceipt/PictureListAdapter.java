@@ -10,7 +10,6 @@ import android.widget.ImageView;
 import com.telerik.widget.list.ListViewAdapter;
 import com.telerik.widget.list.ListViewHolder;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -18,9 +17,9 @@ import java.util.List;
  */
 public class PictureListAdapter extends ListViewAdapter {
     List pictures;
-    public PictureListAdapter(List paths) {
-        super(paths);
-        this.pictures = paths;
+    public PictureListAdapter(List imageBytes) {
+        super(imageBytes);
+        this.pictures = imageBytes;
     }
     @Override
     public ListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -32,14 +31,11 @@ public class PictureListAdapter extends ListViewAdapter {
     @Override
     public void onBindViewHolder(ListViewHolder holder, int position) {
         PictureViewHolder viewHolder = (PictureViewHolder)holder;
-        String picturePath = (String)getItems().get(position);
-        try {
-            byte[] imageBytes = Model.getInstance().getByteArrayFromImage(picturePath);
-            Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes,0,imageBytes.length);
+        byte[] bytes = (byte[]) getItems().get(position);
+
+            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
             viewHolder.pic.setImageBitmap(bitmap);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
 
     }
     public static class PictureViewHolder extends ListViewHolder {

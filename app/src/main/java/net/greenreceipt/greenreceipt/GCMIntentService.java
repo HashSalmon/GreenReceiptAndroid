@@ -58,8 +58,8 @@ public class GCMIntentService extends IntentService {
     }
 
     private void sendNotification(String msg) {
-        Intent resultIntent = new Intent(this, HomeActivity.class);
-        resultIntent.putExtra("msg", msg);
+        Intent resultIntent = new Intent(this, ListReceiptActivity.class);
+        resultIntent.putExtra(Model.RECEIPT_FILTER, 4);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0,
                 resultIntent, PendingIntent.FLAG_ONE_SHOT);
 
@@ -69,9 +69,9 @@ public class GCMIntentService extends IntentService {
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         mNotifyBuilder = new NotificationCompat.Builder(this)
-                .setContentTitle("Alert")
-                .setContentText("You've received new message.")
-                .setSmallIcon(R.drawable.ic_launcher);
+                .setContentTitle("New Receipt Received")
+                .setContentText("You've received a new receipt.")
+                .setSmallIcon(R.drawable.logo);
         // Set pending intent
         mNotifyBuilder.setContentIntent(resultPendingIntent);
 
@@ -83,7 +83,7 @@ public class GCMIntentService extends IntentService {
 
         mNotifyBuilder.setDefaults(defaults);
         // Set the content for Notification
-        mNotifyBuilder.setContentText("New message from Server");
+        mNotifyBuilder.setContentText("New Receipt");
         // Set autocancel
         mNotifyBuilder.setAutoCancel(true);
         // Post a notification

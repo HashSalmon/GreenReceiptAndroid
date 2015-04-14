@@ -1,5 +1,7 @@
 package net.greenreceipt.greenreceipt;
 
+import android.os.AsyncTask;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -126,12 +128,20 @@ public class Networking {
             if(responseString == null || response.getStatusLine().getStatusCode() != 200)
                 return null;
 
-            Receipt receipt = gson.fromJson(responseString,Receipt.class);
+            final Receipt receipt = gson.fromJson(responseString,Receipt.class);
             if(images!=null && images.size()>0) {
-                //TODO async
-                for(ReceiptImage image:images) {
-                    image.ReceiptId = receipt.Id;
-                    postReceiptImage(image);
+
+                for(final ReceiptImage image:images) {
+                    new AsyncTask<ReceiptImage,Integer,Boolean>(){
+
+                        @Override
+                        protected Boolean doInBackground(ReceiptImage... params) {
+                            params[0].ReceiptId = receipt.Id;
+                            return postReceiptImage(image);
+                        }
+
+                    }.execute(image);
+
                 }
             }
             return receipt;
@@ -645,7 +655,39 @@ public class Networking {
             return -1;
         }
     }
+    public ReceiptImage getImageById(int id)
+    {
+        try {
+            error = "";
+            HttpParams httpParameters = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+            HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+            HttpClient client = new DefaultHttpClient(httpParameters);
+            HttpGet request = new HttpGet(BASE_URL + "api/Image/GetImage?id="+id);
+            request.addHeader("Content-Type", "application/json");
+            request.addHeader("Authorization","Bearer "+Model._token);
 
+            HttpResponse response = client.execute(request);
+
+            InputStream responseContent = response.getEntity().getContent();
+            Scanner responseScanner = new Scanner(responseContent);
+            String responseString = responseScanner.hasNext() ? responseScanner.next() : null;
+            if(responseString == null || response.getStatusLine().getStatusCode() != 200)
+            {
+                error = "Bad call";
+                return null;
+            }
+
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
+            ReceiptImage image = gson.fromJson(responseString, ReceiptImage.class);
+            return image;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            error = e.getMessage();
+            return null;
+        }
+    }
 
 
 

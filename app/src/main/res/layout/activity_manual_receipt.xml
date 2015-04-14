@@ -155,15 +155,17 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal">
+
     <ImageView
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_weight="5"
         android:id="@+id/image1"
         android:layout_gravity="center"
-        />
+        android:layout_marginTop="10dp"/>
 
     <ImageView
+        android:layout_marginTop="10dp"
         android:layout_width="25dp"
         android:layout_height="25dp"
         android:id="@+id/camera"
@@ -172,10 +174,13 @@
     </LinearLayout>
 
         <TextView
+            android:layout_marginTop="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/viewAll"
             android:text="View All Pictures"
+            android:textSize="18dp"
+            android:textColor="@color/light_blue"
             android:layout_gravity="center"/>
 
     <LinearLayout

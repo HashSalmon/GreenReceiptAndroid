@@ -79,6 +79,7 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
     int Id = 0;
     boolean switchOn=true;
     ArrayList<String> picturePaths;
+    ReceiptImage[] images;
 
     private ColorDrawable currentBgColor;
     private ActionBar actionBar;
@@ -400,8 +401,12 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
         viewall.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
                 Intent all = new Intent(ManualReceiptActivity.this,PictureListActivity.class);
                 all.putStringArrayListExtra("paths",picturePaths);
+                all.putExtra("id",original.Id);
+//                if(images!=null)
+//                all.putExtra("images",gson.toJson(images,ReceiptImage[].class));
                 startActivity(all);
             }
         });
@@ -541,8 +546,18 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
     protected void onPause() {
 
         super.onPause();
-        if(bitmap != null)
-            bitmap.recycle();
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+//        if (bitmap != null && !bitmap.isRecycled())
+//        {
+//            bitmap.recycle();
+//            bitmap = null;
+//            System.gc();
+//        }
     }
 
     @Override
@@ -565,14 +580,41 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
             mode = currentMode;
             add.setText(mode);
         }
-        picturePaths = getIntent().getStringArrayListExtra("images");
+        picturePaths = getIntent().getStringArrayListExtra("path");
         if(picturePaths == null)
             picturePaths = new ArrayList<>();
+//        String imageString = getIntent().getStringExtra("images");
+//        if(imageString!=null)
+//            images = gson.fromJson(imageString,ReceiptImage[].class);
         if(receiptString != null) {
             try {
                 original = gson.fromJson(receiptString, Receipt.class);
+                Model.getInstance().setGetReceiptImageListener(new Model.GetReceiptImageListener() {
+                    @Override
+                    public void onGetImageSuccess(ReceiptImage[] images) {
+                        ManualReceiptActivity.this.images = images;
+                        if(picturePaths.isEmpty() && images.length>0)
+                        {
+                            byte[] decodedString = Base64.decode(images[0].Base64Image,Base64.NO_WRAP);
+                            bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                            image1.setImageBitmap(bitmap);
+                        }
+                    }
+
+                    @Override
+                    public void onGetImageFailed(String error) {
+
+                    }
+                });
+                Model.getInstance().GetReceiptImages(original.Id);
                 SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
 //                image = new ReceiptImage();
+//                if(images!=null && images.length>0)
+//                {
+//                    byte[] decodedString = Base64.decode(images[0].Base64Image,Base64.NO_WRAP);
+//                    bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+//                    image1.setImageBitmap(bitmap);
+//                }
                 if(picturePaths.size()>0) {
                     byte[] imageBytes = Model.getInstance().getByteArrayFromImage(picturePaths.get(0));
 //                    image.Base64Image = Base64.encodeToString(imageBytes, Base64.NO_WRAP);

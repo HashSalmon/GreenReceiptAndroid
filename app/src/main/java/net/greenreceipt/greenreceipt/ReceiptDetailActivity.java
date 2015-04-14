@@ -58,6 +58,7 @@ public class ReceiptDetailActivity extends ActionBarActivity implements ListAdap
     private BroadcastReceiver receiver;
     Bitmap decodedByte;
     ImageView picture;
+    ReceiptImage[] receiptImages;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,10 +101,12 @@ public class ReceiptDetailActivity extends ActionBarActivity implements ListAdap
             @Override
             public void onGetImageSuccess(ReceiptImage[] images) {
                 if(images.length > 0) {
+                    receiptImages = images;
                     byte[] decodedString = Base64.decode(images[0].Base64Image,Base64.NO_WRAP);
                     decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
                     picture.setImageBitmap(decodedByte);
                     picture.invalidate();
+
                     list.invalidateViews();
                 }
             }
@@ -134,6 +137,7 @@ public class ReceiptDetailActivity extends ActionBarActivity implements ListAdap
                 Intent intent = new Intent(this,ManualReceiptActivity.class);
                 intent.putExtra("receipt",gson.toJson(receipt,Receipt.class));
                 intent.putExtra("mode","Edit");
+//                intent.putExtra("images",gson.toJson(receiptImages,ReceiptImage[].class));
                 startActivity(intent);
                 editing = true;
                 finish();
@@ -201,6 +205,14 @@ public class ReceiptDetailActivity extends ActionBarActivity implements ListAdap
             detail.setText(sdf.format(date)+"\n$"+new DecimalFormat("##.##").format(receipt.Total));
             view.setBackgroundColor(Color.WHITE);
             picture = (ImageView) view.findViewById(R.id.image);
+            picture.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent all = new Intent(ReceiptDetailActivity.this,PictureListActivity.class);
+                    all.putExtra("id",receipt.Id);
+                    startActivity(all);
+                }
+            });
             if(decodedByte!=null)
                 picture.setImageBitmap(decodedByte);
             else

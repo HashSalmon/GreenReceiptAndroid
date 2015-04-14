@@ -339,7 +339,7 @@ public class ResultsActivity extends Activity {
                 String receiptString = gson.toJson(r,Receipt.class);
                 Intent newReceiptIntent = new Intent(this, ManualReceiptActivity.class);
                 newReceiptIntent.putExtra("receipt",receiptString);
-                newReceiptIntent.putExtra("images",images);
+                newReceiptIntent.putExtra("path",images);
                 startActivity(newReceiptIntent);
                 finish();
 //            Model.getInstance().AddReceipt(r,image);

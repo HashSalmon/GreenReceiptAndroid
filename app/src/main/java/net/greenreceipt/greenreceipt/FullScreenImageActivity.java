@@ -1,14 +1,21 @@
 package net.greenreceipt.greenreceipt;
 
+import android.app.ProgressDialog;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.PointF;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Base64;
 import android.util.FloatMath;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+
+import java.io.IOException;
 
 
 public class FullScreenImageActivity extends ActionBarActivity implements View.OnTouchListener {
@@ -24,16 +31,51 @@ public class FullScreenImageActivity extends ActionBarActivity implements View.O
     public static final int DRAG = 1;
     public static final int ZOOM = 2;
     public static int mode = NONE;
+    Bitmap decodedByte;
 
     float oldDist;
-
+    ImageView view;
+    ProgressDialog spinner;
     private float[] matrixValues = new float[9];
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_full_screen_image);
+        view = (ImageView) findViewById(R.id.image);
+        int picId = getIntent().getIntExtra("id",0);
+        String path = getIntent().getStringExtra("path");
+        if(path==null && picId > 0)
+        {
+            spinner = ProgressDialog.show(FullScreenImageActivity.this, null, "Loading...");
+            new AsyncTask<Integer,Integer,ReceiptImage>(){
 
-        ImageView view = (ImageView) findViewById(R.id.image);
+                @Override
+                protected ReceiptImage doInBackground(Integer... params) {
+                    Networking n = new Networking();
+                    return n.getImageById(params[0]);
+                }
+
+                @Override
+                protected void onPostExecute(ReceiptImage receiptImage) {
+                    super.onPostExecute(receiptImage);
+                    spinner.dismiss();
+                    byte[] decodedString = Base64.decode(receiptImage.Base64Image, Base64.NO_WRAP);
+                    decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                    view.setImageBitmap(decodedByte);
+                    view.invalidate();
+                }
+            }.execute(picId);
+        }
+        else {
+            try {
+                byte[] bytes = Model.getInstance().getByteArrayFromImage(path);
+                decodedByte = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                view.setImageBitmap(decodedByte);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         view.setImageResource(getIntent().getIntExtra("resource", R.drawable.ic_action_camera));
         view.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -119,5 +161,10 @@ public class FullScreenImageActivity extends ActionBarActivity implements View.O
         point.set(x / 2, y / 2);
     }
 
-
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(decodedByte!=null)
+            decodedByte.recycle();
+    }
 }
