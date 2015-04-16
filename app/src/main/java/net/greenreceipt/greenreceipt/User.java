@@ -12,4 +12,6 @@ public class User
     public String ConfirmPassword;
     public String Username;
     public UserRole Role;
+    public String PushNotificationId;
+    public String UserAccountId;
 }

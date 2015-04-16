@@ -160,6 +160,7 @@ public class SignUpActivity extends ActionBarActivity {
             protected void onPostExecute(String msg) {
                 if (!TextUtils.isEmpty(regId)) {
                     // Store RegId created by GCM Server in SharedPref
+                    storeRegIdinSharedPref(SignUpActivity.this,regId);
                     Model.getInstance().Register(email.getText().toString(),firstname.getText().toString(),
                             lastname.getText().toString(),password.getText().toString(),confirm.getText().toString(),username.getText().toString(),regId);
                 } else {
@@ -173,7 +174,7 @@ public class SignUpActivity extends ActionBarActivity {
     }
     // Store  RegId and Email entered by User in SharedPref
     private void storeRegIdinSharedPref(Context context, String regId) {
-        SharedPreferences prefs = getSharedPreferences("UserDetails",
+        SharedPreferences prefs = getSharedPreferences("GreenReceipt",
                 Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(REG_ID, regId);

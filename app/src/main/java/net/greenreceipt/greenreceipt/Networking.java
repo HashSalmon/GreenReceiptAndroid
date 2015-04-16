@@ -105,6 +105,25 @@ public class Networking {
             return false;
         }
     }
+    public boolean updateUserPushNotificationId(String PushNotificationId)
+    {
+        try {
+            HttpParams httpParameters = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+            HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+            HttpClient client = new DefaultHttpClient(httpParameters);
+            HttpPost request = new HttpPost(BASE_URL + " api/UserAccountId/UpdatePushNotificationId?pushNotificationId="+PushNotificationId);
+            request.addHeader("Authorization","Bearer "+Model._token);
+
+            HttpResponse response = client.execute(request);
+
+            return response.getStatusLine().getStatusCode() == 200;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
     public Receipt addReceipt(Receipt r,List<ReceiptImage> images)
     {
 
@@ -688,7 +707,39 @@ public class Networking {
             return null;
         }
     }
+    public UserAccountId[] getGreenReceiptId()
+    {
+        try {
+            error = "";
+            HttpParams httpParameters = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+            HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+            HttpClient client = new DefaultHttpClient(httpParameters);
+            HttpGet request = new HttpGet(BASE_URL + "api/UserAccountId");
+            request.addHeader("Content-Type", "application/json");
+            request.addHeader("Authorization","Bearer "+Model._token);
 
+            HttpResponse response = client.execute(request);
+
+            InputStream responseContent = response.getEntity().getContent();
+            Scanner responseScanner = new Scanner(responseContent);
+            String responseString = responseScanner.hasNext() ? responseScanner.next() : null;
+            if(responseString == null || response.getStatusLine().getStatusCode() != 200)
+            {
+                error = "Bad call";
+                return null;
+            }
+
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
+            UserAccountId[] ids = gson.fromJson(responseString, UserAccountId[].class);
+            return ids;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            error = e.getMessage();
+            return null;
+        }
+    }
 
 
 

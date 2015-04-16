@@ -32,29 +32,29 @@
         android:layout_width="match_parent"
         android:layout_height="0dip"
         android:layout_weight="9" />
-    <TextView
-        android:text="OR"
-        android:textSize="20dip"
-        android:textColor="#000000"
-        android:gravity="center"
-        android:layout_width="match_parent"
-        android:layout_height="0dip"
-        android:layout_weight="10" />
-    <TextView
-        android:text="Scan the following code"
-        android:textSize="20dip"
-        android:textColor="#000000"
-        android:gravity="center"
-        android:layout_width="match_parent"
-        android:layout_height="0dip"
-        android:layout_weight="10" />
-    <ImageView
-        android:layout_weight="30"
-        android:layout_width="match_parent"
-        android:layout_height="0dip"
-        android:id="@+id/code"
-        android:gravity="center"
-        android:src="@drawable/code"/>
+    <!--<TextView-->
+        <!--android:text="OR"-->
+        <!--android:textSize="20dip"-->
+        <!--android:textColor="#000000"-->
+        <!--android:gravity="center"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="0dip"-->
+        <!--android:layout_weight="10" />-->
+    <!--<TextView-->
+        <!--android:text="Scan the following code"-->
+        <!--android:textSize="20dip"-->
+        <!--android:textColor="#000000"-->
+        <!--android:gravity="center"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="0dip"-->
+        <!--android:layout_weight="10" />-->
+    <!--<ImageView-->
+        <!--android:layout_weight="30"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="0dip"-->
+        <!--android:id="@+id/code"-->
+        <!--android:gravity="center"-->
+        <!--android:src="@drawable/code"/>-->
     <TextView
         android:text="OR"
         android:textSize="20dip"

@@ -115,7 +115,9 @@ public class ResultsActivity extends Activity {
                 {
                     if (!foundStoreName)
                     {
-                        getStoreName(text.toLowerCase());
+                        storeName = text;
+                        foundStoreName = true;
+//                        getStoreName(text.toLowerCase());
                     }
 
                     if (!foundTotalAmount)

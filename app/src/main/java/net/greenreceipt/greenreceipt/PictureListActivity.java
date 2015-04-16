@@ -52,10 +52,11 @@ ActionBar actionBar;
 
                 @Override
                 public void onGetImageFailed(String error) {
-
+                    spinner.dismiss();
                 }
             });
             spinner = ProgressDialog.show(PictureListActivity.this, null, "Loading...");
+            if(imageBytes.isEmpty())
             Model.getInstance().GetReceiptImages(rId);
         }
         picturePaths = getIntent().getStringArrayListExtra("paths");
@@ -91,7 +92,7 @@ ActionBar actionBar;
             public void onItemClick(int i, MotionEvent motionEvent) {
                 Intent full = new Intent(PictureListActivity.this,FullScreenImageActivity.class);
 //
-                if(i >= picturePaths.size())
+                if(picturePaths==null || i >= picturePaths.size())
                 {
                     //Already on server, attach id
                     full.putExtra("id",images[i].Id);

@@ -70,7 +70,7 @@ public class GCMIntentService extends IntentService {
 
         mNotifyBuilder = new NotificationCompat.Builder(this)
                 .setContentTitle("New Receipt Received")
-                .setContentText("You've received a new receipt.")
+                .setContentText(msg)
                 .setSmallIcon(R.drawable.logo);
         // Set pending intent
         mNotifyBuilder.setContentIntent(resultPendingIntent);

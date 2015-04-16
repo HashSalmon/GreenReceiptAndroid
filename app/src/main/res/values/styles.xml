@@ -11,8 +11,11 @@
     <style name="ActionBarTitleTextStyle" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title">
         <item name="android:textColor">#eee</item>
     </style>
+    <style name="SettingsTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:textColor">@color/primary_accent_color</item>
 
 
+    </style>
     <style name="ExamplesActivityActionBar" parent="Widget.AppCompat.ActionBar">
         <item name="android:background">#FF252939</item>
         <item name="android:titleTextStyle">@style/ActionBarTitleTextStyle</item>

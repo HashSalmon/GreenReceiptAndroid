@@ -13,6 +13,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.io.File;
 
@@ -71,6 +72,8 @@ public class NewReceiptActivity extends ActionBarActivity {
                 startActivityForResult(intent, TAKE_PICTURE);
             }
         });
+        TextView greenReceiptNumber = (TextView) findViewById(R.id.greenReceiptNumber);
+        greenReceiptNumber.setText(Model.getInstance()._currentUser.UserAccountId);
 
     }
 
@@ -84,12 +87,7 @@ public class NewReceiptActivity extends ActionBarActivity {
 
 
 
-    public void captureImageFromSdCard( View view ) {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("image/*");
 
-        startActivityForResult(intent, SELECT_FILE);
-    }
 
     public static final int MEDIA_TYPE_IMAGE = 1;
 
@@ -120,13 +118,7 @@ public class NewReceiptActivity extends ActionBarActivity {
         return mediaFile;
     }
 
-    public void captureImageFromCamera( View view) {
-        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-        Uri fileUri = getOutputMediaFileUri(); // create a file to save the image
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); // set the image file name
 
-        startActivityForResult(intent, TAKE_PICTURE);
-    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -140,15 +132,7 @@ public class NewReceiptActivity extends ActionBarActivity {
             case TAKE_PICTURE:
                 imageFilePath = getOutputMediaFileUri().getPath();
                 break;
-//		case SELECT_FILE: {
-//			Uri imageUri = data.getData();
-//
-//			String[] projection = { MediaStore.Images.Media.DATA };
-//			Cursor cur = managedQuery(imageUri, projection, null, null, null);
-//			cur.moveToFirst();
-//			imageFilePath = cur.getString(cur.getColumnIndex(MediaStore.Images.Media.DATA));
-//			}
-//			break;
+
         }
 
         //Remove output file

@@ -7,6 +7,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -85,6 +86,7 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
     private ActionBar actionBar;
 
     private final int TAKE_PICTURE = 0;
+    private final int SELECT_FILE = 1;
     private String resultUrl = "result.txt";
 //    private String picturePath;
     Bitmap bitmap;
@@ -404,6 +406,7 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
                 Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
                 Intent all = new Intent(ManualReceiptActivity.this,PictureListActivity.class);
                 all.putStringArrayListExtra("paths",picturePaths);
+                if(original!=null)
                 all.putExtra("id",original.Id);
 //                if(images!=null)
 //                all.putExtra("images",gson.toJson(images,ReceiptImage[].class));
@@ -456,7 +459,15 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
                 picturePaths.add(imageFilePath.getPath());
                 image1.setImageURI(imageFilePath);
                 break;
+            case SELECT_FILE: {
+                Uri imageUri = data.getData();
 
+                String[] projection = { MediaStore.Images.Media.DATA };
+                Cursor cur = managedQuery(imageUri, projection, null, null, null);
+                cur.moveToFirst();
+                picturePaths.add(cur.getString(cur.getColumnIndex(MediaStore.Images.Media.DATA)));
+            }
+            break;
         }
 
         //Remove output file
@@ -729,5 +740,17 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
         AlertDialog addDialog = builder.create();
         addDialog.show();
     }
+    public void captureImageFromSdCard( View view ) {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
 
+        startActivityForResult(intent, SELECT_FILE);
+    }
+    public void captureImageFromCamera( View view) {
+        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+        Uri fileUri = getOutputMediaFileUri(); // create a file to save the image
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); // set the image file name
+
+        startActivityForResult(intent, TAKE_PICTURE);
+    }
 }

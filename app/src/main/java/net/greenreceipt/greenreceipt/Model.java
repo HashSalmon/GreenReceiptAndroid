@@ -254,7 +254,25 @@ public class Model
         context.startActivity(login);
     }
 
+    public void GetUserAcountId()
+    {
+        AsyncTask<Void,Void,UserAccountId[]> task = new AsyncTask<Void, Void, UserAccountId[]>() {
+            @Override
+            protected UserAccountId[] doInBackground(Void... params) {
+                return networking.getGreenReceiptId();
+            }
 
+            @Override
+            protected void onPostExecute(UserAccountId[] userAccountIds) {
+                super.onPostExecute(userAccountIds);
+                if(userAccountIds!=null)
+                {
+                    _currentUser.UserAccountId = userAccountIds[0].AccountId;
+                }
+            }
+        };
+          task.execute();
+    }
     public void Register(final String email, String firstname, String lastname, final String password, String confirm, String username, String PushNotificationId)
     {
         AsyncTask<String,Integer,Boolean> registerTask = new AsyncTask<String, Integer, Boolean>() {
@@ -273,6 +291,27 @@ public class Model
             }
         };
         registerTask.execute(email,firstname,lastname,password,confirm,username,PushNotificationId);
+    }
+    public void UpdatePushNotificationId(String NotificationId)
+    {
+        AsyncTask<String,Integer,Boolean> registerTask = new AsyncTask<String, Integer, Boolean>() {
+            @Override
+            protected Boolean doInBackground(String... params) {
+                return networking.updateUserPushNotificationId(params[0]);
+            }
+
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                super.onPostExecute(aBoolean);
+                if(_registerUserListener!=null) {
+                    if (aBoolean)
+                        _registerUserListener.userRegistered();
+                    else
+                        _registerUserListener.userRegisterFailed();
+                }
+            }
+        };
+        registerTask.execute(NotificationId);
     }
     public void AddReceipt(Receipt r, List<ReceiptImage> image)
     {

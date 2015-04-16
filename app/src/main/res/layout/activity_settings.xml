@@ -18,16 +18,23 @@ tools:context="com.telerik.examples.MainActivity">
         android:layout_height="50dp"
         android:background="@color/primary_accent_color">
     </android.support.v7.widget.Toolbar>
+
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/toolbar">
-
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/list"
+            android:layout_alignParentTop="true"/>
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Logout"
-            android:id="@+id/logoutButton"/>
+            android:id="@+id/logoutButton"
+            android:layout_below="@+id/list"/>
     </RelativeLayout>
 </RelativeLayout>
 

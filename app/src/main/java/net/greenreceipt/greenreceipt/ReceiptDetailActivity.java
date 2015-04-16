@@ -479,8 +479,8 @@ public class ReceiptDetailActivity extends ActionBarActivity implements ListAdap
         super.onPause();
         if(!deleted && !editing)
         Model.getInstance().AddReceipt(receipt,null);//update if not deleted
-        if(decodedByte!=null)
-        decodedByte.recycle();
+//        if(decodedByte!=null)
+//        decodedByte.recycle();
     }
     private static final int WHITE = 0xFFFFFFFF;
     private static final int BLACK = 0xFF000000;

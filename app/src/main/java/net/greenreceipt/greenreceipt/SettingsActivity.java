@@ -2,6 +2,7 @@ package net.greenreceipt.greenreceipt;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceFragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -28,11 +29,20 @@ public class SettingsActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        ViewGroup root = (ViewGroup) findViewById(android.R.id.content);
+//        View content = root.getChildAt(0);
+//        LinearLayout toolbarContainer = (LinearLayout) View.inflate(this, R.layout.activity_settings, null);
+//
+//        root.removeAllViews();
+//        toolbarContainer.addView(content);
+//        root.addView(toolbarContainer);
+//
+//        getFragmentManager().beginTransaction().replace(android.R.id.content, new MyPreferenceFragment()).commit();
         setContentView(R.layout.activity_settings);
-//        ActionBar bar = getActionBar();
-//        bar.setDisplayHomeAsUpEnabled(true);
-
-        setContentView(R.layout.activity_settings);
+        Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
+        this.setSupportActionBar(tb);
+        tb.setTitleTextColor(Color.WHITE);
+        actionBar = getSupportActionBar();
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         nav_options = getResources().getStringArray(R.array.nav_array);
         DrawerItem[] drawerItem = new DrawerItem[5];
@@ -51,12 +61,6 @@ public class SettingsActivity extends ActionBarActivity {
         drawer.setAdapter(new DrawerAdapter(this, R.layout.drawer_list_item, drawerItem, 4));
         drawer.setOnItemClickListener(new DrawerOnItemClickListener(this,drawerLayout,drawer,5));
 
-
-        Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
-        this.setSupportActionBar(tb);
-        tb.setTitleTextColor(Color.WHITE);
-        actionBar = getSupportActionBar();
-
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
         toggle = new ActionBarDrawerToggle(this,drawerLayout,
@@ -65,6 +69,7 @@ public class SettingsActivity extends ActionBarActivity {
                 R.string.navigation_drawer_close);
         drawerLayout.setDrawerListener(toggle);
         toggle.syncState();
+
 //        Toolbar actionBar = (Toolbar) findViewById(R.id.action_bar);
 //        setSupportActionBar(actionBar);
         logout = (Button) findViewById(R.id.logoutButton);
@@ -76,6 +81,39 @@ public class SettingsActivity extends ActionBarActivity {
                     Model.getInstance().Logout(getApplicationContext());
                 }
             });
+        }
+    }
+//    @Override
+//    protected void onPostCreate(Bundle savedInstanceState) {
+//        super.onPostCreate(savedInstanceState);
+//
+//        LinearLayout root = (LinearLayout)findViewById(android.R.id.list).getParent().getParent().getParent();
+//        Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
+//        tb.setTitleTextColor(Color.WHITE);
+//
+////        actionBar.setHomeButtonEnabled(true);
+////        actionBar.setDisplayHomeAsUpEnabled(true);
+////        toggle = new ActionBarDrawerToggle(this,drawerLayout,
+////                tb,
+////                R.string.navigation_drawer_open,
+////                R.string.navigation_drawer_close);
+////        drawerLayout.setDrawerListener(toggle);
+////        toggle.syncState();
+//        root.addView(tb, 0); // insert at top
+//        tb.setNavigationOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                finish();
+//            }
+//        });
+//    }
+    public static class MyPreferenceFragment extends PreferenceFragment
+    {
+        @Override
+        public void onCreate(final Bundle savedInstanceState)
+        {
+            super.onCreate(savedInstanceState);
+            addPreferencesFromResource(R.xml.settings);
         }
     }
 
