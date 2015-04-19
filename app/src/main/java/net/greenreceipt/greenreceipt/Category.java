@@ -7,7 +7,7 @@ import java.util.Date;
  */
 public class Category
 {
-    public String Name;
+    public String Name="";
     public boolean IsDeleted;
     public Date CreatedDate;
     public int Id;

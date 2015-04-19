@@ -12,6 +12,8 @@ import com.telerik.widget.list.ListViewHolder;
 
 import java.util.List;
 
+import Util.Helper;
+
 /**
  * Created by Boya on 3/11/15.
  */
@@ -25,6 +27,7 @@ public class PictureListAdapter extends ListViewAdapter {
     public ListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.picturelistitem, parent, false);
+
         return new PictureViewHolder(view);
     }
 
@@ -32,8 +35,11 @@ public class PictureListAdapter extends ListViewAdapter {
     public void onBindViewHolder(ListViewHolder holder, int position) {
         PictureViewHolder viewHolder = (PictureViewHolder)holder;
         byte[] bytes = (byte[]) getItems().get(position);
+        int degree = Exif.getOrientation(bytes);
 
             Bitmap bitmap = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
+        bitmap = Helper.RotateBitmap(bitmap,degree);
+
             viewHolder.pic.setImageBitmap(bitmap);
 
 
@@ -46,7 +52,9 @@ public class PictureListAdapter extends ListViewAdapter {
             super(itemView);
 
             pic = (ImageView)itemView.findViewById(R.id.picture);
+            pic.setPadding(2,0,2,0);
         }
     }
+
 
 }

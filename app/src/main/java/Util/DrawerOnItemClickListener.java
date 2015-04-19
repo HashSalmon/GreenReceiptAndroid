@@ -56,7 +56,7 @@ public class DrawerOnItemClickListener implements AdapterView.OnItemClickListene
             case 3:
                 if(selected!=3) {
                     Intent list = new Intent(context, ListReceiptActivity.class);
-                    list.putExtra(Model.RECEIPT_FILTER, 4);
+                    list.putExtra(Model.RECEIPT_FILTER, Model.SHOW_ALL);
                     context.startActivity(list);
                 }
                     break;

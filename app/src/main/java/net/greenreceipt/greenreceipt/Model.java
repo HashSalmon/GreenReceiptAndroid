@@ -20,6 +20,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -73,6 +74,11 @@ public class Model
         public void deleteSuccess();
         public void deleteFailed(String error);
     }
+    public interface OnDeleteReceiptImageListener
+    {
+        public void deleteSuccess();
+        public void deleteFialed(String error);
+    }
     public interface GetCategoryListener
     {
         public void onGetCategorySuccess();
@@ -98,11 +104,23 @@ public class Model
         public void onGetImageSuccess(ReceiptImage[] images);
         public void onGetImageFailed(String error);
     }
+    public interface GetAccountIdListener
+    {
+        public void onGetAccountIdSuccess(String id);
+
+    }
+    public interface FillCategoryListener{
+        public void onFillSuccess(List<Item> items);
+        public void onFillFail(String error);
+    }
 
 
     public static final String RECEIPT_FILTER="filter";
-    static final int SHOW_RETURN_RECEIPTS = 5;
-    static final String[] PAYMENT_TYPES = {
+    public static final int SHOW_RETURN_RECEIPTS = 4;
+    public static final int SHOW_THIS_YEAR = 2;
+    public static final int SHOW_THIS_MONTH = 1;
+    public static final int SHOW_ALL = 3;
+    public static final String[] PAYMENT_TYPES = {
             "Payment Type",
             "Amex",
             "Visa",
@@ -112,6 +130,7 @@ public class Model
     };
 
     static final int RETURN_ALERT_NOTIFICATION = 1;
+
 
 
     private OnLoginListener _loginListener;
@@ -125,6 +144,9 @@ public class Model
     private GetCurrentBudgetListener _getCurrentBudgetListener;
     private CreateBudgetListener _createBudgetListener;
     private GetReceiptImageListener _getReceiptImageListener;
+    private GetAccountIdListener _getAccountIdListenerListener;
+    private OnDeleteReceiptImageListener _onDeleteReceiptImageListener;
+    private FillCategoryListener _fillCategoryListener;
 
     private static Model _instance;
 
@@ -136,6 +158,8 @@ public class Model
     Category[] categories;
     Budget currentBudget;
     TrendingReport trendingReport;
+    LinkedList<AsyncTask> taskQ = new LinkedList<>();
+
     private static int currentPage=1;
     static int pageSize = 25;
     private static Networking networking;
@@ -211,6 +235,18 @@ public class Model
     {
         _getReceiptImageListener = listener;
     }
+    public void setGetAccountIdListener(GetAccountIdListener listener)
+    {
+        _getAccountIdListenerListener = listener;
+    }
+    public void setOnDeleteReceiptImageListener(OnDeleteReceiptImageListener listener)
+    {
+        _onDeleteReceiptImageListener = listener;
+    }
+    public void setFillCategoryListener(FillCategoryListener listener)
+    {
+        _fillCategoryListener = listener;
+    }
     /*
     ****************Server calls******************
      */
@@ -254,7 +290,7 @@ public class Model
         context.startActivity(login);
     }
 
-    public void GetUserAcountId()
+    public void GetUserAccountId()
     {
         AsyncTask<Void,Void,UserAccountId[]> task = new AsyncTask<Void, Void, UserAccountId[]>() {
             @Override
@@ -265,9 +301,11 @@ public class Model
             @Override
             protected void onPostExecute(UserAccountId[] userAccountIds) {
                 super.onPostExecute(userAccountIds);
-                if(userAccountIds!=null)
+                if(userAccountIds!=null && userAccountIds.length>0)
                 {
-                    _currentUser.UserAccountId = userAccountIds[0].AccountId;
+                    getInstance()._currentUser.UserAccountId = userAccountIds[0].AccountId;
+                    if(_getAccountIdListenerListener!=null)
+                        _getAccountIdListenerListener.onGetAccountIdSuccess(userAccountIds[0].AccountId);
                 }
             }
         };
@@ -325,31 +363,32 @@ public class Model
             @Override
             protected void onPostExecute(Receipt result) {
                 super.onPostExecute(result);
-                if(_receiptListener!=null)
-                {
-                    if (result!=null) {
-                        int index = getReceiptById(result.Id);
-                        if(index > -1)
-                        {
-                            _receipts.set(index,result);
-                        }
-                        else
-                        {
-                            _receipts.add(result);
-                        }
+                if (result!=null) {
+                    int index = getReceiptById(result.Id);
+                    if (index > -1) {
+                        _receipts.set(index, result);
+                    } else {
+                        _receipts.add(result);
+                    }
+                    if (_receiptListener != null) {
                         _receiptListener.addReceiptSuccess();
                     }
-                    else
-                        _receiptListener.addReceiptFailed(networking.error);
+
                 }
+                else
+                {
+                    if(_receiptListener!=null)
+                    _receiptListener.addReceiptFailed(networking.error);
+                }
+
             }
         };
         addTask.execute(r,image);
     }
 
-    public void DeleteReceipt(long id)
+    public void DeleteReceipt(final long id)
     {
-        AsyncTask<Long,Integer,Boolean> deleteTask = new AsyncTask<Long, Integer, Boolean>() {
+        final AsyncTask<Long,Integer,Boolean> deleteTask = new AsyncTask<Long, Integer, Boolean>() {
             @Override
             protected Boolean doInBackground(Long... params) {
                 return networking.deleteReceipt(params[0]);
@@ -360,8 +399,12 @@ public class Model
                 super.onPostExecute(aBoolean);
 
                 if(aBoolean)
-                    if(_onDeleteReceiptListener!=null)
-                    _onDeleteReceiptListener.deleteSuccess();
+                    if(_onDeleteReceiptListener!=null) {
+                        _onDeleteReceiptListener.deleteSuccess();
+                        int index = getReceiptById((int)id);
+                        _receipts.remove(index);
+
+                    }
                 else
                     if(_onDeleteReceiptListener!=null)
                         _onDeleteReceiptListener.deleteFailed(networking.error);
@@ -370,6 +413,59 @@ public class Model
             }
         };
         deleteTask.execute(id);
+    }
+    public void DeleteReceiptImage(int id)
+    {
+        AsyncTask<Integer,Integer,Boolean> delete = new AsyncTask<Integer, Integer, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Integer... params) {
+                return networking.deleteReceiptImage(params[0]);
+            }
+
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                super.onPostExecute(aBoolean);
+                if(aBoolean)
+                {
+                    if(_onDeleteReceiptImageListener != null)
+                        _onDeleteReceiptImageListener.deleteSuccess();
+                }
+                else
+                {
+                    if(_onDeleteReceiptImageListener != null)
+                        _onDeleteReceiptImageListener.deleteFialed(networking.error);
+                }
+            }
+        };
+        delete.execute(id);
+    }
+    public void FillCategory(List<Item> item)
+    {
+        AsyncTask<List<Item>,Integer,Item[]> task = new AsyncTask<List<Item>, Integer, Item[]>() {
+            @Override
+            protected Item[] doInBackground(List<Item>... params) {
+                return networking.fillCategory(params[0]);
+            }
+
+            @Override
+            protected void onPostExecute(Item[] items) {
+                super.onPostExecute(items);
+                if(items!=null)
+                {
+                    List<Item> filledItems = new ArrayList<>();
+                    for(Item i: items)
+                        filledItems.add(i);
+                    if(_fillCategoryListener!=null)
+                        _fillCategoryListener.onFillSuccess(filledItems);
+                }
+                else
+                {
+                    if(_fillCategoryListener!=null)
+                        _fillCategoryListener.onFillFail(networking.error);
+                }
+            }
+        };
+        task.execute(item);
     }
     public void GetAllReceipt(int pageSize,final int pageCount)
     {
@@ -636,15 +732,18 @@ public class Model
     }
     public void GetReceiptImages(int id)
     {
-        AsyncTask<Integer,Integer,ReceiptImage[]> task = new AsyncTask<Integer, Integer, ReceiptImage[]>() {
+        final AsyncTask<Integer,Integer,ReceiptImage[]> task = new AsyncTask<Integer, Integer, ReceiptImage[]>() {
             @Override
             protected ReceiptImage[] doInBackground(Integer... params) {
-                return networking.getReceiptImages(params[0]);
+                ReceiptImage[] images = networking.getReceiptImages(params[0]);
+
+                return images;
             }
 
             @Override
             protected void onPostExecute(ReceiptImage[] receiptImages) {
                 super.onPostExecute(receiptImages);
+                taskQ.remove(this);
                 if(receiptImages!=null)
                 {
                     if(_getReceiptImageListener!=null)
@@ -657,8 +756,12 @@ public class Model
                 }
             }
         };
+        taskQ.addFirst(task);
+
         task.execute(id);
+
     }
+
     public void GetTotalReceiptCount(final Context c)
     {
         AsyncTask<String, Integer, Integer> task = new AsyncTask<String, Integer, Integer>() {
@@ -892,18 +995,16 @@ public class Model
     {
         switch (display){
 
-            case 1://week
-                break;
-            case 2://month
+            case 1://month
                 _displayReceipts = getCurrentMonthReceipt();
                 break;
-            case 3://year
+            case 2://year
                 _displayReceipts = getCurrentYearReceipt();
                 break;
-            case 4:
+            case 3:
                 _displayReceipts = _receipts;
                 break;
-            case 5://display return
+            case 4://display return
                 _displayReceipts = _returnReceipts;
                 break;
             default:

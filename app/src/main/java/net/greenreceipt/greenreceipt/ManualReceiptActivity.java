@@ -12,6 +12,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -38,6 +39,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -81,7 +83,7 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
     boolean switchOn=true;
     ArrayList<String> picturePaths;
     ReceiptImage[] images;
-
+    ArrayList<Integer> imageIds = new ArrayList<>();
     private ColorDrawable currentBgColor;
     private ActionBar actionBar;
 
@@ -230,8 +232,8 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
                                 receipt.SubTotal = subtotal;
                                 receipt.CreatedDate = new Date();
                                 receipt.PurchaseDate = new Date(date.getText().toString());
-                                receipt.picturePath = ManualReceiptActivity.this.picturePaths;
-                                receipt.ReceiptItems.addAll(items);
+//                                receipt.picturePath = ManualReceiptActivity.this.picturePaths;
+                                receipt.ReceiptItems=items;
                                 receipt.ReturnReminder = alertSwitch.isChecked();
                                 receipt.Total = receipt.SubTotal + receipt.Tax;
                                 receipt.CardType = payment.getSelectedItemPosition();
@@ -265,7 +267,7 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
                                 receipt.Tax = Double.parseDouble(tax.getText().toString());
                                 receipt.SubTotal = subtotal;
                                 receipt.PurchaseDate = new Date(date.getText().toString());
-                                receipt.picturePath = ManualReceiptActivity.this.picturePaths;
+//                                receipt.picturePath = ManualReceiptActivity.this.picturePaths;
                                 receipt.ReceiptItems=items;
                                 receipt.ReturnReminder = alertSwitch.isChecked();
                                 receipt.Total = receipt.SubTotal + receipt.Tax;
@@ -286,6 +288,13 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
                                 }
                             }
                             Model.getInstance().AddReceipt(receipt,images);
+                            if (bitmap != null && !bitmap.isRecycled())
+                            {
+                                bitmap.recycle();
+                                bitmap = null;
+                                System.gc();
+                            }
+
 
 
 
@@ -408,6 +417,7 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
                 all.putStringArrayListExtra("paths",picturePaths);
                 if(original!=null)
                 all.putExtra("id",original.Id);
+                all.putExtra("imageIds",imageIds);
 //                if(images!=null)
 //                all.putExtra("images",gson.toJson(images,ReceiptImage[].class));
                 startActivity(all);
@@ -457,7 +467,27 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
                 if(picturePaths == null)
                     picturePaths = new ArrayList<>();
                 picturePaths.add(imageFilePath.getPath());
-                image1.setImageURI(imageFilePath);
+                ExifInterface ei = null;
+                try {
+                    ei = new ExifInterface(imageFilePath.getPath());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+                BitmapFactory.Options o2 = new BitmapFactory.Options();
+                o2.inSampleSize=8;
+                switch(orientation) {
+                    case ExifInterface.ORIENTATION_ROTATE_90:
+                        bitmap = BitmapFactory.decodeFile(imageFilePath.getPath(),o2);
+                        image1.setImageBitmap(Helper.RotateBitmap(bitmap, 90));
+                        break;
+                    case ExifInterface.ORIENTATION_ROTATE_180:
+                        bitmap = BitmapFactory.decodeFile(imageFilePath.getPath(),o2);
+                        image1.setImageBitmap(Helper.RotateBitmap(bitmap, 180));
+                        break;
+                    // etc.
+                }
+//                image1.setImageURI(imageFilePath);
                 break;
             case SELECT_FILE: {
                 Uri imageUri = data.getData();
@@ -520,6 +550,7 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
         return result;
     }
 
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -530,7 +561,7 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
                 spinner.dismiss();
                 Intent intent = new Intent(getBaseContext(),ListReceiptActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-                intent.putExtra(Model.RECEIPT_FILTER,4);
+                intent.putExtra(Model.RECEIPT_FILTER,Model.SHOW_ALL);
                 startActivity(intent);
                 finish();
             }
@@ -557,12 +588,16 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
     protected void onPause() {
 
         super.onPause();
+        Model.getInstance().setAddReceiptListener(null);
 
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        Model.getInstance().setAddReceiptListener(null);
+
+
 //        if (bitmap != null && !bitmap.isRecycled())
 //        {
 //            bitmap.recycle();
@@ -600,24 +635,39 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
         if(receiptString != null) {
             try {
                 original = gson.fromJson(receiptString, Receipt.class);
-                Model.getInstance().setGetReceiptImageListener(new Model.GetReceiptImageListener() {
-                    @Override
-                    public void onGetImageSuccess(ReceiptImage[] images) {
-                        ManualReceiptActivity.this.images = images;
-                        if(picturePaths.isEmpty() && images.length>0)
-                        {
-                            byte[] decodedString = Base64.decode(images[0].Base64Image,Base64.NO_WRAP);
-                            bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                            image1.setImageBitmap(bitmap);
+                imageIds = getIntent().getIntegerArrayListExtra("imageIds");
+                if(imageIds==null || imageIds.isEmpty()) {
+                    Model.getInstance().setGetReceiptImageListener(new Model.GetReceiptImageListener() {
+                        @Override
+                        public void onGetImageSuccess(ReceiptImage[] images) {
+                            ManualReceiptActivity.this.images = images;
+                            if (picturePaths.isEmpty() && images.length > 0) {
+                                byte[] decodedString = Base64.decode(images[0].Base64Image, Base64.NO_WRAP);
+                                bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                                float degree = Exif.getOrientation(decodedString);
+                                bitmap = Helper.RotateBitmap(bitmap, degree);
+                                image1.setImageBitmap(bitmap);
+                            }
+                            for (ReceiptImage image : images) {
+                                imageIds.add(image.Id);
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onGetImageFailed(String error) {
+                        @Override
+                        public void onGetImageFailed(String error) {
 
-                    }
-                });
-                Model.getInstance().GetReceiptImages(original.Id);
+                        }
+                    });
+                    Model.getInstance().GetReceiptImages(original.Id);
+                }
+                else
+                {
+                    byte[] imageBytes = loadImageBytesFromCache(original.Id,imageIds.get(0));
+                    float degree = Exif.getOrientation(imageBytes);
+                    bitmap = BitmapFactory.decodeByteArray(imageBytes,0,imageBytes.length);
+                    bitmap = Helper.RotateBitmap(bitmap, degree);
+                    image1.setImageBitmap(bitmap);
+                }
                 SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
 //                image = new ReceiptImage();
 //                if(images!=null && images.length>0)
@@ -631,6 +681,8 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
 //                    image.Base64Image = Base64.encodeToString(imageBytes, Base64.NO_WRAP);
 //                    image.FileName = "image.jpg";
                     bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+                    float degree = Exif.getOrientation(imageBytes);
+                    bitmap = Helper.RotateBitmap(bitmap, degree);
                     image1.setImageBitmap(bitmap);
                 }
 
@@ -753,4 +805,22 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
 
         startActivityForResult(intent, TAKE_PICTURE);
     }
+    private byte[] loadImageBytesFromCache(int ReceiptId, int ImageId)
+    {
+        try
+        {
+            String filename = "Receipt"+ReceiptId+"Image"+ ImageId+".jpg";
+            File image = new File(getCacheDir(),filename);
+            byte[] imageBytes = new byte[(int)image.length()];
+            FileInputStream fis = new FileInputStream(image);
+            fis.read(imageBytes,0,(int)image.length());
+            fis.close();
+            return imageBytes;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+
+    }
+
 }

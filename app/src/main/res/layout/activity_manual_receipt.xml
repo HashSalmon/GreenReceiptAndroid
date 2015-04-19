@@ -153,25 +153,41 @@
 
 <LinearLayout
     android:layout_width="match_parent"
+    android:layout_height="100dp"
+    android:orientation="horizontal"
+    android:gravity="right"
+    android:layout_marginTop="10dp">
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"></LinearLayout>
+<LinearLayout
+    android:layout_width="0dp"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
-
+    android:layout_weight="1"
+    android:gravity="center">
     <ImageView
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:layout_weight="5"
         android:id="@+id/image1"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
+        android:layout_gravity="center_horizontal"
         android:scaleType="centerCrop"/>
+    </LinearLayout>
 
-    <ImageView
-        android:layout_marginTop="10dp"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
-        android:id="@+id/camera"
-        android:src="@drawable/ic_action_camera"
-        android:layout_gravity="center"/>
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:gravity="center">
+        <ImageView
+            android:layout_marginTop="10dp"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:id="@+id/camera"
+            android:src="@drawable/ic_action_camera"
+            android:layout_gravity="center"/>
+        </LinearLayout>
+
     </LinearLayout>
 
         <TextView
@@ -183,6 +199,8 @@
             android:textSize="18dp"
             android:textColor="@color/light_blue"
             android:layout_gravity="center"/>
+            <!---->
+
 
     <LinearLayout
         android:layout_weight="45"

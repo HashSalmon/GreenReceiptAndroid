@@ -4,13 +4,15 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.util.Log;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.widget.ImageView;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-
 import net.greenreceipt.greenreceipt.R;
+
+import java.io.IOException;
 
 /**
  * Created by Boya on 2/12/15.
@@ -44,5 +46,31 @@ public class Helper
 
         dialog.show();
     }
+    public static Bitmap rotatePicture(String filePath, Bitmap bitmap)
+    {
+        ExifInterface ei = null;
+        try {
+            ei = new ExifInterface(filePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
 
+        switch(orientation) {
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                bitmap = BitmapFactory.decodeFile(filePath);
+                return RotateBitmap(bitmap, 90);
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                bitmap = BitmapFactory.decodeFile(filePath);
+                return RotateBitmap(bitmap, 180);
+            // etc.
+        }
+        return bitmap;
+    }
+    public static Bitmap RotateBitmap(Bitmap source, float angle)
+    {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
+    }
 }

@@ -11,6 +11,6 @@ public class Item
     public double Price;
     public int Id;
     public Date CreatedDate = new Date();
-    public Category Category = new Category();
+    public Category Category = null;
 
 }

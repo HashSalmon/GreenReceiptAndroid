@@ -112,7 +112,7 @@ public class Networking {
             HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
             HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
             HttpClient client = new DefaultHttpClient(httpParameters);
-            HttpPost request = new HttpPost(BASE_URL + " api/UserAccountId/UpdatePushNotificationId?pushNotificationId="+PushNotificationId);
+            HttpPost request = new HttpPost(BASE_URL + "api/UserAccountId/UpdatePushNotificationId?pushNotificationId="+PushNotificationId);
             request.addHeader("Authorization","Bearer "+Model._token);
 
             HttpResponse response = client.execute(request);
@@ -733,6 +733,63 @@ public class Networking {
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
             UserAccountId[] ids = gson.fromJson(responseString, UserAccountId[].class);
             return ids;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            error = e.getMessage();
+            return null;
+        }
+    }
+    public boolean deleteReceiptImage(int id)
+    {
+        try {
+            error = "";
+            HttpParams httpParameters = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+            HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+            HttpClient client = new DefaultHttpClient(httpParameters);
+            HttpDelete request = new HttpDelete(BASE_URL + "api/Image?id="+id);
+            request.addHeader("Authorization","Bearer "+Model._token);
+
+            HttpResponse response = client.execute(request);
+
+            return response.getStatusLine().getStatusCode()==200;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            error = e.getMessage();
+            return false;
+        }
+    }
+    public Item[] fillCategory(List<Item> receiptItems)
+    {
+        try {
+            error = "";
+            HttpParams httpParameters = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+            HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+            HttpClient client = new DefaultHttpClient(httpParameters);
+            HttpPost request = new HttpPost(BASE_URL + "api/ReceiptItem/FillCategories");
+            request.addHeader("Content-Type", "application/json");
+            request.addHeader("Authorization","Bearer "+Model._token);
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
+            String jsonString = gson.toJson(receiptItems);
+            StringEntity entity = new StringEntity(jsonString);
+            request.setEntity(entity);
+            HttpResponse response = client.execute(request);
+
+            InputStream responseContent = response.getEntity().getContent();
+            Scanner responseScanner = new Scanner(responseContent).useDelimiter("\\A");
+            String responseString = responseScanner.hasNext() ? responseScanner.next() : null;
+            if(responseString == null || response.getStatusLine().getStatusCode() != 200)
+            {
+                error = "Bad call";
+                return null;
+            }
+
+            Item[] items = gson.fromJson(responseString, Item[].class);
+
+            return items;
         }
         catch (Exception e) {
             e.printStackTrace();

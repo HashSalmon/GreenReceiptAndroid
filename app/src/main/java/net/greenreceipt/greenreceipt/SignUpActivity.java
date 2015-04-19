@@ -103,10 +103,17 @@ public class SignUpActivity extends ActionBarActivity {
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    boolean canRegister = checkInput();
                     spinner = ProgressDialog.show(SignUpActivity.this, null, "Registering...");
                     if(checkPlayServices()){
 
                             registerInBackground();
+
+                    }
+                    else
+                    {
+                        Model.getInstance().Register(email.getText().toString(),firstname.getText().toString(),
+                            lastname.getText().toString(),password.getText().toString(),confirm.getText().toString(),username.getText().toString(),regId);
 
                     }
 
@@ -188,5 +195,15 @@ public class SignUpActivity extends ActionBarActivity {
     protected void onResume() {
         super.onResume();
         checkPlayServices();
+    }
+    private boolean checkInput()
+    {
+        boolean canRegister = true;
+        if(!password.getText().toString().equals(confirm.getText().toString()))
+            canRegister = false;
+        if(password.getText().toString().length()<8)
+            canRegister = false;
+
+        return canRegister;
     }
 }

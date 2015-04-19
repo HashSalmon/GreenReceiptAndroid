@@ -4,10 +4,10 @@
     android:layout_width="120dp"
     android:layout_height="120dp"
     android:id="@+id/picture"
-    android:background="@color/primary_accent_color"
+    android:background="@color/white"
     android:scaleType="centerCrop"
-    android:paddingLeft="2dp"
-    android:paddingTop="2dp"
-    android:paddingBottom="2dp"
-    android:paddingRight="2dp"/>
+    android:layout_marginTop="2dp"
+    android:layout_marginBottom="2dp"
+    android:layout_marginRight="2dp"
+    android:layout_marginLeft="2dp"/>
 

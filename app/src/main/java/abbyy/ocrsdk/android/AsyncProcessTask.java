@@ -1,13 +1,16 @@
 package abbyy.ocrsdk.android;
 
-import java.io.FileOutputStream;
-
-import com.abbyy.ocrsdk.*;
-
-import android.app.*;
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+
+import com.abbyy.ocrsdk.Client;
+import com.abbyy.ocrsdk.ProcessingSettings;
+import com.abbyy.ocrsdk.Task;
+
+import java.io.FileOutputStream;
 
 public class AsyncProcessTask extends AsyncTask<String, String, Boolean> {
 
@@ -130,7 +133,7 @@ public class AsyncProcessTask extends AsyncTask<String, String, Boolean> {
 		} catch (Exception e) {
 			final String message = "Error: " + e.getMessage();
 			publishProgress( message);
-			activity.createReceipt(message);
+//			activity.createReceipt(message);
 			return false;
 		}
 	}

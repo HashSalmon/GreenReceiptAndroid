@@ -15,7 +15,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -42,10 +41,7 @@ public class LoginActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        if(checkPlayServices())
-        {
-            registerInBackground();
-        }
+
         SharedPreferences pref = getApplicationContext().getSharedPreferences("GreenReceipt", 0); // 0 - for private mode
         if(pref.getString("token","")!="")//user is logged in
         {
@@ -57,6 +53,10 @@ public class LoginActivity extends Activity {
             Model.getInstance()._currentUser.UserAccountId=pref.getString("Account","");
             Intent checkReturnIntent = new Intent(this,CheckReturnService.class);
             startService(checkReturnIntent);
+            if(checkPlayServices())
+            {
+                registerInBackground();
+            }
             Intent home = new Intent(getBaseContext(),HomeActivity.class);
             startActivity(home);
             finish();
@@ -79,12 +79,24 @@ public class LoginActivity extends Activity {
         {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_login);
-
+            if(checkPlayServices())
+            {
+                registerInBackground();
+            }
             Model.getInstance().setOnLoginListener(new Model.OnLoginListener() {
                 @Override
                 public void onLoginSuccess() {
                     spinner.dismiss();
-                    Model.getInstance().GetUserAcountId();
+                    Model.getInstance().GetUserAccountId();
+                    Model.getInstance().setGetAccountIdListener(new Model.GetAccountIdListener() {
+                        @Override
+                        public void onGetAccountIdSuccess(String id) {
+                            SharedPreferences pref = getApplicationContext().getSharedPreferences("GreenReceipt", 0); // 0 - for private mode
+                            SharedPreferences.Editor editor = pref.edit();
+                            editor.putString("Account",Model.getInstance()._currentUser.UserAccountId);
+                            editor.commit();
+                        }
+                    });
                     if(keepUser.isChecked())//keep user session if asked
                     {
                         SharedPreferences pref = getApplicationContext().getSharedPreferences("GreenReceipt", 0); // 0 - for private mode
@@ -93,7 +105,7 @@ public class LoginActivity extends Activity {
                         editor.putString("FirstName", Model.getInstance()._currentUser.FirstName);
                         editor.putString("LastName", Model.getInstance()._currentUser.LastName);
                         editor.putString("Email", Model.getInstance()._currentUser.Email);
-                        editor.putString("Account",Model.getInstance()._currentUser.UserAccountId);
+
                         editor.commit();
                     }
                     Intent checkReturnIntent = new Intent(LoginActivity.this,CheckReturnService.class);
@@ -120,8 +132,8 @@ public class LoginActivity extends Activity {
                     dialog.show();
                 }
             });
-            ImageView logo = (ImageView) findViewById(R.id.logo);
-            logo.setImageResource (R.drawable.logo);
+//            ImageView logo = (ImageView) findViewById(R.id.logo);
+//            logo.setImageResource (R.drawable.logo);
             login = (Button) findViewById(R.id.loginButton);
             username = (EditText) findViewById(R.id.usernameField);
             password = (EditText) findViewById(R.id.passwordField);

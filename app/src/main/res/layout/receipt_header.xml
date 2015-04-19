@@ -11,7 +11,12 @@
         android:layout_height="100dp"
         android:src="@drawable/placeholder"
         android:id="@+id/image"
-        android:scaleType="centerCrop"/>
+        android:scaleType="centerCrop"
+        android:visibility="visible"/>
+    <!--<ProgressBar-->
+        <!--android:layout_width="100dp"-->
+        <!--android:layout_height="100dp"-->
+        <!--android:id="@+id/progressBar"/>-->
     <TextView
         android:layout_width="0dp"
         android:layout_height="match_parent"

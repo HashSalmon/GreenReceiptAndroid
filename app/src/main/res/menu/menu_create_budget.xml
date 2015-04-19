@@ -6,5 +6,5 @@
         android:title="Add"
         android:orderInCategory="100"
         app:showAsAction="always"
-        android:icon="@drawable/ic_action_new2"/>
+        android:icon="@drawable/ic_action_new_white"/>
 </menu>

@@ -35,7 +35,7 @@
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:id="@+id/logo"
-            android:src="@drawable/logo"
+            android:src="@drawable/greenreceiptsmall"
             android:layout_centerHorizontal="true"/>
 
 

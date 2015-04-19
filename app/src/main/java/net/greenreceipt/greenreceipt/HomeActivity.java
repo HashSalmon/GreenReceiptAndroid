@@ -99,7 +99,7 @@ public class HomeActivity extends ActionBarActivity{
             @Override
             public void onClick(View v) {
                 Intent list = new Intent(HomeActivity.this,ListReceiptActivity.class);
-                list.putExtra(Model.RECEIPT_FILTER,4);
+                list.putExtra(Model.RECEIPT_FILTER,Model.SHOW_ALL);
                 startActivity(list);
             }
         });
@@ -107,7 +107,7 @@ public class HomeActivity extends ActionBarActivity{
             @Override
             public void onClick(View v) {
                 Intent list = new Intent(HomeActivity.this,ListReceiptActivity.class);
-                list.putExtra(Model.RECEIPT_FILTER,2);
+                list.putExtra(Model.RECEIPT_FILTER,Model.SHOW_THIS_MONTH);
                 startActivity(list);
             }
         });

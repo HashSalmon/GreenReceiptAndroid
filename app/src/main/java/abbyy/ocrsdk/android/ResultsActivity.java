@@ -27,6 +27,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,6 +59,19 @@ public class ResultsActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+        Model.getInstance().setFillCategoryListener(new Model.FillCategoryListener() {
+            @Override
+            public void onFillSuccess(List<Item> items) {
+                itemsList = (ArrayList) items;
+                createReceipt();
+            }
+
+            @Override
+            public void onFillFail(String error) {
+                Helper.AlertBox(ResultsActivity.this,"Error","Failed To fill category, please select category manually");
+                createReceipt();
+            }
+        });
 		Model.getInstance().setAddReceiptListener(new Model.AddReceiptListener() {
             @Override
             public void addReceiptSuccess() {
@@ -115,7 +129,7 @@ public class ResultsActivity extends Activity {
                 {
                     if (!foundStoreName)
                     {
-                        storeName = text;
+                        storeName = text.trim();
                         foundStoreName = true;
 //                        getStoreName(text.toLowerCase());
                     }
@@ -141,9 +155,9 @@ public class ResultsActivity extends Activity {
 
 
 
-			createReceipt(null);
+			Model.getInstance().FillCategory(itemsList);
 		} catch (Exception e) {
-			createReceipt("Error: " + e.getMessage());
+			Model.getInstance().FillCategory(itemsList);
 		}
 	}
     public void isItem(String str)
@@ -223,7 +237,7 @@ public class ResultsActivity extends Activity {
         }
         catch (Exception e)
         {
-            Helper.AlertBox(this,"Error",e.getMessage());
+//            Helper.AlertBox(this,"Error",e.getMessage());
         }
     }
     public String getStoreName()
@@ -231,17 +245,17 @@ public class ResultsActivity extends Activity {
         return this.storeName;
     }
 
-    private void getStoreName(String contents)
-    {
-        for (String s : StoreNames.storeNames())
-        {
-            if (contents.contains(s))
-            {
-                this.storeName = s;
-                this.foundStoreName = true;
-            }
-        }
-    }
+//    private void getStoreName(String contents)
+//    {
+//        for (String s : StoreNames.storeNames())
+//        {
+//            if (contents.contains(s))
+//            {
+//                this.storeName = s;
+//                this.foundStoreName = true;
+//            }
+//        }
+//    }
 
     public String getTotalAmount()
     {
@@ -316,15 +330,17 @@ public class ResultsActivity extends Activity {
     }
 
 	
-	public void createReceipt(String text)
+	public void createReceipt()
 	{
-        if(text!=null)
-		tv.post( new MessagePoster( text ) );
-        else
-        {
+//        if(text!=null)
+//		tv.post( new MessagePoster( text ) );
+//        else
+//        {
+            Receipt r = new Receipt();
+            ArrayList<String> images = new ArrayList<>();
             try {
 //                spinner = ProgressDialog.show(ResultsActivity.this,null,"Working...");
-                Receipt r = new Receipt();
+
                 r.Store.Company.Name = getStoreName();
                 r.CreatedDate = new Date();
                 Pair<Double,Double> location = Model.getInstance().getCurrentLocation(this);
@@ -335,7 +351,7 @@ public class ResultsActivity extends Activity {
                 r.total = getTotalAmount().trim();
                 r.tax = getTotalTax().trim();
                 r.ReceiptItems = itemsList;
-                ArrayList<String> images = new ArrayList<>();
+
                 images.add(imageUrl);
                 Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
                 String receiptString = gson.toJson(r,Receipt.class);
@@ -349,11 +365,18 @@ public class ResultsActivity extends Activity {
             catch (Exception e)
             {
 //                spinner.dismiss();
-                Helper.AlertBox(this,"Error",e.getMessage());
+                Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
+                String receiptString = gson.toJson(r,Receipt.class);
+                Intent newReceiptIntent = new Intent(this, ManualReceiptActivity.class);
+                newReceiptIntent.putExtra("receipt",receiptString);
+                newReceiptIntent.putExtra("path",images);
+                startActivity(newReceiptIntent);
+                finish();
+//                Helper.AlertBox(this,"Error",e.getMessage());
             }
 
 
-        }
+//        }
 	}
 	
 	@Override

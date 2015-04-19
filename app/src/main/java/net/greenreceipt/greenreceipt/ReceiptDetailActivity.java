@@ -34,12 +34,17 @@ import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.EnumMap;
 import java.util.Map;
+
+import Util.Helper;
 
 
 public class ReceiptDetailActivity extends ActionBarActivity implements ListAdapter {
@@ -53,12 +58,15 @@ public class ReceiptDetailActivity extends ActionBarActivity implements ListAdap
     ProgressDialog spinner;
     boolean deleted = false;
     boolean editing = false;
+    boolean changed = false;
     private ActionBar actionBar;
     private ColorDrawable currentBgColor;
     private BroadcastReceiver receiver;
     Bitmap decodedByte;
     ImageView picture;
     ReceiptImage[] receiptImages;
+    byte[] decodedString;
+    ArrayList<Integer> imageIds = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,7 +94,12 @@ public class ReceiptDetailActivity extends ActionBarActivity implements ListAdap
                     spinner.dismiss();
                 deleted = true;
                 Intent list = new Intent(getBaseContext(),ListReceiptActivity.class);
-                list.putExtra(Model.RECEIPT_FILTER,4);
+                list.putExtra(Model.RECEIPT_FILTER,Model.SHOW_ALL);
+                if(decodedByte != null && !decodedByte.isRecycled())
+                {
+                    decodedByte.recycle();
+                    decodedByte = null;
+                }
                 startActivity(list);
                 finish();
             }
@@ -102,12 +115,26 @@ public class ReceiptDetailActivity extends ActionBarActivity implements ListAdap
             public void onGetImageSuccess(ReceiptImage[] images) {
                 if(images.length > 0) {
                     receiptImages = images;
-                    byte[] decodedString = Base64.decode(images[0].Base64Image,Base64.NO_WRAP);
-                    decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                    decodedString = Base64.decode(images[0].Base64Image,Base64.NO_WRAP);
+                    BitmapFactory.Options o2 = new BitmapFactory.Options();
+                    o2.inSampleSize=8;
+                    decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length,o2);
                     picture.setImageBitmap(decodedByte);
                     picture.invalidate();
 
                     list.invalidateViews();
+                }
+                else
+                {
+                    picture.setImageResource(R.drawable.placeholder);
+                    picture.invalidate();
+                    list.invalidate();
+                }
+                for(ReceiptImage i: images)
+                {
+                    byte[] bytes = Base64.decode(i.Base64Image,Base64.NO_WRAP);
+                    cachePicture(bytes,i.ReceiptId,i.Id);
+                    imageIds.add(i.Id);
                 }
             }
 
@@ -137,7 +164,15 @@ public class ReceiptDetailActivity extends ActionBarActivity implements ListAdap
                 Intent intent = new Intent(this,ManualReceiptActivity.class);
                 intent.putExtra("receipt",gson.toJson(receipt,Receipt.class));
                 intent.putExtra("mode","Edit");
+                intent.putIntegerArrayListExtra("imageIds",imageIds);
 //                intent.putExtra("images",gson.toJson(receiptImages,ReceiptImage[].class));
+                if(Model.getInstance().taskQ.size()>0)
+                Model.getInstance().taskQ.removeFirst().cancel(true);
+                if(decodedByte != null && !decodedByte.isRecycled())
+                {
+                    decodedByte.recycle();
+                    decodedByte = null;
+                }
                 startActivity(intent);
                 editing = true;
                 finish();
@@ -145,6 +180,7 @@ public class ReceiptDetailActivity extends ActionBarActivity implements ListAdap
             case R.id.delete:
                 spinner = ProgressDialog.show(this,null,"Deleting...");
                 Model.getInstance().DeleteReceipt(receipt.Id);
+
                 return true;
 
         }
@@ -210,37 +246,18 @@ public class ReceiptDetailActivity extends ActionBarActivity implements ListAdap
                 public void onClick(View v) {
                     Intent all = new Intent(ReceiptDetailActivity.this,PictureListActivity.class);
                     all.putExtra("id",receipt.Id);
+                    all.putIntegerArrayListExtra("imageIds", imageIds);
+                    if(Model.getInstance().taskQ.size()>0)
+                        Model.getInstance().taskQ.removeFirst().cancel(true);
                     startActivity(all);
                 }
             });
             if(decodedByte!=null)
-                picture.setImageBitmap(decodedByte);
-            else
             {
+                int degree = Exif.getOrientation(decodedString);
+                picture.setImageBitmap(Helper.RotateBitmap(decodedByte,degree));
 
             }
-//            if(receipt.Store.Company.Name.equals("ARBY'S")) {
-//                image.setImageResource(R.drawable.arby);
-//                image.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        Intent intent = new Intent(ReceiptDetailActivity.this,FullScreenImageActivity.class);
-//                        intent.putExtra("resource",R.drawable.arby);
-//                        startActivity(intent);
-//                    }
-//                });
-//            }
-//            else
-//            {
-//                image.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        Intent intent = new Intent(ReceiptDetailActivity.this,FullScreenImageActivity.class);
-//                        intent.putExtra("resource",R.drawable.ic_action_camera);
-//                        startActivity(intent);
-//                    }
-//                });
-//            }
         }
 
         else if(position == 1)//alert
@@ -253,6 +270,7 @@ public class ReceiptDetailActivity extends ActionBarActivity implements ListAdap
             alert.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    changed = true;
                     receipt.ReturnReminder = isChecked;
                     if(isChecked) {//if turn on alert, force user to pick a date
                         final Calendar c = Calendar.getInstance();
@@ -477,7 +495,9 @@ public class ReceiptDetailActivity extends ActionBarActivity implements ListAdap
     @Override
     protected void onPause() {
         super.onPause();
-        if(!deleted && !editing)
+        if(!Model.getInstance().taskQ.isEmpty())
+            Model.getInstance().taskQ.removeFirst().cancel(true);
+        if(!deleted && changed && !editing)
         Model.getInstance().AddReceipt(receipt,null);//update if not deleted
 //        if(decodedByte!=null)
 //        decodedByte.recycle();
@@ -529,5 +549,20 @@ public class ReceiptDetailActivity extends ActionBarActivity implements ListAdap
         }
         return null;
     }
+    private void cachePicture(byte[] imageBytes, int receiptId, int imageId)
+    {
+        try{
+            String FILENAME = "Receipt"+receiptId+"Image"+imageId+".jpg";
+            File image = new File(getCacheDir(),FILENAME);
+            image.setReadable(true);
+            FileOutputStream fos = new FileOutputStream(image);
+            fos.write(imageBytes);
+            fos.close();
 
+        }
+        catch (Exception e)
+        {
+
+        }
+    }
 }

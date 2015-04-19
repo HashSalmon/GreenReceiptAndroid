@@ -38,11 +38,11 @@
         android:paddingTop="15dp"
         android:paddingBottom="10dp"/>
     <ImageView
-        android:src="@drawable/logo"
+        android:src="@drawable/greenreceiptsmall"
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:layout_gravity="center"
-        android:id="@+id/logo"
+        android:id="@+id/greenReceiptNumber"
         android:paddingBottom="10dp"/>
     <EditText
         android:layout_weight="10"
@@ -75,8 +75,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Keep me logged in"
+        
         android:id="@+id/keeplogin"
-        android:textColor="@color/white"/>
+        android:textColor="@color/black"/>
     <TextView
         android:text="Forgot Password?"
         android:layout_width="match_parent"
