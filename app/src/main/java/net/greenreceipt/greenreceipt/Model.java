@@ -110,7 +110,7 @@ public class Model
 
     }
     public interface FillCategoryListener{
-        public void onFillSuccess(List<Item> items);
+        public void onFillSuccess(List<Item> items, boolean unknown);
         public void onFillFail(String error);
     }
 
@@ -118,6 +118,7 @@ public class Model
     public static final String RECEIPT_FILTER="filter";
     public static final int SHOW_RETURN_RECEIPTS = 4;
     public static final int SHOW_THIS_YEAR = 2;
+    public static final int SHOW_ALL_REFRESH = 5;
     public static final int SHOW_THIS_MONTH = 1;
     public static final int SHOW_ALL = 3;
     public static final String[] PAYMENT_TYPES = {
@@ -281,7 +282,7 @@ public class Model
     }
     public void Logout(Context context)
     {
-        SharedPreferences pref = context.getSharedPreferences("GreenReceipt", 0); // 0 - for private mode
+        SharedPreferences pref = context.getSharedPreferences("GreenReceipt", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
         editor.clear();
         editor.commit();
@@ -341,12 +342,12 @@ public class Model
             @Override
             protected void onPostExecute(Boolean aBoolean) {
                 super.onPostExecute(aBoolean);
-                if(_registerUserListener!=null) {
-                    if (aBoolean)
-                        _registerUserListener.userRegistered();
-                    else
-                        _registerUserListener.userRegisterFailed();
-                }
+//                if(_registerUserListener!=null) {
+//                    if (aBoolean)
+//                        _registerUserListener.userRegistered();
+//                    else
+//                        _registerUserListener.userRegisterFailed();
+//                }
             }
         };
         registerTask.execute(NotificationId);
@@ -402,6 +403,7 @@ public class Model
                     if(_onDeleteReceiptListener!=null) {
                         _onDeleteReceiptListener.deleteSuccess();
                         int index = getReceiptById((int)id);
+                        if(index > -1)
                         _receipts.remove(index);
 
                     }
@@ -453,10 +455,14 @@ public class Model
                 if(items!=null)
                 {
                     List<Item> filledItems = new ArrayList<>();
-                    for(Item i: items)
+                    boolean unknown = false;
+                    for(Item i: items) {
                         filledItems.add(i);
+                        if(i.Category==null)
+                            unknown = true;
+                    }
                     if(_fillCategoryListener!=null)
-                        _fillCategoryListener.onFillSuccess(filledItems);
+                        _fillCategoryListener.onFillSuccess(filledItems,unknown);
                 }
                 else
                 {

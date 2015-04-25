@@ -117,27 +117,28 @@ public class CreateBudgetActivity extends ActionBarActivity {
                 TextView name = (TextView) view.findViewById(R.id.name);
                 name.setText(categoryPicker.getCurrentValue());
                 EditText displayLimit = (EditText) view.findViewById(R.id.limit);
-                displayLimit.setText(limit.getText().toString());
-                Button delete = (Button) view.findViewById(R.id.delete);
-                delete.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        container.removeView((ViewGroup) v.getParent().getParent());
-                        container.invalidate();
-                    }
-                });
-                BudgetItem item = new BudgetItem();
-                int index = categoryPicker.getCurrent();
-                String s = categoryPicker.getCurrentValue();
-                if(Model.getInstance().categories !=null)
-                item.Category = Model.getInstance().categories[categoryPicker.getCurrent()];
-                item.AmountAllowed = Double.parseDouble(limit.getText().toString());
-                item.AmountUsed = 0;
-                items.add(item);
-                container.addView(view);
-                if(save.getVisibility() == View.GONE)
-                    save.setVisibility(View.VISIBLE);
+                if(!limit.getText().toString().isEmpty()) {
+                    displayLimit.setText(limit.getText().toString());
+                    Button delete = (Button) view.findViewById(R.id.delete);
+                    delete.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            int index = container.indexOfChild((ViewGroup) v.getParent().getParent());
+                            items.remove(index);
+                            container.removeView((ViewGroup) v.getParent().getParent());
+                            container.invalidate();
+                        }
+                    });
+                    BudgetItem item = new BudgetItem();
+                    if (Model.getInstance().categories != null)
+                        item.Category = Model.getInstance().categories[categoryPicker.getCurrent()];
+                    item.AmountAllowed = Double.parseDouble(limit.getText().toString());
+                    item.AmountUsed = 0;
+                    items.add(item);
+                    container.addView(view);
+                    if (save.getVisibility() == View.GONE)
+                        save.setVisibility(View.VISIBLE);
+                }
 
             }
         });

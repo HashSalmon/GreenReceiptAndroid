@@ -61,9 +61,26 @@ public class ResultsActivity extends Activity {
 		super.onCreate(savedInstanceState);
         Model.getInstance().setFillCategoryListener(new Model.FillCategoryListener() {
             @Override
-            public void onFillSuccess(List<Item> items) {
+            public void onFillSuccess(List<Item> items, boolean unknown) {
                 itemsList = (ArrayList) items;
-                createReceipt();
+                if(unknown) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(ResultsActivity.this);
+                    builder.setTitle("Category");
+                    builder.setMessage("Failed to find category for one or more item.\nYou may select a category manually, or your item will be saved using 'Unknown' category.");
+                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            createReceipt();
+                        }
+                    });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                }
+                else
+                {
+                    createReceipt();
+                }
+
             }
 
             @Override
@@ -160,37 +177,13 @@ public class ResultsActivity extends Activity {
 			Model.getInstance().FillCategory(itemsList);
 		}
 	}
+
+    /**
+     * parse for item
+     * @param str
+     */
     public void isItem(String str)
     {
-//        try {
-//
-//            String pattern = "(\\w+\\s)+(\\s)+\\$?(\\d)+.(\\d)+";
-//
-//            Pattern r = Pattern.compile(pattern);
-//            Matcher match = r.matcher(str);
-//
-//            if (match.find()) {
-//                String itemNamePattern = "(\\w+\\s)+";
-//                Pattern p1 = Pattern.compile(itemNamePattern);
-//                Matcher m1 = p1.matcher(str);
-//
-//                if (m1.find()) {
-//                    String itemName = str.substring(m1.start(), m1.end()).trim();
-//                    String itemPrice = str.substring(m1.end()).trim();
-//                    double price = Double.parseDouble(itemPrice.substring(1));
-//                    Item item = new Item();
-//                    item.ItemName = itemName;
-//                    item.Price = price;
-//                    itemsList.add(item);
-//                    sum += sum;
-//                    System.out.println("Item Name: " + itemName + "\n" + "Item Price: " + itemPrice);
-//                }
-//            }
-//        }
-//        catch (Exception e)
-//        {
-//            Helper.AlertBox(this,"Error",e.getMessage());
-//        }
         // BestBuy, Costco, Walmart, 7-11, Smith, Liquor store, Nordstrom rack, Mimis cafe
         try {
             String generalPattern = "(\\w+\\s)+(\\s)*\\$?(\\d)+.(\\d)+(\\s)?(R)?((\\s)*\\(?(\\d)+.(\\d)+\\)?)?";

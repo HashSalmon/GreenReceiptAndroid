@@ -20,7 +20,9 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -136,7 +138,8 @@ public class Networking {
             HttpPost request = new HttpPost(BASE_URL + "api/Receipt");
             request.addHeader("Content-Type", "application/json");
             request.addHeader("Authorization","Bearer "+Model._token);
-            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").serializeNulls().create();
+
             String jsonString = gson.toJson(r);
             StringEntity entity = new StringEntity(jsonString);
             request.setEntity(entity);
@@ -148,7 +151,7 @@ public class Networking {
                 return null;
 
             final Receipt receipt = gson.fromJson(responseString,Receipt.class);
-            if(images!=null && images.size()>0) {
+            if(receipt!=null &&images!=null && images.size()>0) {
 
                 for(final ReceiptImage image:images) {
                     new AsyncTask<ReceiptImage,Integer,Boolean>(){
@@ -532,9 +535,24 @@ public class Networking {
 
             HttpResponse response = client.execute(request);
 
-            InputStream responseContent = response.getEntity().getContent();
-            Scanner responseScanner = new Scanner(responseContent);
-            String responseString = responseScanner.hasNext() ? responseScanner.next() : null;
+            String responseString = null;
+            try
+            {
+                InputStream responseContent = response.getEntity().getContent();
+                InputStreamReader is = new InputStreamReader(responseContent);
+                //StringBuilder sb=new StringBuilder();
+                BufferedReader br = new BufferedReader(is);
+                responseString = br.readLine();
+            }
+            catch(Exception e)
+            {
+                error = e.getMessage();
+                return null;
+            }
+
+
+            //Scanner responseScanner = new Scanner(responseContent);
+           // String responseString = responseScanner.hasNext() ? responseScanner.next() : null;
             if(responseString == null || response.getStatusLine().getStatusCode() != 200)
             {
                 error = "Bad call";

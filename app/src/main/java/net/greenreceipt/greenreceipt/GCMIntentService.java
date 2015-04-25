@@ -6,6 +6,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 
@@ -15,7 +17,6 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
  * An {@link IntentService} subclass for handling asynchronous task requests in
  * a service on a separate handler thread.
  * <p/>
- * TODO: Customize class - update intent actions, extra parameters and static
  * helper methods.
  */
 public class GCMIntentService extends IntentService {
@@ -25,6 +26,7 @@ public class GCMIntentService extends IntentService {
         super("GcmIntentService");
     }
     NotificationCompat.Builder builder;
+    Bitmap bitmap;
     /**
      * Creates an IntentService.  Invoked by your subclass's constructor.
      *
@@ -50,8 +52,8 @@ public class GCMIntentService extends IntentService {
                         + extras.toString());
             } else if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE
                     .equals(messageType)) {
-                sendNotification("Message Received from Google GCM Server:\n\n"
-                        + extras.get(ApplicationConstants.MSG_KEY));
+
+                sendNotification(extras.containsKey("message") ? extras.getString("message") : "New Receipt");
             }
         }
         NotificationReceiver.completeWakefulIntent(intent);
@@ -59,7 +61,7 @@ public class GCMIntentService extends IntentService {
 
     private void sendNotification(String msg) {
         Intent resultIntent = new Intent(this, ListReceiptActivity.class);
-        resultIntent.putExtra(Model.RECEIPT_FILTER, 4);
+        resultIntent.putExtra(Model.RECEIPT_FILTER, Model.SHOW_ALL);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0,
                 resultIntent, PendingIntent.FLAG_ONE_SHOT);
 
@@ -67,11 +69,12 @@ public class GCMIntentService extends IntentService {
         NotificationManager mNotificationManager;
 
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
+        bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.greenreceiptsmall);
         mNotifyBuilder = new NotificationCompat.Builder(this)
                 .setContentTitle("New Receipt Received")
-                .setContentText(msg)
-                .setSmallIcon(R.drawable.logo);
+                .setLargeIcon(bitmap)
+                .setSmallIcon(R.drawable.greenreceiptsmall);
+
         // Set pending intent
         mNotifyBuilder.setContentIntent(resultPendingIntent);
 
@@ -83,10 +86,11 @@ public class GCMIntentService extends IntentService {
 
         mNotifyBuilder.setDefaults(defaults);
         // Set the content for Notification
-        mNotifyBuilder.setContentText("New Receipt");
+        mNotifyBuilder.setContentText(msg);
         // Set autocancel
         mNotifyBuilder.setAutoCancel(true);
         // Post a notification
         mNotificationManager.notify(notifyID, mNotifyBuilder.build());
     }
+
 }

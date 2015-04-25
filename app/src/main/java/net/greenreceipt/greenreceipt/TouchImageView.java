@@ -1,6 +1,6 @@
 package net.greenreceipt.greenreceipt;
 /**
- * Michael Ortiz
+ * Credit to Michael Ortiz
  */
 import android.content.Context;
 import android.graphics.Matrix;

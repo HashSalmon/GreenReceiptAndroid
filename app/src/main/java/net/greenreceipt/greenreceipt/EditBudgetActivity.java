@@ -72,13 +72,19 @@ public class EditBudgetActivity extends ActionBarActivity {
                 delete.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        View p = (View) v.getParent().getParent();
-                        int position = p.getId();
-                        BudgetItem b = Model.getInstance().currentBudget.BudgetItems.get(position);
-                        deleted.add(b.Id);
                         changed = true;
+                        int index = container.indexOfChild((ViewGroup) v.getParent().getParent());
+                        BudgetItem b = Model.getInstance().currentBudget.BudgetItems.get(index);
+                        deleted.add(b.Id);
+                        Model.getInstance().currentBudget.BudgetItems.remove(index);
+                        container.removeView((ViewGroup) v.getParent().getParent());
+                        container.invalidate();
+//                        View p = (View) v.getParent().getParent();
+//                        int position = p.getId();
+
+
 //                        Model.getInstance().DeleteBudgetItem(id,EditBudgetActivity.this);
-                        container.removeView(p);
+
 //                        copy.remove(position);
 
                     }
@@ -150,10 +156,17 @@ public class EditBudgetActivity extends ActionBarActivity {
                             delete.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    View p = (View) v.getParent().getParent();
-                                    int position = p.getId();
-                                    int id = Model.getInstance().currentBudget.BudgetItems.get(position).Id;
-                                    Model.getInstance().currentBudget.BudgetItems.remove(position);
+//                                    View p = (View) v.getParent().getParent();
+//                                    int position = p.getId();
+//                                    int id = Model.getInstance().currentBudget.BudgetItems.get(position).Id;
+
+
+                                    int index = container.indexOfChild((ViewGroup) v.getParent().getParent());
+                                    BudgetItem b = Model.getInstance().currentBudget.BudgetItems.get(index);
+                                    deleted.add(b.Id);
+                                    Model.getInstance().currentBudget.BudgetItems.remove(index);
+                                    container.removeView((ViewGroup) v.getParent().getParent());
+                                    container.invalidate();
 //                                    Model.getInstance().DeleteBudgetItem(id,EditBudgetActivity.this);
 
 //                        container.removeView(p);
@@ -184,17 +197,9 @@ public class EditBudgetActivity extends ActionBarActivity {
                 name.setText(editName.getCurrentValue());
                 EditText displayLimit = (EditText) view.findViewById(R.id.limit);
                 displayLimit.setText(limit.getText().toString());
-                Button delete = (Button) view.findViewById(R.id.delete);
-                delete.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        container.removeView((ViewGroup) v.getParent().getParent());
-                        container.invalidate();
-                    }
-                });
+                BudgetItem item=null;
                 try {
-                    BudgetItem item = new BudgetItem();
+                    item = new BudgetItem();
                     if (Model.getInstance().categories != null)
                         item.Category = Model.getInstance().categories[editName.getCurrent()];
                     item.AmountAllowed = Double.parseDouble(limit.getText().toString());
@@ -208,6 +213,17 @@ public class EditBudgetActivity extends ActionBarActivity {
                 {
                     e.printStackTrace();
                 }
+                Button delete = (Button) view.findViewById(R.id.delete);
+                final BudgetItem finalItem = item;
+                delete.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int index = container.indexOfChild((ViewGroup) v.getParent().getParent());
+                        items.remove(finalItem);
+                        container.removeView((ViewGroup) v.getParent().getParent());
+                        container.invalidate();
+                    }
+                });
 
             }
         });
@@ -217,6 +233,7 @@ public class EditBudgetActivity extends ActionBarActivity {
         editName = (StringPicker) add.findViewById(R.id.name);
         if(Model.getInstance().categories != null)
         {
+            categoryList.clear();;
             for(Category c: Model.getInstance().categories)
                 categoryList.add(c.Name);
         }
@@ -237,7 +254,15 @@ public class EditBudgetActivity extends ActionBarActivity {
             EditText allowed = (EditText) l.getChildAt(0);
             Model.getInstance().currentBudget.BudgetItems.get(i).AmountAllowed = Double.parseDouble(allowed.getText().toString());
         }
+        for(int i = Model.getInstance().currentBudget.BudgetItems.size();i<items.size()+Model.getInstance().currentBudget.BudgetItems.size();i++)
+        {
+            LinearLayout v = (LinearLayout) container.getChildAt(i);
+            LinearLayout l = (LinearLayout)v.getChildAt(1);
+            EditText allowed = (EditText) l.getChildAt(0);
+            int index = i-Model.getInstance().currentBudget.BudgetItems.size();
+            items.get(index).AmountAllowed = Double.parseDouble(allowed.getText().toString());
 
+        }
             Model.getInstance().SaveBudgetItems(Model.getInstance().currentBudget.BudgetItems, this);
             Model.getInstance().SaveBudgetItems(items, this);
             Model.getInstance().DeleteBudgetItems(deleted,this);

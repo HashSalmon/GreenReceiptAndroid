@@ -6,7 +6,6 @@ import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -78,7 +77,6 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
     ImageView image1;
     ImageView camera;
     String mode = "Add";
-    int imageCount=0;
     int Id = 0;
     boolean switchOn=true;
     ArrayList<String> picturePaths;
@@ -90,7 +88,6 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
     private final int TAKE_PICTURE = 0;
     private final int SELECT_FILE = 1;
     private String resultUrl = "result.txt";
-//    private String picturePath;
     Bitmap bitmap;
     Receipt original;
 
@@ -100,18 +97,12 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manual_receipt);
         if(picturePaths == null)
-        picturePaths = new ArrayList<String>();
-        Resources resources = getResources();
-        ColorDrawable bgColorPrimary = new ColorDrawable(resources.getColor(R.color.primary_accent_color));
-        ColorDrawable bgColorSecondary = new ColorDrawable(resources.getColor(R.color.secondary_title_background));
-        currentBgColor = bgColorPrimary;
+        picturePaths = new ArrayList<>();
+        //set up action bar
         Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
         this.setSupportActionBar(tb);
         tb.setTitleTextColor(Color.WHITE);
         actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setBackgroundDrawable(currentBgColor);
-        }
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
@@ -121,19 +112,13 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
                 categoryList.add(c.Name);
         }
         itemsPurchased = (TextView) findViewById(R.id.itemsPurchased);
-//        category = (TextView) findViewById(R.id.category);
 
-
-
-
-
-//        ImageView categoryIcon = (ImageView) findViewById(R.id.categoryIcon);
-//        categoryIcon.setImageResource(R.drawable.ic_action_labels);
         itemContainer = (LinearLayout) findViewById(R.id.itemContainer);
         lastFour = (EditText) findViewById(R.id.lastFour);
         storeName = (EditText) findViewById(R.id.store);
         alertSwitch = (Switch) findViewById(R.id.alertSwitch);
 
+        //popup date selector when switched on
         alertSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -203,7 +188,7 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
         tax = (EditText) findViewById(R.id.tax);
         returnDate = (TextView) findViewById(R.id.returnAlert);
         add = (Button) findViewById(R.id.addButton);
-
+        //handles add receipt
         if(add!=null)
             add.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -221,6 +206,7 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
                         try {
                             Receipt receipt = new Receipt();
                             List<ReceiptImage> images = new ArrayList<ReceiptImage>();
+                            //new receipt
                             if(mode.equals("Add")) {
                                 spinner = ProgressDialog.show(ManualReceiptActivity.this, null, "Processing...");
                                 spinner.setCanceledOnTouchOutside(true);
@@ -255,6 +241,7 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
 
                                 }
                             }
+                            //edit receipt
                             else
                             {
                                 receipt = original;
@@ -287,6 +274,7 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
 
                                 }
                             }
+                            //pictures
                             Model.getInstance().AddReceipt(receipt,images);
                             if (bitmap != null && !bitmap.isRecycled())
                             {
@@ -329,12 +317,13 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
                             remove.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-
+                                    //handle delete
                                     int index = itemContainer.indexOfChild((View) v.getParent().getParent());
                                     itemContainer.removeViewAt(index);
                                     items.remove(index);
                                 }
                             });
+                            //create item and add to list and view
                             final Item item = new Item();
                             item.ItemName = itemName.getText().toString();
                             item.Price = Double.parseDouble(itemPrice.getText().toString());
@@ -363,11 +352,12 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
                 itemPrice = (EditText) add.findViewById(R.id.price);
                 categoryPicker = (StringPicker) add.findViewById(R.id.category);
 
-                categoryPicker.setValues(categoryList);
+                //set category picker values
                 if(categoryList.size()==0)
                 {
                     categoryList.add("");
                 }
+                categoryPicker.setValues(categoryList);
                 AlertDialog addDialog = builder.create();
                 addDialog.show();
             }
@@ -438,10 +428,10 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
 
         File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES), "GreenReceipt");
-        // This location works best if you want the created images to be shared
-        // between applications and persist after your app has been uninstalled.
-
-        // Create the storage directory if it does not exist
+//        // This location works best if you want the created images to be shared
+//        // between applications and persist after your app has been uninstalled.
+//
+//        // Create the storage directory if it does not exist
         if (! mediaStorageDir.exists()){
             if (! mediaStorageDir.mkdirs()){
                 return null;
@@ -449,10 +439,17 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
         }
 
         // Create a media file name
-        File mediaFile = new File(mediaStorageDir.getPath() + File.separator + "image"+picturePaths.size()+".jpg" );
+        File mediaFile = new File(mediaStorageDir+ File.separator + "image"+picturePaths.size()+".jpg" );
 
         return mediaFile;
     }
+
+    /**
+     * handle take picture finished
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -509,6 +506,14 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
 //        startActivity(results);
     }
 
+    /**
+     * validation for receipt
+     * @param store
+     * @param date
+     * @param tax
+     * @param items
+     * @return
+     */
     private boolean checkReceipt(EditText store, EditText date, EditText tax, List items)
     {
         boolean result = true;
@@ -554,11 +559,17 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
     @Override
     protected void onResume() {
         super.onResume();
+        //register callback
         Model.getInstance().setAddReceiptListener(new Model.AddReceiptListener() {
             @Override
             public void addReceiptSuccess() {
                 if(spinner!=null)
                 spinner.dismiss();
+                for(String s:picturePaths)
+                {
+                    File f = new File(s);
+                    f.delete();
+                }
                 Intent intent = new Intent(getBaseContext(),ListReceiptActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
                 intent.putExtra(Model.RECEIPT_FILTER,Model.SHOW_ALL);
@@ -616,6 +627,10 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
         startActivityForResult(intent, TAKE_PICTURE);
 
     }
+
+    /**
+     * Prefill the fields
+     */
     public void preFill()
     {
 //        ReceiptImage image = null;
@@ -636,14 +651,16 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
             try {
                 original = gson.fromJson(receiptString, Receipt.class);
                 imageIds = getIntent().getIntegerArrayListExtra("imageIds");
-                if(imageIds==null || imageIds.isEmpty()) {
+                if(imageIds==null || imageIds.isEmpty()) {//load from server
                     Model.getInstance().setGetReceiptImageListener(new Model.GetReceiptImageListener() {
                         @Override
                         public void onGetImageSuccess(ReceiptImage[] images) {
                             ManualReceiptActivity.this.images = images;
                             if (picturePaths.isEmpty() && images.length > 0) {
                                 byte[] decodedString = Base64.decode(images[0].Base64Image, Base64.NO_WRAP);
-                                bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                                BitmapFactory.Options o2 = new BitmapFactory.Options();
+                                o2.inSampleSize=8;
+                                bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length,o2);
                                 float degree = Exif.getOrientation(decodedString);
                                 bitmap = Helper.RotateBitmap(bitmap, degree);
                                 image1.setImageBitmap(bitmap);
@@ -660,11 +677,13 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
                     });
                     Model.getInstance().GetReceiptImages(original.Id);
                 }
-                else
+                else//load from cache
                 {
                     byte[] imageBytes = loadImageBytesFromCache(original.Id,imageIds.get(0));
                     float degree = Exif.getOrientation(imageBytes);
-                    bitmap = BitmapFactory.decodeByteArray(imageBytes,0,imageBytes.length);
+                    BitmapFactory.Options o2 = new BitmapFactory.Options();
+                    o2.inSampleSize=8;
+                    bitmap = BitmapFactory.decodeByteArray(imageBytes,0,imageBytes.length,o2);
                     bitmap = Helper.RotateBitmap(bitmap, degree);
                     image1.setImageBitmap(bitmap);
                 }
@@ -680,7 +699,9 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
                     byte[] imageBytes = Model.getInstance().getByteArrayFromImage(picturePaths.get(0));
 //                    image.Base64Image = Base64.encodeToString(imageBytes, Base64.NO_WRAP);
 //                    image.FileName = "image.jpg";
-                    bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+                    BitmapFactory.Options o2 = new BitmapFactory.Options();
+                    o2.inSampleSize=8;
+                    bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length,o2);
                     float degree = Exif.getOrientation(imageBytes);
                     bitmap = Helper.RotateBitmap(bitmap, degree);
                     image1.setImageBitmap(bitmap);
@@ -721,13 +742,15 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
                     });
                     view.setBackgroundColor(Color.WHITE);
 
+
+                    itemContainer.addView(view);
                     view.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
+                            int finalJ = itemContainer.indexOfChild(v);
                             editItem(finalJ);
                         }
                     });
-                    itemContainer.addView(view);
                     itemsPurchased.setTextColor(Color.GRAY);
                 }
             }
@@ -737,6 +760,11 @@ public class ManualReceiptActivity extends ActionBarActivity implements View.OnC
             }
         }
     }
+
+    /**
+     * make items editable
+     * @param itemIndex
+     */
     public void editItem(int itemIndex)
     {
         final int finalJ = itemIndex;

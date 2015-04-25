@@ -69,15 +69,18 @@ public class SummaryActivity extends ActionBarActivity {
         tabs = (PagerSlidingTabStrip) findViewById(R.id.tabs);
         tabs.setTextColor(Color.WHITE);
         tabs.setViewPager(pager);
+
+        //setup drawer and actionbar
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         nav_options = getResources().getStringArray(R.array.nav_array);
-        DrawerItem[] drawerItem = new DrawerItem[5];
+        DrawerItem[] drawerItem = new DrawerItem[nav_options.length];
 
         drawerItem[0] = new DrawerItem(R.drawable.ic_menu_home, nav_options[0]);
         drawerItem[1] = new DrawerItem(R.drawable.ic_action_new, nav_options[1]);
         drawerItem[2] = new DrawerItem(R.drawable.ic_action_labels, nav_options[2]);
         drawerItem[3] = new DrawerItem(R.drawable.ic_action_place, nav_options[3]);
-        drawerItem[4] = new DrawerItem(R.drawable.ic_action_settings, nav_options[4]);
+        drawerItem[4] = new DrawerItem(R.drawable.ic_action_location_searching, nav_options[4]);
+        drawerItem[5] = new DrawerItem(R.drawable.ic_action_settings, nav_options[5]);
         drawer = (ListView) findViewById(R.id.drawer);
         LayoutInflater lf = this.getLayoutInflater();
         View headerView = (View)lf.inflate(R.layout.drawer_header, drawer, false);
@@ -101,4 +104,13 @@ public class SummaryActivity extends ActionBarActivity {
         drawerLayout.setDrawerListener(toggle);
         toggle.syncState();
     }
+    @Override
+    public void onBackPressed() {
+        if (drawerLayout.isDrawerOpen(drawer)) {
+            drawerLayout.closeDrawer(drawer);
+        } else {
+            super.onBackPressed();
+        }
+    }
 }
+

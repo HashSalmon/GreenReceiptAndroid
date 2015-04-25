@@ -55,51 +55,43 @@ public class LoginActivity extends Activity {
             startService(checkReturnIntent);
             if(checkPlayServices())
             {
-                registerInBackground();
+                registerInBackground();//register for gcm.
             }
             Intent home = new Intent(getBaseContext(),HomeActivity.class);
             startActivity(home);
             finish();
         }
-
-//        Model instance = Model.getInstance ();
-
-//        if(instance.getReceiptFile() == null){
-//            File file = new File(getFilesDir(), "ReceiptFile1.txt");
-//            instance.setReceiptFile(file);
-//        }
-
-//        if (instance.userLoggedIn())
-//        {
-//            Intent home = new Intent(getBaseContext(),HomeActivity.class);
-//            startActivity(home);
-//            finish();
-//        }
         else
         {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_login);
-            if(checkPlayServices())
-            {
-                registerInBackground();
-            }
+            String email = getIntent().getStringExtra("email");
+
             Model.getInstance().setOnLoginListener(new Model.OnLoginListener() {
                 @Override
                 public void onLoginSuccess() {
                     spinner.dismiss();
+                    if(checkPlayServices())
+                    {
+                        registerInBackground();//register for gcm
+                    }
                     Model.getInstance().GetUserAccountId();
                     Model.getInstance().setGetAccountIdListener(new Model.GetAccountIdListener() {
                         @Override
                         public void onGetAccountIdSuccess(String id) {
-                            SharedPreferences pref = getApplicationContext().getSharedPreferences("GreenReceipt", 0); // 0 - for private mode
-                            SharedPreferences.Editor editor = pref.edit();
-                            editor.putString("Account",Model.getInstance()._currentUser.UserAccountId);
-                            editor.commit();
+                            if(keepUser.isChecked())//keep user session if asked
+                            {
+                                SharedPreferences pref = getApplicationContext().getSharedPreferences("GreenReceipt", MODE_PRIVATE); // 0 - for private mode
+
+                                SharedPreferences.Editor editor = pref.edit();
+                                editor.putString("Account", Model.getInstance()._currentUser.UserAccountId);
+                                editor.commit();
+                            }
                         }
                     });
                     if(keepUser.isChecked())//keep user session if asked
                     {
-                        SharedPreferences pref = getApplicationContext().getSharedPreferences("GreenReceipt", 0); // 0 - for private mode
+                        SharedPreferences pref = getApplicationContext().getSharedPreferences("GreenReceipt", MODE_PRIVATE); // 0 - for private mode
                         SharedPreferences.Editor editor = pref.edit();
                         editor.putString("token", Model._token);
                         editor.putString("FirstName", Model.getInstance()._currentUser.FirstName);
@@ -136,6 +128,8 @@ public class LoginActivity extends Activity {
 //            logo.setImageResource (R.drawable.logo);
             login = (Button) findViewById(R.id.loginButton);
             username = (EditText) findViewById(R.id.usernameField);
+            if(email!=null)
+            username.setText(email);
             password = (EditText) findViewById(R.id.passwordField);
             keepUser = (CheckBox) findViewById(R.id.keeplogin);
             Button signup = (Button) findViewById(R.id.signupButton);

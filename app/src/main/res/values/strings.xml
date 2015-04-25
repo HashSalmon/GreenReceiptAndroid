@@ -54,7 +54,9 @@
         <item>Add Receipt</item>
         <item>View Receipts</item>
         <item>Reports and Budget</item>
+        <item>View Receipts On Map</item>
         <item>Settings</item>
+
     </string-array>
 
     <string name="drawer_open">Open navigation drawer</string>

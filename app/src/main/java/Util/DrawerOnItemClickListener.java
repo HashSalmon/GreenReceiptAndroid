@@ -9,6 +9,7 @@ import android.widget.ListView;
 
 import net.greenreceipt.greenreceipt.HomeActivity;
 import net.greenreceipt.greenreceipt.ListReceiptActivity;
+import net.greenreceipt.greenreceipt.MapActivity;
 import net.greenreceipt.greenreceipt.Model;
 import net.greenreceipt.greenreceipt.NewReceiptActivity;
 import net.greenreceipt.greenreceipt.SettingsActivity;
@@ -67,13 +68,19 @@ public class DrawerOnItemClickListener implements AdapterView.OnItemClickListene
                     context.startActivity(summary);
                 }
                     break;
-
             case 5:
-                if(selected!=5) {
+                if(selected !=5){
+                    Intent map = new Intent(context, MapActivity.class);
+                    context.startActivity(map);
+                }
+                    break;
+            case 6:
+                if(selected!=6) {
                     Intent settings = new Intent(context, SettingsActivity.class);
                     context.startActivity(settings);
                 }
                     break;
+
 
         }
         drawer.setItemChecked(position,true);

@@ -12,6 +12,9 @@ import com.abbyy.ocrsdk.Task;
 
 import java.io.FileOutputStream;
 
+/**
+ * Abbyy sample code
+ */
 public class AsyncProcessTask extends AsyncTask<String, String, Boolean> {
 
 	public AsyncProcessTask(ResultsActivity activity) {

@@ -1,8 +1,10 @@
 package net.greenreceipt.greenreceipt;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.DataSetObserver;
 import android.graphics.Bitmap;
@@ -72,7 +74,7 @@ public class ReceiptDetailActivity extends ActionBarActivity implements ListAdap
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_receipt_detail);
 
-
+        //setup actionbar
         Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
         this.setSupportActionBar(tb);
         tb.setTitleTextColor(Color.WHITE);
@@ -95,6 +97,7 @@ public class ReceiptDetailActivity extends ActionBarActivity implements ListAdap
                 deleted = true;
                 Intent list = new Intent(getBaseContext(),ListReceiptActivity.class);
                 list.putExtra(Model.RECEIPT_FILTER,Model.SHOW_ALL);
+                //recycle bitmap
                 if(decodedByte != null && !decodedByte.isRecycled())
                 {
                     decodedByte.recycle();
@@ -143,7 +146,7 @@ public class ReceiptDetailActivity extends ActionBarActivity implements ListAdap
 
             }
         });
-        Model.getInstance().GetReceiptImages(receipt.Id);
+
     }
 
     @Override
@@ -163,7 +166,7 @@ public class ReceiptDetailActivity extends ActionBarActivity implements ListAdap
                 Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
                 Intent intent = new Intent(this,ManualReceiptActivity.class);
                 intent.putExtra("receipt",gson.toJson(receipt,Receipt.class));
-                intent.putExtra("mode","Edit");
+                intent.putExtra("mode","Save");
                 intent.putIntegerArrayListExtra("imageIds",imageIds);
 //                intent.putExtra("images",gson.toJson(receiptImages,ReceiptImage[].class));
                 if(Model.getInstance().taskQ.size()>0)
@@ -178,8 +181,25 @@ public class ReceiptDetailActivity extends ActionBarActivity implements ListAdap
                 finish();
                 return true;
             case R.id.delete:
-                spinner = ProgressDialog.show(this,null,"Deleting...");
-                Model.getInstance().DeleteReceipt(receipt.Id);
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Delete Receipt");
+                builder.setMessage("Are you sure you want to delete this receipt?");
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        spinner = ProgressDialog.show(ReceiptDetailActivity.this, null, "Deleting...");
+                        Model.getInstance().DeleteReceipt(receipt.Id);
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
 
                 return true;
 
@@ -433,7 +453,7 @@ public class ReceiptDetailActivity extends ActionBarActivity implements ListAdap
             }
 
         }
-        else{
+        else{//items purchased
             Item item = receipt.getItem(position - 2);
 
             view =View.inflate(this, R.layout.listitem_nodivider, null);
@@ -490,6 +510,9 @@ public class ReceiptDetailActivity extends ActionBarActivity implements ListAdap
     protected void onResume() {
         super.onResume();
         list.invalidateViews();
+        if(receiptImages==null || receiptImages.length==0)
+        Model.getInstance().GetReceiptImages(receipt.Id);
+
     }
 
     @Override
@@ -504,7 +527,7 @@ public class ReceiptDetailActivity extends ActionBarActivity implements ListAdap
     }
     private static final int WHITE = 0xFFFFFFFF;
     private static final int BLACK = 0xFF000000;
-
+    //barcode, credit to zxing
     Bitmap encodeAsBitmap(String contents, BarcodeFormat format, int img_width, int img_height) throws WriterException {
         String contentsToEncode = contents;
         if (contentsToEncode == null) {
@@ -553,7 +576,7 @@ public class ReceiptDetailActivity extends ActionBarActivity implements ListAdap
     {
         try{
             String FILENAME = "Receipt"+receiptId+"Image"+imageId+".jpg";
-            File image = new File(getCacheDir(),FILENAME);
+            File image = new File(getFilesDir(),FILENAME);
             image.setReadable(true);
             FileOutputStream fos = new FileOutputStream(image);
             fos.write(imageBytes);
@@ -565,4 +588,5 @@ public class ReceiptDetailActivity extends ActionBarActivity implements ListAdap
 
         }
     }
+
 }

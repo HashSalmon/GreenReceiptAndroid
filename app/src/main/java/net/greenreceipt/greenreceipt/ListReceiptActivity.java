@@ -2,7 +2,6 @@ package net.greenreceipt.greenreceipt;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -24,6 +23,7 @@ import android.widget.TextView;
 import com.telerik.widget.list.LoadOnDemandBehavior;
 import com.telerik.widget.list.RadListView;
 import com.telerik.widget.list.SwipeExecuteBehavior;
+import com.telerik.widget.list.SwipeRefreshBehavior;
 
 import Util.DrawerAdapter;
 import Util.DrawerItem;
@@ -69,12 +69,11 @@ public class ListReceiptActivity extends ActionBarActivity {
         Model.getInstance().setGetReceiptListener(new Model.GetReceiptListener() {
             @Override
             public void getReceiptSuccess() {
-//                Model.getInstance().changeDisplayReceipts(filter);
                 spinner.dismiss();
                 Model.getInstance().changeDisplayReceipts(filter);
                 adapter.setItems(Model.getInstance()._displayReceipts);
-//                adapter.notifyDataSetChanged();
                 adapter.notifyLoadingFinished();
+                adapter.notifyRefreshFinished();
             }
 
             @Override
@@ -85,7 +84,8 @@ public class ListReceiptActivity extends ActionBarActivity {
         });
         Model.getInstance().resetCurrentPage();
         Model.getInstance().GetAllReceipt(Model.pageSize,1);
-    spinner = ProgressDialog.show(this, null, "Loading...");
+        //setup list and adapter
+        spinner = ProgressDialog.show(this, null, "Loading...");
         list = (RadListView) findViewById(R.id.list);
         adapter = new ListAdapter(Model.getInstance()._displayReceipts);
         list.setAdapter(adapter);
@@ -103,6 +103,7 @@ public class ListReceiptActivity extends ActionBarActivity {
 
             }
         });
+        //setup behaviors
         SwipeExecuteBehavior swipeExecuteBehavior = new SwipeExecuteBehavior();
         list.addBehavior(swipeExecuteBehavior);
         LoadOnDemandBehavior loadOnDemandBehavior = new LoadOnDemandBehavior();
@@ -122,18 +123,32 @@ public class ListReceiptActivity extends ActionBarActivity {
                 };
 
         loadOnDemandBehavior.addListener(loadOnDemandListener);
+        SwipeRefreshBehavior swipeRefreshBehavior = new SwipeRefreshBehavior();
+        list.addBehavior(swipeRefreshBehavior);
+        SwipeRefreshBehavior.SwipeRefreshListener swipeRefreshListener =
+                new SwipeRefreshBehavior.SwipeRefreshListener() {
+
+                    @Override
+                    public void onRefreshRequested() {
+                        Model.getInstance().resetCurrentPage();
+                        Model.getInstance().GetAllReceipt(Model.pageSize,1);
+//                        adapter.notifyRefreshFinished();
+                    }
+                };
+        swipeRefreshBehavior.addListener(swipeRefreshListener);
 //        loadOnDemandBehavior.setMode(LoadOnDemandBehavior.LoadOnDemandMode.AUTOMATIC);
 //        loadOnDemandBehavior.setMaxRemainingItems(5);
-
+        //setup drawer and actionbar
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         nav_options = getResources().getStringArray(R.array.nav_array);
-        DrawerItem[] drawerItem = new DrawerItem[5];
+        DrawerItem[] drawerItem = new DrawerItem[nav_options.length];
 
         drawerItem[0] = new DrawerItem(R.drawable.ic_menu_home, nav_options[0]);
         drawerItem[1] = new DrawerItem(R.drawable.ic_action_new, nav_options[1]);
         drawerItem[2] = new DrawerItem(R.drawable.ic_action_labels, nav_options[2]);
         drawerItem[3] = new DrawerItem(R.drawable.ic_action_place, nav_options[3]);
-        drawerItem[4] = new DrawerItem(R.drawable.ic_action_settings, nav_options[4]);
+        drawerItem[4] = new DrawerItem(R.drawable.ic_action_location_searching, nav_options[4]);
+        drawerItem[5] = new DrawerItem(R.drawable.ic_action_settings, nav_options[5]);
         drawer = (ListView) findViewById(R.id.drawer);
         LayoutInflater lf = this.getLayoutInflater();
         View headerView = (View)lf.inflate(R.layout.drawer_header, drawer, false);
@@ -143,17 +158,13 @@ public class ListReceiptActivity extends ActionBarActivity {
         drawer.setAdapter(new DrawerAdapter(this, R.layout.drawer_list_item, drawerItem, 2));
         drawer.setOnItemClickListener(new DrawerOnItemClickListener(this,drawerLayout,drawer,3));
 
-        Resources resources = getResources();
-        ColorDrawable bgColorPrimary = new ColorDrawable(resources.getColor(R.color.primary_accent_color));
-        currentBgColor = bgColorPrimary;
+
         Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
         tb.inflateMenu(R.menu.list_receipt);
         this.setSupportActionBar(tb);
         tb.setTitleTextColor(Color.WHITE);
         actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setBackgroundDrawable(currentBgColor);
-        }
+
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
@@ -164,7 +175,7 @@ public class ListReceiptActivity extends ActionBarActivity {
         drawerLayout.setDrawerListener(toggle);
         toggle.syncState();
 
-
+        //setup filters
         filters = (Spinner) findViewById(R.id.filters);
         final ArrayAdapter<String> filterAdapter = new ArrayAdapter<String>(
                 this, android.R.layout.simple_spinner_item, options);
@@ -235,7 +246,14 @@ public class ListReceiptActivity extends ActionBarActivity {
         return true;
     }
 
-
+    @Override
+    public void onBackPressed() {
+        if (drawerLayout.isDrawerOpen(drawer)) {
+            drawerLayout.closeDrawer(drawer);
+        } else {
+            super.onBackPressed();
+        }
+    }
 
     @Override
     protected void onResume() {
@@ -246,6 +264,10 @@ public class ListReceiptActivity extends ActionBarActivity {
 //        Model.getInstance().changeDisplayReceipts(filter);
         if(filter >= 0 && filter < options.length)//it's with in the option range
             filters.setSelection(filter);
+//        if(filter == 5) {
+//            spinner = ProgressDialog.show(this, null, "Loading...");
+//            Model.getInstance().GetAllReceipt(Model.pageSize, 1);
+//        }
         adapter.notifyDataSetChanged();
     }
 }

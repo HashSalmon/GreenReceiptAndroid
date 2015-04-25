@@ -12,8 +12,9 @@
         android:elevation="4dp"
         android:id="@+id/toolbar"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:background="@color/primary_accent_color"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="50dp">
         </android.support.v7.widget.Toolbar>
     <LinearLayout
         android:orientation="vertical"

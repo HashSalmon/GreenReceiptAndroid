@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -16,7 +17,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -24,6 +24,10 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import Util.Helper;
 
 
 public class SignUpActivity extends ActionBarActivity {
@@ -38,6 +42,7 @@ public class SignUpActivity extends ActionBarActivity {
     EditText password;
     EditText confirm;
     EditText username;
+    String validationError = "";
 
     public static final String REG_ID = "regId";
     GoogleCloudMessaging gcm;
@@ -47,7 +52,7 @@ public class SignUpActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
 
-
+        //actionbar setup
         Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
         this.setSupportActionBar(tb);
         tb.setTitleTextColor(Color.WHITE);
@@ -55,8 +60,6 @@ public class SignUpActivity extends ActionBarActivity {
 
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
-        ImageView logo = (ImageView) findViewById(R.id.logo);
-        logo.setImageResource(R.drawable.logo);
         email = (EditText) findViewById(R.id.emailField);
         firstname = (EditText) findViewById(R.id.firstNameField);
         lastname = (EditText) findViewById(R.id.lastNameField);
@@ -64,15 +67,19 @@ public class SignUpActivity extends ActionBarActivity {
         confirm = (EditText) findViewById(R.id.comfirmField);
         username = (EditText) findViewById(R.id.usernameField);
         Button button = (Button) findViewById(R.id.signupButton);
-
+        //set listener
         Model.getInstance().setRegisterUserListener(new Model.RegisterUserListener() {
             @Override
             public void userRegistered() {
+                if(spinner!=null)
                spinner.dismiss();
                 AlertDialog.Builder builder = new AlertDialog.Builder(SignUpActivity.this);
                 builder.setPositiveButton("OK",new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        Intent login = new Intent(SignUpActivity.this, LoginActivity.class);
+                        login.putExtra("email",email.getText().toString());
+                        startActivity(login);
                         finish();
                     }
                 });
@@ -93,28 +100,33 @@ public class SignUpActivity extends ActionBarActivity {
                     }
                 });
                 builder.setTitle("Oops...");
-                builder.setMessage("Registration failed! Please try again.");
+                builder.setMessage("Email already in use.");
                 AlertDialog dialog = builder.create();
                 dialog.show();
 
             }
         });
+        //Handle sign up button
         if(button != null)
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     boolean canRegister = checkInput();
-                    spinner = ProgressDialog.show(SignUpActivity.this, null, "Registering...");
-                    if(checkPlayServices()){
+                    if(canRegister) {
+                        spinner = ProgressDialog.show(SignUpActivity.this, null, "Registering...");
+                        if (checkPlayServices()) {
 
                             registerInBackground();
 
+                        } else {
+                            Model.getInstance().Register(email.getText().toString(), firstname.getText().toString(),
+                                    lastname.getText().toString(), password.getText().toString(), confirm.getText().toString(), username.getText().toString(), regId);
+
+                        }
                     }
                     else
                     {
-                        Model.getInstance().Register(email.getText().toString(),firstname.getText().toString(),
-                            lastname.getText().toString(),password.getText().toString(),confirm.getText().toString(),username.getText().toString(),regId);
-
+                        Helper.AlertBox(SignUpActivity.this,"Invalid input",validationError);
                     }
 
 //                    Model.getInstance().Register(email.getText().toString(),firstname.getText().toString(),
@@ -196,14 +208,65 @@ public class SignUpActivity extends ActionBarActivity {
         super.onResume();
         checkPlayServices();
     }
+
+    /**
+     * Validation
+     * @return
+     */
     private boolean checkInput()
     {
         boolean canRegister = true;
-        if(!password.getText().toString().equals(confirm.getText().toString()))
+        if(email.getText().toString().isEmpty())
+        {
             canRegister = false;
-        if(password.getText().toString().length()<8)
+            validationError = "Email is required!";
+            return canRegister;
+        }
+        if(username.getText().toString().isEmpty())
+        {
             canRegister = false;
+            validationError = "Username is required!";
+            return canRegister;
+        }
+        if(firstname.getText().toString().isEmpty())
+        {
+            canRegister = false;
+            validationError = "Firstname is required!";
+            return canRegister;
+        }
+        if(lastname.getText().toString().isEmpty())
+        {
+            canRegister = false;
+            validationError = "Lastname is required!";
+            return canRegister;
+        }
+        if(!password.getText().toString().equals(confirm.getText().toString())) {
+            canRegister = false;
+            validationError = "Passwords do not match!";
+            return canRegister;
+        }
 
-        return canRegister;
+        String pattern = "((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\\W]).{8,20})";
+
+        Pattern r = Pattern.compile(pattern);
+        Matcher match = r.matcher(password.getText().toString());
+
+        if (!match.matches())
+        {
+            validationError = "Passwords must be 8-20 characters in length.\nMust contain at least one number, one capital,one lower case, and one special character";
+            canRegister = false;
+            return canRegister;
+
+        }
+        pattern = "^[0-9a-zA-Z]+([0-9a-zA-Z]*[-._+])*[0-9a-zA-Z]+@[0-9a-zA-Z]+([-.][0-9a-zA-Z]+)*([0-9a-zA-Z]*[.])[a-zA-Z]{2,6}$";
+        r = Pattern.compile(pattern);
+        match = r.matcher(email.getText().toString());
+        if(!match.find())
+        {
+            canRegister = false;
+            validationError = "Please enter a valid email!";
+            return canRegister;
+        }
+;        return canRegister;
     }
 }

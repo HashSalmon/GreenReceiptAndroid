@@ -18,6 +18,8 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.android.gms.gcm.GoogleCloudMessaging;
+
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -29,6 +31,11 @@ import Util.DrawerOnItemClickListener;
 
 public class HomeActivity extends ActionBarActivity{
 
+
+    private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    public static final String REG_ID = "regId";
+    GoogleCloudMessaging gcm;
+    String regId = "";
 
     private ActionBar actionBar;
     private DrawerLayout drawerLayout;
@@ -46,16 +53,22 @@ public class HomeActivity extends ActionBarActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-
+//        if(checkPlayServices())
+//        {
+//            registerInBackground();
+//        }
+        //setup drawer and actionbar
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         nav_options = getResources().getStringArray(R.array.nav_array);
-        DrawerItem[] drawerItem = new DrawerItem[5];
+        DrawerItem[] drawerItem = new DrawerItem[nav_options.length];
 
         drawerItem[0] = new DrawerItem(R.drawable.ic_menu_home, nav_options[0]);
         drawerItem[1] = new DrawerItem(R.drawable.ic_action_new, nav_options[1]);
         drawerItem[2] = new DrawerItem(R.drawable.ic_action_labels, nav_options[2]);
         drawerItem[3] = new DrawerItem(R.drawable.ic_action_place, nav_options[3]);
-        drawerItem[4] = new DrawerItem(R.drawable.ic_action_settings, nav_options[4]);
+        drawerItem[4] = new DrawerItem(R.drawable.ic_action_location_searching, nav_options[4]);
+        drawerItem[5] = new DrawerItem(R.drawable.ic_action_settings, nav_options[5]);
+
         drawer = (ListView) findViewById(R.id.drawer);
         LayoutInflater lf = this.getLayoutInflater();
         View headerView = (View)lf.inflate(R.layout.drawer_header, drawer, false);
@@ -64,11 +77,6 @@ public class HomeActivity extends ActionBarActivity{
         drawer.addHeaderView(headerView);
         drawer.setAdapter(new DrawerAdapter(this, R.layout.drawer_list_item, drawerItem, 0));
         drawer.setOnItemClickListener(new DrawerOnItemClickListener(this, drawerLayout, drawer, 1));
-
-//        drawer.setMainContent(R.layout.main_content);
-//        drawer.setDrawerContent(R.layout.drawer_content);
-//        drawer.setDrawerSize(R.dimen.navigation_drawer_width);
-//        View main = View.inflate(this,R.layout.main_content,null);
 
         Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
         this.setSupportActionBar(tb);
@@ -84,6 +92,7 @@ public class HomeActivity extends ActionBarActivity{
         drawerLayout.setDrawerListener(toggle);
         toggle.syncState();
 
+        //set fields with handlers
         TextView date = (TextView) findViewById(R.id.date);
         TextView greeting = (TextView) findViewById(R.id.greeting);
         if(Model.getInstance()._currentUser!=null)
@@ -137,7 +146,7 @@ public class HomeActivity extends ActionBarActivity{
     @Override
     protected void onResume() {
         super.onResume();
-
+        //update dashboard
         receiver = new BroadcastReceiver()
         {
             @Override
@@ -193,7 +202,4 @@ public class HomeActivity extends ActionBarActivity{
 //        summary.invalidateViews();
 
     }
-
-
-
 }

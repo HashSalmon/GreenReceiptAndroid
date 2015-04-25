@@ -36,8 +36,9 @@ public class PictureListAdapter extends ListViewAdapter {
         PictureViewHolder viewHolder = (PictureViewHolder)holder;
         byte[] bytes = (byte[]) getItems().get(position);
         int degree = Exif.getOrientation(bytes);
-
-            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
+        BitmapFactory.Options o2 = new BitmapFactory.Options();
+        o2.inSampleSize=8;
+            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes,0,bytes.length,o2);
         bitmap = Helper.RotateBitmap(bitmap,degree);
 
             viewHolder.pic.setImageBitmap(bitmap);

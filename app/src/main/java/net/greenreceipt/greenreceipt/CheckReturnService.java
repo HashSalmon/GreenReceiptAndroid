@@ -33,7 +33,7 @@ public class CheckReturnService extends IntentService {
             public void returnDetected() {
                 //do notification here
                 NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(CheckReturnService.this);
-                mBuilder.setSmallIcon(R.drawable.logo);
+                mBuilder.setSmallIcon(R.drawable.greenreceiptsmall);
                 mBuilder.setContentTitle("Return Alert");
                 mBuilder.setContentText("You have upcoming return deadlines");
                 NotificationManager mNotificationManager =

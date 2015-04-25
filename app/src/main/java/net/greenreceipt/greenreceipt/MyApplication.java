@@ -10,14 +10,14 @@ public class MyApplication extends Application{
     public void onCreate ()
     {
 //        Setup handler for uncaught exceptions.
-//        Thread.setDefaultUncaughtExceptionHandler (new Thread.UncaughtExceptionHandler()
-//        {
-//            @Override
-//            public void uncaughtException (Thread thread, Throwable e)
-//            {
-//                handleUncaughtException (thread, e);
-//            }
-//        });
+        Thread.setDefaultUncaughtExceptionHandler (new Thread.UncaughtExceptionHandler()
+        {
+            @Override
+            public void uncaughtException (Thread thread, Throwable e)
+            {
+                handleUncaughtException (thread, e);
+            }
+        });
     }
 
     public void handleUncaughtException (Thread thread, Throwable e)
